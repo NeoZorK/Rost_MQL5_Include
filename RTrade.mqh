@@ -147,6 +147,7 @@ private:
    uint              m_bottle_size_emul;
    uint              m_one_bottle_size_emul;
    uint              m_all_bottle_size_emul;
+   double            m_comission_emul;
    //Caterpillar
 
    //Other   
@@ -183,9 +184,10 @@ private:
    char              m_EMUL_WhoFirst(const uint iter_start);
    //TR Close Positions
    bool              m_EMUL_AutoCloseDCSpread(const double Dc,const uint Spread,const double Commission);
+   double            m_EMUL_CalculateDc(const uint Iteration);
    //TR Open Positions(-1,-2=none,-1=sell,+1=buy)
    int               m_EMUL_TR_Caterpillar(const char Case,const int IterationNum);
-   char              m_EMUL_CloseRule(const ENUM_CloseRule CloseRuleNum);
+   char              m_EMUL_CloseRule(const ENUM_CloseRule CloseRuleNum,const double CurrentDC,const uint CurrentSpread);
    int               m_EMUL_OpenRule(const ENUM_OpenRule OpenRuleNum,const char Case,const int IterationNum);
 
 public:
@@ -207,7 +209,7 @@ public:
                                   double &arr_Signals[],double &arr_Firsts[],double &arr_Poms[],double &arr_Dc[]);
    //Emulate                         
    bool              _InitEmul(const ENUM_CloseRule CloseRuleNum,const ENUM_OpenRule OpenRuleNum,const int MaxSpread,
-                               const double PomBuy,const double PomSell,const double PomKoef);
+                               const double PomBuy,const double PomSell,const double PomKoef,const double Comission);
 
    //   bool              Capture_Q(const TIMEMARKS &_TimeMarks,SIMUL_Q &_SimulQ);
    //   bool              Capture_NP(const TIMEMARKS &_TimeMarks,SIMUL_NP &_SimulNP);
@@ -335,17 +337,21 @@ bool RTrade::Emulate_Trading(const bool Priming1)
       //+++++EMULATION++++++\\
       //+++++EMULATION++++++\\
 
+/*
       //Local Caterpillar params
       double LocalPOM=0;
       double LocalDC=0;
       char   LocalWhoFirst=0;
       char   LocalSignal=0;
-
+*/
       //Do it for 3 Cases :case 1, Case 4, Case14
       for(char Case=0;Case<3;Case++)
         {
          uint BUY_Signal_Count=0;
          uint SELL_Signal_Count=0;
+         bool BUY_OPENED=false;
+         bool SELL_OPENED=false;
+         double Calculated_Dc=0;
 
          //From first day 00:00 to 23:50 last day in Priming1
          for(int i=ArrSize-1;i>-1;i--)
@@ -353,14 +359,17 @@ bool RTrade::Emulate_Trading(const bool Priming1)
             // Print(IntegerToString(i)+" First: "+TimeToString(m_arr_Rates_P1[ArraySize(m_arr_Rates_P1)-1].time,TIME_DATE|TIME_MINUTES));
             //Print(IntegerToString(i)+" Last: "+TimeToString(m_arr_Rates_P1[i].time,TIME_DATE|TIME_MINUTES));
 
+/*
             //Reset parmas
             LocalPOM=0;
             LocalDC=0;
             LocalWhoFirst=0;
             LocalSignal=0;
 
+            //
+
             //Wait for minimum Indicator Values(3 bottles * 4 price in each bottle)
-/*          if(i>i-(int)m_all_bottle_size_emul) //or from (4*3*m_bottle_size_emul)-1 ?
+          if(i>i-(int)m_all_bottle_size_emul) //or from (4*3*m_bottle_size_emul)-1 ?
               {
                continue;
               }
@@ -374,25 +383,15 @@ bool RTrade::Emulate_Trading(const bool Priming1)
             //1. Check Open Rule (TEST IT!!!!!)
             int OTR_RESULT=m_EMUL_OpenRule(m_open_rule_num_emul,Case,i);
 
-            //If Buy
-            if(OTR_RESULT==BUY1)
-              {
-               BUY_Signal_Count++;
-               Alert("BUY!");
-               Print("BUY "+TimeToString(m_arr_Rates_P1[i].time));
+            //2. Pass first 3 bars for DC
+            if(i>ArrSize-3) continue;
 
-              }
-
-            //If Sell
-            if(OTR_RESULT==SELL1)
-              {
-               SELL_Signal_Count++;
-               Alert("SELL!");
-               Print("SELL "+TimeToString(m_arr_Rates_P1[i].time));
-              }
+            //3. Calculate DC
+            Calculated_Dc=0;
+            Calculated_Dc= m_EMUL_CalculateDc(i);
 
             //2. Check Close Rule (DONT WORK)
-            char CTR_RESULT=m_EMUL_CloseRule(m_close_rule_num_emul);
+            //  char CTR_RESULT=m_EMUL_CloseRule(m_close_rule_num_emul,Calculated_Dc,m_arr_Spread_P1[i]);
 
             //3. Check Spread (if > max then next iteration)
             if(CheckSpread(m_max_spread_emul,m_arr_Spread_P1[i])) continue;
@@ -400,9 +399,32 @@ bool RTrade::Emulate_Trading(const bool Priming1)
             //4. Check if NOSIGNAL then exit
             if(OTR_RESULT<=0) continue;
 
-            //5. Check if _CanOpenNewPos
-            //6. Add Volume
-            //7. OpenPosition
+            //+++OPEN POSITION+++
+
+            //If Case14 both can be opened
+            if(BUY_OPENED || SELL_OPENED) continue;
+
+            //If Buy
+            if(OTR_RESULT==BUY1)
+              {
+               // Check If already opened Position exist, 
+               if(BUY_OPENED) continue;
+
+               BUY_Signal_Count++;
+               BUY_OPENED=true;
+               Print("BUY "+TimeToString(m_arr_Rates_P1[i].time)+" "+DoubleToString(Calculated_Dc));
+              }//END OF BUY
+
+            //If Sell
+            if(OTR_RESULT==SELL1)
+              {
+               //Check If already opened Position exist, 
+               if(SELL_OPENED) continue;
+
+               SELL_Signal_Count++;
+               SELL_OPENED=true;
+               Print("SELL "+TimeToString(m_arr_Rates_P1[i].time)+" "+DoubleToString(Calculated_Dc));
+              }//END OF SELL
 
            }//END OF CASE
          Print("Case "+IntegerToString(Case)+" Buys: "+IntegerToString(BUY_Signal_Count));
@@ -461,7 +483,7 @@ bool  RTrade::m_EMUL_AutoCloseDCSpread(const double Dc,const uint Spread,const d
 //+------------------------------------------------------------------+
 //| Emulated Choosing Close Rule                                     |
 //+------------------------------------------------------------------+
-char  RTrade::m_EMUL_CloseRule(const ENUM_CloseRule CloseRuleNum)
+char  RTrade::m_EMUL_CloseRule(const ENUM_CloseRule CloseRuleNum,const double CurrentDC,const uint CurrentSpread)
   {
 //TR_RESULT  
    char TR_RES=-1;
@@ -473,7 +495,7 @@ char  RTrade::m_EMUL_CloseRule(const ENUM_CloseRule CloseRuleNum)
 
    switch(CloseRuleNum)
      {
-      case  0:TR_RES=m_EMUL_AutoCloseDCSpread(0,0,0);
+      case  0:TR_RES=m_EMUL_AutoCloseDCSpread(CurrentDC,CurrentSpread,m_comission_emul);
 
       break;
       default:
@@ -563,7 +585,7 @@ int RTrade::m_EMUL_TR_Caterpillar(const char Case,const int IterationNum)
 //| Emulation Initialisation                                         |
 //+------------------------------------------------------------------+
 bool RTrade::_InitEmul(const ENUM_CloseRule CloseRuleNum,const ENUM_OpenRule OpenRuleNum,const int MaxSpread,
-                       const double PomBuy,const double PomSell,const double PomKoef)
+                       const double PomBuy,const double PomSell,const double PomKoef,const double Comission)
   {
    m_close_rule_num_emul=CloseRuleNum;
    m_open_rule_num_emul=OpenRuleNum;
@@ -571,6 +593,7 @@ bool RTrade::_InitEmul(const ENUM_CloseRule CloseRuleNum,const ENUM_OpenRule Ope
    m_pom_buy_emul=PomBuy;
    m_pom_sell_emul=PomSell;
    m_pom_koef_emul=PomKoef;
+   m_comission_emul=Comission;
 
 //Init Ok   
    m_initialised_emul=true;
@@ -670,4 +693,59 @@ char RTrade::m_EMUL_WhoFirst(const uint iter_start)
    return(0);
 
   }//End of who first  
+//+------------------------------------------------------------------+
+//| Emulate dc by 3 bars forward                                     |
+//+------------------------------------------------------------------+
+double RTrade::m_EMUL_CalculateDc(const uint Iteration)
+  {
+   double res=-1;
+   uint i=Iteration;
+
+//Pass first 3 bars
+
+//If Priming 1
+   if(m_CurrentPriming)
+     {
+      double r0=m_arr_Rates_P1[i].high-m_arr_Rates_P1[i].low;
+
+      double r2=m_arr_Rates_P1[i+2].high-m_arr_Rates_P1[i+2].low;
+
+      long t1=m_arr_Rates_P1[i+2].tick_volume-m_arr_Rates_P1[i+1].tick_volume;
+
+      double t2=t1*r2;
+      if(t2==0)return(res=0); //div 0 exception
+
+      double t3=m_arr_Rates_P1[i+1].close-m_arr_Rates_P1[i+2].close;
+
+      double t4=t3/t2;
+
+      long t6=m_arr_Rates_P1[i+1].tick_volume-m_arr_Rates_P1[i].tick_volume;
+
+      res=t6*t4*r0;
+      res= NormalizeDouble(res,5);
+     }
+   else
+     {
+      //For Priming 2
+      double r0=m_arr_Rates_P2[i].high-m_arr_Rates_P2[i].low;
+
+      double r2=m_arr_Rates_P2[i+2].high-m_arr_Rates_P2[i+2].low;
+
+      long t1=m_arr_Rates_P2[i+2].tick_volume-m_arr_Rates_P2[i+1].tick_volume;
+
+      double t2=t1*r2;
+      if(t2==0)return(res=0); //div 0 exception
+
+      double t3=m_arr_Rates_P2[i+1].close-m_arr_Rates_P2[i+2].close;
+
+      double t4=t3/t2;
+
+      long t6=m_arr_Rates_P2[i+1].tick_volume-m_arr_Rates_P2[i].tick_volume;
+
+      res=t6*t4*r0;
+      res= NormalizeDouble(res,5);
+     }
+//If Ok
+   return(res);
+  }
 //+------------------------------------------------------------------+
