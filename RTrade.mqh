@@ -15,6 +15,7 @@ const int SELL1=2006;
 const char HighFirst= 1;
 const char LowFirst = -1;
 const char EqualFirst=0; //High==Open or other Private Case
+const ushort     inpDeltaC_koef=1000; //Dc * 
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -25,6 +26,7 @@ enum ENUM_TradeResults
    TRR_CANT_COPY_ARR=-1,
    TRR_NOT_INIT_EMUL=-2,
    TRR_CANT_CONVERT_OHLC_TO_ROW=-3,
+   TRR_BAD_SYMBOL_POINT=-4,
   };
 //+------------------------------------------------------------------+
 //| Open Position Trading rules                                      |
@@ -136,6 +138,8 @@ class RTrade
   {
 
 private:
+   string            m_pair;
+   double            m_pair_point;
    //Emulation
    bool              m_initialised_emul;
    ENUM_CloseRule    m_close_rule_num_emul;
@@ -183,11 +187,11 @@ private:
    //Who First 0,-1,+1 |No,Low,High
    char              m_EMUL_WhoFirst(const uint iter_start);
    //TR Close Positions
-   bool              m_EMUL_AutoCloseDCSpread(const double Dc,const uint Spread,const double Commission);
+   bool              m_EMUL_AutoCloseDCSpread(const double PositionProfit,const double Dc,const uint Spread,const double Commission);
    double            m_EMUL_CalculateDc(const uint Iteration);
    //TR Open Positions(-1,-2=none,-1=sell,+1=buy)
    int               m_EMUL_TR_Caterpillar(const char Case,const int IterationNum);
-   char              m_EMUL_CloseRule(const ENUM_CloseRule CloseRuleNum,const double CurrentDC,const uint CurrentSpread);
+   bool              m_EMUL_CloseRule(const ENUM_CloseRule CloseRuleNum,const double CurrentProfit,const double CurrentDC,const uint CurrentSpread);
    int               m_EMUL_OpenRule(const ENUM_OpenRule OpenRuleNum,const char Case,const int IterationNum);
 
 public:
@@ -250,6 +254,15 @@ RTrade::~RTrade()
 bool RTrade::_Init(const string pair,const string path_to_ind,const uchar bottlesize,
                    const datetime from_date,const datetime to_date,const bool debug)
   {
+   m_pair=pair;
+
+//Gey Pair Point value
+   if(!SymbolInfoDouble(pair,SYMBOL_POINT,m_pair_point))
+     {
+      m_Result=-4;
+      return(false);
+     }
+
    m_debug=debug;
    m_bottle_size_emul=bottlesize;
    m_one_bottle_size_emul = m_bottle_size_emul*4;
@@ -350,8 +363,11 @@ bool RTrade::Emulate_Trading(const bool Priming1)
          uint BUY_Signal_Count=0;
          uint SELL_Signal_Count=0;
          bool BUY_OPENED=false;
+         double BUY_OPENED_PRICE=0;
+         double SELL_OPENED_PRICE=0;
          bool SELL_OPENED=false;
          double Calculated_Dc=0;
+         double PositionProfit=0;
 
          //From first day 00:00 to 23:50 last day in Priming1
          for(int i=ArrSize-1;i>-1;i--)
@@ -386,20 +402,48 @@ bool RTrade::Emulate_Trading(const bool Priming1)
             //2. Pass first 3 bars for DC
             if(i>ArrSize-3) continue;
 
-            //3. Calculate DC
+            //2.1 Calculate DC
             Calculated_Dc=0;
-            Calculated_Dc= m_EMUL_CalculateDc(i);
+            Calculated_Dc= m_EMUL_CalculateDc(i)*inpDeltaC_koef;
 
-            //2. Check Close Rule (DONT WORK)
-            //  char CTR_RESULT=m_EMUL_CloseRule(m_close_rule_num_emul,Calculated_Dc,m_arr_Spread_P1[i]);
 
-            //3. Check Spread (if > max then next iteration)
+            //3. Check if pos opened, try to close
+            if(BUY_OPENED || SELL_OPENED)
+              {
+               //3.1 Calculate Position Profit for buy
+               if(BUY_OPENED)
+                 {
+                  PositionProfit=(m_arr_Rates_P1[i].close-BUY_OPENED_PRICE)/m_pair_point;
+                 }
+
+               //3.2 Calculate Position Profit for sell
+               if(SELL_OPENED)
+                 {
+                  PositionProfit=(SELL_OPENED_PRICE-m_arr_Rates_P1[i].close)/m_pair_point;
+                 }
+
+               //3.3 Check Close Rule (DONT WORK)
+               bool CTR_RESULT=m_EMUL_CloseRule(m_close_rule_num_emul,PositionProfit,Calculated_Dc,m_arr_Spread_P1[i]);
+
+               //3.4 If need to Close position
+               if(CTR_RESULT)
+                 {
+                  BUY_OPENED=false;
+                  SELL_OPENED=false;
+                  BUY_OPENED_PRICE=0;
+                  SELL_OPENED_PRICE=0;
+                  PositionProfit=0;
+                  continue;
+                 }
+              }//END OF TRY TO CLOSE
+
+            //4. Check Spread (if > max then next iteration)
             if(CheckSpread(m_max_spread_emul,m_arr_Spread_P1[i])) continue;
 
-            //4. Check if NOSIGNAL then exit
+            //5. Check if NOSIGNAL then exit
             if(OTR_RESULT<=0) continue;
 
-            //+++OPEN POSITION+++
+            //6. +++OPEN POSITION+++
 
             //If Case14 both can be opened
             if(BUY_OPENED || SELL_OPENED) continue;
@@ -410,9 +454,11 @@ bool RTrade::Emulate_Trading(const bool Priming1)
                // Check If already opened Position exist, 
                if(BUY_OPENED) continue;
 
+               BUY_OPENED_PRICE=m_arr_Rates_P1[i].close;
                BUY_Signal_Count++;
                BUY_OPENED=true;
                Print("BUY "+TimeToString(m_arr_Rates_P1[i].time)+" "+DoubleToString(Calculated_Dc));
+               continue;
               }//END OF BUY
 
             //If Sell
@@ -421,16 +467,26 @@ bool RTrade::Emulate_Trading(const bool Priming1)
                //Check If already opened Position exist, 
                if(SELL_OPENED) continue;
 
+               SELL_OPENED_PRICE=m_arr_Rates_P1[i].close;
                SELL_Signal_Count++;
                SELL_OPENED=true;
                Print("SELL "+TimeToString(m_arr_Rates_P1[i].time)+" "+DoubleToString(Calculated_Dc));
+               continue;
               }//END OF SELL
 
            }//END OF CASE
-         Print("Case "+IntegerToString(Case)+" Buys: "+IntegerToString(BUY_Signal_Count));
-         Print("Case "+IntegerToString(Case)+" Sells: "+IntegerToString(SELL_Signal_Count));
+
+         //On the end of Period - Force Close Position
+         BUY_OPENED=false;
+         SELL_OPENED=false;
+         BUY_OPENED_PRICE=0;
+         SELL_OPENED_PRICE=0;
+         PositionProfit=0;
+
+         Print("Priming 1, Case "+IntegerToString(Case)+" Buys: "+IntegerToString(BUY_Signal_Count));
+         Print("Priming 1, Case "+IntegerToString(Case)+" Sells: "+IntegerToString(SELL_Signal_Count));
         }//END OF ALL CASES
-      Print("All Cases");
+      Print("Priming 1, All Cases Completed");
      }//END OF PRIMING1
 
 //8. Count Opened Positions & NP priming1
@@ -463,30 +519,26 @@ bool  RTrade::CheckSpread(const uint MaxSpread,const uint CurrentSpread)
 //+------------------------------------------------------------------+
 //| Emulated AutoClose Dc+Spread+Commisstion                         |
 //+------------------------------------------------------------------+
-bool  RTrade::m_EMUL_AutoCloseDCSpread(const double Dc,const uint Spread,const double Commission)
+bool  RTrade::m_EMUL_AutoCloseDCSpread(const double PositionProfit,const double Dc,const uint Spread,const double Commission)
   {// CLose if NetProfit >= |dC|+spread+commision
    bool res=false;
 
-//Open position?
-/*
-   if(!PositionSelect(pair)) {return(res);}
-   double pos_profit,pos_volume=0;
-   PositionGetDouble(POSITION_VOLUME,pos_volume);
-   PositionGetDouble(POSITION_PROFIT,pos_profit);
-   if(pos_profit>=MathAbs(dc*10)+(spread*pos_volume)+(comission*pos_volume))
+//Check for close
+   if(PositionProfit>=MathAbs(Dc*10)+Spread+Commission)
      {
-      if(Rost_ClosePosition(pair,"Spread="+IntegerToString(spread)+" dC: "+DoubleToString(dc/_inpDeltaC_koef)+"|Closed by|dC|")) {res=true;}
+      //Close Position
+      return(true);
      }
-*/
+
    return(res);
   }
 //+------------------------------------------------------------------+
 //| Emulated Choosing Close Rule                                     |
 //+------------------------------------------------------------------+
-char  RTrade::m_EMUL_CloseRule(const ENUM_CloseRule CloseRuleNum,const double CurrentDC,const uint CurrentSpread)
+bool  RTrade::m_EMUL_CloseRule(const ENUM_CloseRule CloseRuleNum,const double CurrentProfit,const double CurrentDC,const uint CurrentSpread)
   {
 //TR_RESULT  
-   char TR_RES=-1;
+   bool TR_RES=-1;
 
    if(CloseRuleNum<0)
      {
@@ -495,7 +547,7 @@ char  RTrade::m_EMUL_CloseRule(const ENUM_CloseRule CloseRuleNum,const double Cu
 
    switch(CloseRuleNum)
      {
-      case  0:TR_RES=m_EMUL_AutoCloseDCSpread(CurrentDC,CurrentSpread,m_comission_emul);
+      case  0:TR_RES=m_EMUL_AutoCloseDCSpread(CurrentProfit,CurrentDC,CurrentSpread,m_comission_emul);
 
       break;
       default:
