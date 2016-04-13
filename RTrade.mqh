@@ -273,8 +273,8 @@ bool RTrade::_InitPriming(const bool Priming1,MqlRates &arr_Rates[],int &arr_Spr
      }
 
 //Stop speed measuring     
-   uint Stop_measuring=GetTickCount()-Start_measure;
-   PrintFormat("Init Primings complete in %d ms",Stop_measuring);
+//  uint Stop_measuring=GetTickCount()-Start_measure;
+//  PrintFormat("Init Primings complete in %d ms",Stop_measuring);
 
 //If Ok
    m_Result=0;
@@ -429,7 +429,7 @@ bool RTrade::Emulate_Trading1()
                BUY_OPENED_PRICE=m_arr_Rates_P1[i].close;
                BUY_Signal_Count++;
                BUY_OPENED=true;
-               Print("BUY "+TimeToString(m_arr_Rates_P1[i].time)+" "+DoubleToString(Calculated_Dc));
+               //  Print("BUY "+TimeToString(m_arr_Rates_P1[i].time)+" "+DoubleToString(Calculated_Dc));
                continue;
               }//END OF BUY
 
@@ -442,7 +442,7 @@ bool RTrade::Emulate_Trading1()
                SELL_OPENED_PRICE=m_arr_Rates_P1[i].close;
                SELL_Signal_Count++;
                SELL_OPENED=true;
-               Print("SELL "+TimeToString(m_arr_Rates_P1[i].time)+" "+DoubleToString(Calculated_Dc));
+               //  Print("SELL "+TimeToString(m_arr_Rates_P1[i].time)+" "+DoubleToString(Calculated_Dc));
                continue;
               }//END OF SELL
 
@@ -461,19 +461,19 @@ bool RTrade::Emulate_Trading1()
             break;
         }//END OF FILLING Priming1 Omega Structures
 
-      Print("Priming 1, Case "+IntegerToString(Case)+" Buys: "+IntegerToString(BUY_Signal_Count));
-      Print("Priming 1, Case "+IntegerToString(Case)+" Sells: "+IntegerToString(SELL_Signal_Count));
+      //      Print("Priming 1, Case "+IntegerToString(Case)+" Buys: "+IntegerToString(BUY_Signal_Count));
+      //      Print("Priming 1, Case "+IntegerToString(Case)+" Sells: "+IntegerToString(SELL_Signal_Count));
      }//END OF ALL CASES
 
-   Print("Priming 1, All Cases Completed");
+//   Print("Priming 1, All Cases Completed");
 
 //8. Count Opened Positions & NP priming1
 
 //Stop speed measuring   
 // if(m_debug)
 // {
-   uint Stop_measuring=GetTickCount()-Start_measure;
-   PrintFormat("Emulating Priming1 complete in %d ms",Stop_measuring);
+// uint Stop_measuring=GetTickCount()-Start_measure;
+// PrintFormat("Emulating Priming1 complete in %d ms",Stop_measuring);
 //  }
 
 //If Ok
@@ -628,7 +628,7 @@ bool RTrade::Emulate_Trading2()
                BUY_OPENED_PRICE=m_arr_Rates_P2[i].close;
                BUY_Signal_Count++;
                BUY_OPENED=true;
-               Print("BUY "+TimeToString(m_arr_Rates_P2[i].time)+" "+DoubleToString(Calculated_Dc));
+               //  Print("BUY "+TimeToString(m_arr_Rates_P2[i].time)+" "+DoubleToString(Calculated_Dc));
                continue;
               }//END OF BUY
 
@@ -641,7 +641,7 @@ bool RTrade::Emulate_Trading2()
                SELL_OPENED_PRICE=m_arr_Rates_P2[i].close;
                SELL_Signal_Count++;
                SELL_OPENED=true;
-               Print("SELL "+TimeToString(m_arr_Rates_P2[i].time)+" "+DoubleToString(Calculated_Dc));
+               //  Print("SELL "+TimeToString(m_arr_Rates_P2[i].time)+" "+DoubleToString(Calculated_Dc));
                continue;
               }//END OF SELL
 
@@ -660,18 +660,18 @@ bool RTrade::Emulate_Trading2()
             break;
         }//END OF FILLING Priming2 Omega Structures
 
-      Print("Priming 2, Case "+IntegerToString(Case)+" Buys: "+IntegerToString(BUY_Signal_Count));
-      Print("Priming 2, Case "+IntegerToString(Case)+" Sells: "+IntegerToString(SELL_Signal_Count));
+      //      Print("Priming 2, Case "+IntegerToString(Case)+" Buys: "+IntegerToString(BUY_Signal_Count));
+      //      Print("Priming 2, Case "+IntegerToString(Case)+" Sells: "+IntegerToString(SELL_Signal_Count));
      }//END OF ALL CASES
-   Print("Priming 2, All Cases Completed");
+//   Print("Priming 2, All Cases Completed");
 
 //8. Count Opened Positions & NP priming1
 
 //Stop speed measuring   
 // if(m_debug)
 // {
-   uint Stop_measuring=GetTickCount()-Start_measure;
-   PrintFormat("Emulating Priming2 complete in %d ms",Stop_measuring);
+//  uint Stop_measuring=GetTickCount()-Start_measure;
+//  PrintFormat("Emulating Priming2 complete in %d ms",Stop_measuring);
 //  }
 
 //Add +1 Cell to Dynamic Array of Primings Omegas
