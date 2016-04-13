@@ -16,6 +16,13 @@ const char HighFirst= 1;
 const char LowFirst = -1;
 const char EqualFirst=0; //High==Open or other Private Case
 const ushort     inpDeltaC_koef=1000; //Dc * 
+                                      //Constants for Ck signals:
+const char CkNoSignal=-1;
+const char CkBuy1=0;
+const char CkSell4=1;
+const char CkBuySell14=2;
+const char CkSingularityBuy=3;
+const char CkSingularitySell=4;
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -43,6 +50,13 @@ enum ENUM_EMUL_CloseRule
    CloseTR_DcSpread
   };
 //+------------------------------------------------------------------+
+//| Trading Rule for Ck                                              |
+//+------------------------------------------------------------------+
+enum ENUM_TRCK
+  {
+   CK_TR18_0330_Virt
+  };
+//+------------------------------------------------------------------+
 //| Prediction Period                                                |
 //+------------------------------------------------------------------+
 enum ENUM_myPredictPeriod
@@ -55,12 +69,12 @@ enum ENUM_myPredictPeriod
 //---Structure for simulated Qs
 struct SIMUL_Q
   {
-   double            P1_Q1_Simul;
-   double            P1_Q4_Simul;
-   double            P1_Q14_Simul;
-   double            P2_Q1_Simul;
-   double            P2_Q4_Simul;
-   double            P2_Q14_Simul;
+   int               P1_Q1_Simul;
+   int               P1_Q4_Simul;
+   int               P1_Q14_Simul;
+   int               P2_Q1_Simul;
+   int               P2_Q4_Simul;
+   int               P2_Q14_Simul;
   };
 //------GLOBAL VARIABLES
 
@@ -85,6 +99,8 @@ private:
    //Emulation
    // Each 2 primings = +1  
    uint              m_simulated_primings_total;
+   //Ck Predictions
+   char              m_arr_ck_predictions[];
    //Array of Simulated Q  
    SIMUL_Q           m_arr_sim_q[];
 
@@ -142,7 +158,8 @@ private:
    int               m_EMUL_TR_Caterpillar(const char Case,const int IterationNum,const double Current_OHLC_Price);
    bool              m_EMUL_CloseRule(const ENUM_EMUL_CloseRule CloseRuleNum,const double CurrentProfit,const double CurrentDC,const uint CurrentSpread);
    int               m_EMUL_OpenRule(const ENUM_EMUL_OpenRule OpenRuleNum,const char Case,const int IterationNum,const double Current_OHLC_Price);
-
+   //Calculate Ck Prediction 0,1,2 : 1,4,14
+   char              m_BUILD_CK_TR18_0330_Virt(const bool USDFirst);
 public:
                      RTrade();
                     ~RTrade();
@@ -172,6 +189,12 @@ public:
    bool              EmulationResult_Selected(const uint EmulNumber,SIMUL_Q &SimulStruct);
    //Get Latest Results after Emulation
    bool              EmulationResult_Latest(SIMUL_Q &SimulStruct);
+   //Choose TR for Ck
+   char              TR_PredictCk(const ENUM_TRCK TRCk_Name,const bool USDFirst);
+   //Converts Ck Prediction to string
+   string            CkResultToString(const char Ck);
+   //Get Ck Predictions by Index
+   char              CkPredictionByIndex(const uint CkIndex);
   };
 //+------------------------------------------------------------------+
 //| Init                                                             |
@@ -315,8 +338,8 @@ bool RTrade::Emulate_Trading1()
 //Do it for 3 Cases :case 1, Case 4, Case14
    for(char Case=0;Case<3;Case++)
      {
-      uint BUY_Signal_Count=0;
-      uint SELL_Signal_Count=0;
+      int BUY_Signal_Count=0;
+      int SELL_Signal_Count=0;
       bool BUY_OPENED=false;
       double BUY_OPENED_PRICE=0;
       double SELL_OPENED_PRICE=0;
@@ -514,8 +537,8 @@ bool RTrade::Emulate_Trading2()
 //Do it for 3 Cases :case 1, Case 4, Case14
    for(char Case=0;Case<3;Case++)
      {
-      uint BUY_Signal_Count=0;
-      uint SELL_Signal_Count=0;
+      int BUY_Signal_Count=0;
+      int SELL_Signal_Count=0;
       bool BUY_OPENED=false;
       double BUY_OPENED_PRICE=0;
       double SELL_OPENED_PRICE=0;
@@ -1064,4 +1087,200 @@ bool RTrade::EmulationResult_Latest(SIMUL_Q &SimulStruct)
 //If Ok
    return(true);
   }//END OF LATEST EMULATION RESULTS  
+//+------------------------------------------------------------------+
+//| Choose TR for Ck                                                 |
+//+------------------------------------------------------------------+
+char RTrade::TR_PredictCk(const ENUM_TRCK TRCk_Name,const bool USDFirst)
+  {
+//TR_RESULT  
+   char TR_RES=-3;
+
+//Add +1 Cell to Dynamic Array of Ck Prediction
+   ArrayResize(m_arr_ck_predictions,ArraySize(m_arr_ck_predictions)+1);
+
+//Set Default Prediction  = none
+   m_arr_ck_predictions[ArraySize(m_arr_ck_predictions)-1]=TR_RES;
+
+//Check for Correct TR for Ck
+   if(TRCk_Name<0)
+     {
+      TR_RES=-2;
+      m_arr_ck_predictions[ArraySize(m_arr_ck_predictions)-1]=TR_RES;
+      return(TR_RES);
+     }
+
+   switch(TRCk_Name)
+     {//False - EURUSD
+      case  CK_TR18_0330_Virt:
+        {
+         //Get Ck Prediction
+         TR_RES=m_BUILD_CK_TR18_0330_Virt(USDFirst);
+
+         //Save to arr prediction
+         m_arr_ck_predictions[ArraySize(m_arr_ck_predictions)-1]=TR_RES;
+         break;
+        } //END OF CK_TR18_0330_Virt
+
+      default:
+         break;
+     }
+//If Ok
+   return(TR_RES);
+  }
+//+------------------------------------------------------------------+
+//| TR18_0330_Virt (Ck) 0,1,2,3,4:1,4,14,SingulBuy,SingulSell        |
+//+------------------------------------------------------------------+
+char RTrade::m_BUILD_CK_TR18_0330_Virt(const bool USDFirst)
+  {
+//IF USDCHF , err  
+   if(USDFirst) return(-2);
+
+//Exceptions Limits:  
+   const uchar Ex1_limit = 3;
+   const uchar Ex2_limit = 3;
+   const uchar Ex3_limit = 3;
+   const uchar Ex4_limit = 4;
+
+//For * Exceptions   
+   const char Yes= -1;
+   const char No = 1;
+
+//Exceptions:
+   char Ex1=No;
+   char Ex2=No;
+   char Ex3=No;
+   char Ex4=No;
+
+//0.Save simple value  
+   SIMUL_Q Omega=m_arr_sim_q[m_simulated_primings_total-1];
+
+//1.Calculate DeltaOmega
+   int dO1 = Omega.P2_Q1_Simul - Omega.P1_Q1_Simul;
+   int dO4 = Omega.P2_Q4_Simul - Omega.P1_Q4_Simul;
+   int dO14= Omega.P2_Q14_Simul-Omega.P1_Q14_Simul;
+
+//Exception Equal dO1==dO4 --> C14
+   if(dO1==dO4)
+     {
+      return(CkBuySell14);
+     }
+
+//Exception 3 Singularity dO1==0 or dO4==0 
+   if(dO1==0 || dO4==0)
+     {
+      Ex3=Yes;
+      //SELL For EURUSD Only
+      return(CkSingularitySell);
+     }
+
+//2.Calculate F (div 0 Error?)
+   int f=(dO4*dO1)/MathAbs(dO4*dO1);
+
+//3.Caluclate F1
+   int f1=(dO1-dO4)/MathAbs(dO1-dO4);
+
+//4.Calculate F*F1
+   int ff1=f*f1;
+
+//5.Calculate -C1
+   int mC1=MathAbs(dO14-dO1);
+
+//6.Calculate -C4
+   int mC4=MathAbs(dO14-dO4);
+
+//Exception 1 (dO1<3 and dO4<3)
+   if(dO1<Ex1_limit && dO4<Ex1_limit)
+     {
+      Ex1=Yes;
+     }
+
+//Exception 2 0<|14-1|<3 or 0<|14-4|<3 or 0<|14|<3  
+   if((mC1<Ex2_limit) || (mC4<Ex2_limit) || (MathAbs(dO14)<Ex2_limit))
+     {
+      Ex2=Yes;
+     }
+
+//Exception 4 (||14-1|-|14-4||)<4 
+   if(MathAbs(mC1-mC4)<Ex4_limit)
+     {
+      Ex3=Yes;
+     }
+
+//If [..]=0 then C14 -->????
+
+   int ResMin=0;
+
+//Find Min
+   if(ff1==-1)
+     {
+      ResMin=MathMin(f1*mC1*Ex1*Ex2*Ex4,f1*mC4*Ex1*Ex2*Ex4);
+
+      //Show Ck C1
+      if(MathAbs(ResMin)==mC1)
+        {
+         return(CkBuy1);
+        }//END of Ck=C1
+
+      //Show Ck C4
+      if(MathAbs(ResMin)==mC4)
+        {
+         return(CkSell4);
+        }//END of Ck=C4    
+     }//END OF -1 MIN;
+
+   int ResMax=0;
+
+//Find Max
+   if(ff1==1)
+     {
+      ResMax=MathMax(mC1*Ex1*Ex2*Ex4,mC4*Ex1*Ex2*Ex4);
+
+      //Show Ck C1
+      if(MathAbs(ResMax)==mC1)
+        {
+         return(CkBuy1);
+        }//END of Ck=C1
+
+      //Show Ck C4
+      if(MathAbs(ResMax)==mC4)
+        {
+         return(CkSell4);
+        }//END of Ck=C4    
+     }//END OF -1 MIN;
+
+//If No Signal
+   return(CkNoSignal);
+  }
+//+------------------------------------------------------------------+
+//| Converts Ck Prediction to string                                 |
+//+------------------------------------------------------------------+
+string RTrade::CkResultToString(const char Ck)
+  {
+   switch(Ck)
+     {
+      case  -2: return("USD First");  break;
+      case  -1: return("No Ck Signal");  break;
+      case  0: return("Ck Buy (Case1)");  break;
+      case  1: return("Ck Sell (Case4)");  break;
+      case  2: return("Ck Buy & Sell (Case14)");  break;
+      case  3: return("Ck Buy Singularity (2 Case1 )");  break;
+      case  4: return("Ck Sell Singularity (2 Case4)");  break;
+
+      default: return("Unknown Ck");
+      break;
+     }
+  }//END OF CK to Sring
+//+------------------------------------------------------------------+
+//| Returns Ck prediction by Index                                   |
+//+------------------------------------------------------------------+
+char RTrade::CkPredictionByIndex(const uint CkIndex)
+  {
+   uint ArrSize=ArraySize(m_arr_ck_predictions);
+
+//Check for right request
+   if(CkIndex>ArrSize-1) return(-5);
+
+//If Ok
+   return(m_arr_ck_predictions[CkIndex]);
+  }
 //+------------------------------------------------------------------+
