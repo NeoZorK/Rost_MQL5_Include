@@ -193,6 +193,12 @@ RTrade::RTrade()
    m_Total_Minutes_in_period=0;
    m_CurrentPriming=0;
    m_debug=false;
+
+//Each 2 simulated primings = 2
+   m_simulated_primings_total=0;
+
+//Add +1 Cell to Dynamic Array of Primings Omega
+   ArrayResize(m_arr_sim_q,ArraySize(m_arr_sim_q)+1);
   }
 //+------------------------------------------------------------------+
 //| Deinit                                                           |
@@ -219,12 +225,6 @@ bool RTrade::_Init(const string pair,const string path_to_ind,const uchar bottle
    m_bottle_size_emul=bottlesize;
    m_one_bottle_size_emul = m_bottle_size_emul*4;
    m_all_bottle_size_emul = m_one_bottle_size_emul*3;
-
-//Each 2 simulated primings = 2
-   m_simulated_primings_total=0;
-
-//Add +1 Cell to Dynamic Array of Primings Omega
-   ArrayResize(m_arr_sim_q,ArraySize(m_arr_sim_q)+1);
 
 //if ok 
    return(true);
@@ -676,6 +676,9 @@ bool RTrade::Emulate_Trading2()
 
 //Add +1 Cell to Dynamic Array of Primings Omegas
    ArrayResize(m_arr_sim_q,ArraySize(m_arr_sim_q)+1);
+
+//Always increase by 1 this counter, otherwise program writes to [0]
+   m_simulated_primings_total++;
 
 //If Ok
    return(true);
