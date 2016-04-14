@@ -248,6 +248,13 @@ m_debug(false)
 //Save Path to indicator
    m_ind_path=path_to_ind;
 
+//Connect Indicator
+   if(!_ConnectIndicator())
+     {
+      m_result=-22;
+      return;
+     }
+
    string Server=AccountInfoString(ACCOUNT_SERVER);
 
 //+If ok, save path to DB(FL- first & last minute)
@@ -675,13 +682,14 @@ bool RHistory::_ProcessDays(const ushort MinSessionMinutes,const bool TimesOnly)
          m_result=-18;
          return(false);
         }
-
+/*
       //Connect Indicator
       if(!_ConnectIndicator())
         {
          m_result=-22;
          return(false);
         }
+*/
      }//END OF NOT TIMESONLY
 
 //If all_times err, exit
