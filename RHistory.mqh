@@ -120,7 +120,7 @@ private:
    bool              _ConnectIndicator();       //Connect indicator POM3
 
 public:
-                     RHistory();
+                     RHistory(const string pair,const string path_to_ind,const uchar bottlesize);
                     ~RHistory();
    //Check
    bool              _IsInitialised()                const       {return(m_initialised);}
@@ -181,8 +181,7 @@ public:
    void              ResetResult() {m_result=0;}
 
    //Main
-   bool              _Init(const string pair,const string path_to_ind,const uchar bottlesize,
-                           const datetime from_date,const datetime to_date,const bool debug);
+   bool              _Init(const datetime from_date,const datetime to_date,const bool debug);
    //Call onInit                         
    bool              _Check_Load_History(const uchar TrysCount,const ENUM_TIMEFRAMES TimeFrame);
    //Calculate(days\weeks\months\quarters)  RequestMode = Don`t load rates,spread,Indicator
@@ -203,17 +202,57 @@ public:
 //+------------------------------------------------------------------+
 //| Constructor                                                      |
 //+------------------------------------------------------------------+
-RHistory::RHistory():m_initialised(false),
-                      m_processed(false),
-                      m_imported(false),
-                      m_MRS_identical(false),
-                      m_copyed_all_datetimes(0),
-                      m_first_server_time(0),
-                      m_first_server_spread(0),
-                      //m_last_server_time(0),
+RHistory::RHistory(const string pair,const string path_to_ind,const uchar bottlesize):m_initialised(false),
+                                                                                       m_processed(false),
+                                                                                       m_imported(false),
+                                                                                       m_MRS_identical(false),
+                                                                                       m_copyed_all_datetimes(0),
+                                                                                       m_first_server_time(0),
+                                                                                       m_first_server_spread(0),
+                                                                                       //m_last_server_time(0),
 m_total_working_days_count(0),
 m_debug(false)
   {
+
+//Check symbol 
+   if(pair==NULL || pair=="")
+     {
+      m_result=-14;
+      m_initialised=false;
+      return;
+     }
+//Check Symbol Select
+   if(!SymbolInfoInteger(pair,SYMBOL_SELECT))
+     {
+      if(GetLastError()==ERR_MARKET_UNKNOWN_SYMBOL)
+        {
+         m_result=-14;
+         m_initialised=false;
+         return;
+        }
+
+      if(!SymbolSelect(pair,true))
+        {
+         m_result=-14;
+         m_initialised=false;
+         return;
+        }
+     }//end of SymbolInfo
+
+//+If Ok, Save Pair
+   m_pair=pair;
+
+//Save BottleSize
+   m_bottle_size=bottlesize;
+
+//Save Path to indicator
+   m_ind_path=path_to_ind;
+
+   string Server=AccountInfoString(ACCOUNT_SERVER);
+
+//+If ok, save path to DB(FL- first & last minute)
+   m_path=Server+m_pair+".FLM";
+
   }
 //+------------------------------------------------------------------+
 //| Destructor                                                       |
@@ -787,39 +826,10 @@ bool RHistory::_ProcessDays(const ushort MinSessionMinutes,const bool TimesOnly)
 //+------------------------------------------------------------------+
 //| Initialisation                                                   |
 //+------------------------------------------------------------------+
-bool RHistory::_Init(const string pair,const string path_to_ind,const uchar bottlesize,
-                     datetime from_date,const datetime to_date,const bool debug)
+bool RHistory::_Init(datetime from_date,const datetime to_date,const bool debug)
   {
 //Set Debug mode
    m_debug=debug;
-
-//Check symbol 
-   if(pair==NULL || pair=="")
-     {
-      m_result=-14;
-      m_initialised=false;
-      return(false);
-     }
-//Check Symbol Select
-   if(!SymbolInfoInteger(pair,SYMBOL_SELECT))
-     {
-      if(GetLastError()==ERR_MARKET_UNKNOWN_SYMBOL)
-        {
-         m_result=-14;
-         m_initialised=false;
-         return(false);
-        }
-
-      if(!SymbolSelect(pair,true))
-        {
-         m_result=-14;
-         m_initialised=false;
-         return(false);
-        }
-     }//end of SymbolInfo
-
-//+If Ok, Save Pair
-   m_pair=pair;
 
 //Check From and To Date
    if(from_date>=to_date)
@@ -829,20 +839,9 @@ bool RHistory::_Init(const string pair,const string path_to_ind,const uchar bott
       return(false);
      }
 
-//Save BottleSize
-   m_bottle_size=bottlesize;
-
-//Save Path to indicator
-   m_ind_path=path_to_ind;
-
 //+If ok, save From & To Date
    m_from_date=from_date;
    m_to_date=to_date;
-
-   string Server=AccountInfoString(ACCOUNT_SERVER);
-
-//+If ok, save path to DB(FL- first & last minute)
-   m_path=Server+m_pair+".FLM";
 
 //+If All Ok
    m_initialised=true;
