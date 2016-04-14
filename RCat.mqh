@@ -8,18 +8,25 @@
 #property version   "1.00"
 
 #include <Tools\DateTime.mqh>
+#include <RInclude\RTrade.mqh>
+//RealTime Open TR
+enum ENUM_RT_OpenRule
+  {
+   POMI
+  };
+//RealTime Close TR
+enum ENUM_RT_CloseRule
+  {
+   AutoCloseDcSpread
+  };
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
 /*
-1. Save Symbol
 2. Calculate Lot ?
-3. add constants Ck Signals to global
-4. TR_RES = -1 (if errors occures)
-5. Get Last Ind Buffers
+
 6. Select Trading Rule  POMI
-7.? If Signal -> Save her Minute
-8. Count signals in a row (separatly buy & sell)
+
 9. Check TR AutoClose(TR_RES) -> AutoClose DC Spread = true then continue;
 10. Check If Future End of period NOW, then CloseAllPositions
 11. If Spread>MaxSpread Continue;
@@ -45,21 +52,120 @@
 class RCat
   {
 private:
+   string            m_pair;
+   //Caterpillar Result
+   int               m_TR_RES;
+   //Current Ck Prediction
+   char              m_current_ck;
+   //---Latest Indicator Values
+   double            m_first;
+   double            m_pom;
+   double            m_dc;
+   double            m_signal;
+
+   //Open TR 
+   int               m_OpenRule(const ENUM_RT_OpenRule OpenRule);
+   int               m_POMI();
+   //Close TR 
+   int               m_CloseRule(const ENUM_RT_CloseRule CloseRule);
+   int               m_AutoCloseDcSpread();
 
 public:
-                     RCat();
+                     RCat(const string pair);
                     ~RCat();
+   //Initialisation                 
+   bool              Init(const char Ck_Case,const double &first,const double &pom,const double &dc,const double &signal);
+   //Main
+   bool              Trade();
   };
 //+------------------------------------------------------------------+
-//|                                                                  |
+//| Constructor                                                      |
 //+------------------------------------------------------------------+
-RCat::RCat()
+RCat::RCat(const string pair)
   {
+   m_pair=pair;
   }
 //+------------------------------------------------------------------+
-//|                                                                  |
+//| Destructor                                                       |
 //+------------------------------------------------------------------+
 RCat::~RCat()
   {
+  }
+//+------------------------------------------------------------------+
+//| Initialisation                                                   |
+//+------------------------------------------------------------------+
+bool RCat::Init(const char Ck_Case,const double &first,const double &pom,const double &dc,const double &signal)
+  {
+   if(Ck_Case>4 || Ck_Case<0)
+     {
+      return(false);
+     }
+
+//Fill Latest Indicator Buffers
+   m_first=first;
+   m_pom= pom;
+   m_dc = dc;
+   m_signal=signal;
+
+//If Ok    
+   m_current_ck=Ck_Case;
+   return(true);
+  }
+//+------------------------------------------------------------------+
+//| Main Real Trade Function                                         |
+//+------------------------------------------------------------------+
+bool RCat::Trade(void)
+  {
+///---MAIN CALCULATION---///
+   m_TR_RES=-1;
+
+//OpenRule
+
+//If Ok
+   return(true);
+  }
+//+------------------------------------------------------------------+
+//| Open Rule                                                        |
+//+------------------------------------------------------------------+
+int RCat::m_OpenRule(const ENUM_RT_OpenRule OpenRule)
+  {
+   int TR_RES=-1;
+
+   if(OpenRule<0)
+     {
+      return(-2);
+     }
+
+   switch(OpenRule)
+     {
+      case  0:TR_RES=m_POMI();
+
+      break;
+      default:
+         break;
+     }
+   return(TR_RES);
+  }
+//+------------------------------------------------------------------+
+//| Close Rule                                                       |
+//+------------------------------------------------------------------+
+int RCat::m_CloseRule(const ENUM_RT_CloseRule CloseRule)
+  {
+   int TR_RES=-1;
+
+   if(CloseRule<0)
+     {
+      return(-2);
+     }
+
+   return(TR_RES);
+  }
+//+------------------------------------------------------------------+
+//| Open TR #0 POMI                                                  |
+//+------------------------------------------------------------------+
+int RCat::m_POMI(void)
+  {
+
+   return(0);
   }
 //+------------------------------------------------------------------+
