@@ -62,28 +62,36 @@ private:
    double            m_pom;
    double            m_dc;
    double            m_signal;
+   //Pom constants
+   double            m_pom_koef;
+   double            m_pom_buy;
+   double            m_pom_sell;
 
    //Open TR 
-   int               m_OpenRule(const ENUM_RT_OpenRule OpenRule);
+   int               m_OpenRule(const ENUM_RT_OpenRule &OpenRule);
    int               m_POMI();
    //Close TR 
-   int               m_CloseRule(const ENUM_RT_CloseRule CloseRule);
+   int               m_CloseRule(const ENUM_RT_CloseRule &CloseRule);
    int               m_AutoCloseDcSpread();
 
 public:
-                     RCat(const string pair);
+                     RCat(const string Pair,const double &Pom_Koef,const double &PomBuy,const double &PomSell);
                     ~RCat();
-   //Initialisation                 
-   bool              Init(const char Ck_Case,const double &first,const double &pom,const double &dc,const double &signal);
-   //Main
-   bool              Trade();
+   //Initialisation     
+   bool              Init(const char &Ck_Case);
+   //Main          
+   bool              Trade(const double &first,const double &pom,const double &dc,const double &signal);
+
   };
 //+------------------------------------------------------------------+
 //| Constructor                                                      |
 //+------------------------------------------------------------------+
-RCat::RCat(const string pair)
+RCat::RCat(const string Pair,const double &Pom_Koef,const double &PomBuy,const double &PomSell)
   {
-   m_pair=pair;
+   m_pair=Pair;
+   m_pom_koef= Pom_Koef;
+   m_pom_buy = PomBuy;
+   m_pom_sell= PomSell;
   }
 //+------------------------------------------------------------------+
 //| Destructor                                                       |
@@ -94,13 +102,21 @@ RCat::~RCat()
 //+------------------------------------------------------------------+
 //| Initialisation                                                   |
 //+------------------------------------------------------------------+
-bool RCat::Init(const char Ck_Case,const double &first,const double &pom,const double &dc,const double &signal)
+bool RCat::Init(const char &Ck_Case)
   {
-   if(Ck_Case>4 || Ck_Case<0)
+    if(Ck_Case>4 || Ck_Case<0)
      {
       return(false);
      }
-
+ m_current_ck=Ck_Case;
+   return(true);
+  }
+//+------------------------------------------------------------------+
+//| Main Real Trade Function                                         |
+//+------------------------------------------------------------------+
+bool RCat::Trade(const double &first,const double &pom,const double &dc,const double &signal)
+  {
+ 
 //Fill Latest Indicator Buffers
    m_first=first;
    m_pom= pom;
@@ -108,14 +124,8 @@ bool RCat::Init(const char Ck_Case,const double &first,const double &pom,const d
    m_signal=signal;
 
 //If Ok    
-   m_current_ck=Ck_Case;
-   return(true);
-  }
-//+------------------------------------------------------------------+
-//| Main Real Trade Function                                         |
-//+------------------------------------------------------------------+
-bool RCat::Trade(void)
-  {
+  
+
 ///---MAIN CALCULATION---///
    m_TR_RES=-1;
 
@@ -127,7 +137,7 @@ bool RCat::Trade(void)
 //+------------------------------------------------------------------+
 //| Open Rule                                                        |
 //+------------------------------------------------------------------+
-int RCat::m_OpenRule(const ENUM_RT_OpenRule OpenRule)
+int RCat::m_OpenRule(const ENUM_RT_OpenRule &OpenRule)
   {
    int TR_RES=-1;
 
@@ -149,7 +159,7 @@ int RCat::m_OpenRule(const ENUM_RT_OpenRule OpenRule)
 //+------------------------------------------------------------------+
 //| Close Rule                                                       |
 //+------------------------------------------------------------------+
-int RCat::m_CloseRule(const ENUM_RT_CloseRule CloseRule)
+int RCat::m_CloseRule(const ENUM_RT_CloseRule &CloseRule)
   {
    int TR_RES=-1;
 
@@ -163,7 +173,7 @@ int RCat::m_CloseRule(const ENUM_RT_CloseRule CloseRule)
 //+------------------------------------------------------------------+
 //| Open TR #0 POMI                                                  |
 //+------------------------------------------------------------------+
-int RCat::m_POMI(void)
+int RCat::m_POMI()
   {
 
    return(0);
