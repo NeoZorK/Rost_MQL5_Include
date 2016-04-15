@@ -104,6 +104,7 @@ public:
                            const double &Sl,const double &Tp);
    //Close Position
    bool              ClosePosition(const string CustomComment);
+   bool              CloseAllPositions(const string CustomComment);
    //Open Position
    int               OpenMarketOrder(const double &Vol,const uchar &BuyOrSell,const double &Sl,const double &Tp,
                                      const uint &Magic,const string _Comment,const bool LimitOrder,const ushort LimitShift_Pt);
@@ -167,6 +168,8 @@ bool RCat::Trade(const double &First,const double &Pom,const double &Dc,const do
 
 // CloseRule -> if close, exit
    if(m_CloseRule(m_current_close_rule)) return(true);
+
+// Check if Futured EndOFT - is NOW
 
 //Check Spread     
 
@@ -488,4 +491,45 @@ int RCat::OpenMarketOrder(const double &Vol,const uchar &BuyOrSell,const double 
 
    return(res);
   }//END OF OPEN MARKET ORDER
+//+------------------------------------------------------------------+
+//|  CLOSE ALL POSITIONS                                             |
+//+------------------------------------------------------------------+
+bool RCat::CloseAllPositions(const string CustomComment)
+  {
+   bool res=false;
+   int pos_total=PositionsTotal();
+//   Print("pos total"+IntegerToString(pos_total) );
+   if(pos_total<1){return(false);}
+
+   for(int i=0;i<pos_total;i++)
+     {
+      string pair=PositionGetSymbol(i);
+      if(pair=="")
+        {
+         Print(__FUNCTION__+" Err: "+IntegerToString(GetLastError()));
+         return(res=false);
+        }
+
+      //Position Direction
+      long pos_type=PositionGetInteger(POSITION_TYPE);
+
+      //Position Volume
+      double pos_volume=PositionGetDouble(POSITION_VOLUME);
+
+      //If Buy Opened, close it  
+      if(pos_type==POSITION_TYPE_BUY)
+        {
+         OpenMarketOrder(pos_volume,OP_SELL,m_stoploss,m_takeprofit,MAGIC_IS,CustomComment,false,0);
+         res=true;
+        }//END OF CLOSE BUY
+
+      //If Sell Opened, close it  
+      if(pos_type==POSITION_TYPE_SELL)
+        {
+         OpenMarketOrder(pos_volume,OP_BUY,m_stoploss,m_takeprofit,MAGIC_IB,CustomComment,false,0);
+         res=true;
+        }//END OF CLOSE SELL
+     }//END of FOR
+   return(res);
+  }//END OF CLOSE ALL POSITIONS  
 //+------------------------------------------------------------------+
