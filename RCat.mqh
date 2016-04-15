@@ -29,25 +29,7 @@ enum ENUM_RT_CloseRule
 //|                                                                  |
 //+------------------------------------------------------------------+
 /*
-2. Calculate Lot ?
-
-10. Check If Future End of period NOW, then CloseAllPositions
-11. If Spread>MaxSpread Continue;
-12. if TR_RES<0 then exit (err or no signal)
-13. Quant mode here ?
-14. If any opened position ? bool ,save
-15. If No OPen Pos & TR_RES=BUY1 then OpenBuyMarket and Exit (same for Sell)
-16. //ADD VOLUME
-17. if already open position
-18. get pos volume
-19. check if posvolume > maxVolume -> exit
-20. get pos_open price
-21. get pos_current_price
-22. get pos_direction
-23. get symbol_point (can be once onInit)
-24. if CurrentPOs=Buy & TR_RES= BUY then if price Lower then AddVolumeBUY else exit
-25. same for sell
-26. Ok! Thats All!    
+2. Calculate Lot ?   
 */
 //+------------------------------------------------------------------+
 //| Class for Real Time Trading                                      |
@@ -69,6 +51,7 @@ private:
    double            m_pom_koef;
    double            m_pom_buy;
    double            m_pom_sell;
+   ushort            m_max_spread;
    //Comission for AutoCloseDcSpread
    ushort            m_comission;
    //Latest Position:direction, profit, price (onClose)
@@ -77,6 +60,10 @@ private:
    double            m_position_close_price;
    double            m_stoploss;
    double            m_takeprofit;
+   double            m_start_volume;
+   double            m_step_volume;
+   double            m_max_volume;
+   double            m_add_vol_shift_points;
 
    ENUM_RT_OpenRule  m_current_open_rule;
    ENUM_RT_CloseRule m_current_close_rule;
@@ -95,13 +82,14 @@ private:
 
 public:
                      RCat(const string Pair,const double &Pom_Koef,const double &PomBuy,const double &PomSell,
-                                            const ushort &Fee,const uchar &SleepPage);
+                                            const ushort &Fee,const uchar &SleepPage,const ushort &MaxSpread);
                     ~RCat();
    //Initialisation     
-   bool              Init(const char &Ck_Case,const ENUM_RT_OpenRule &OpenRule,const ENUM_RT_CloseRule &CloseRule);
+   bool              Init(const char &Ck_Case,const ENUM_RT_OpenRule &OpenRule,const ENUM_RT_CloseRule &CloseRule,
+                          const double AddVol_Shift_Pt);
    //Main          
    bool              Trade(const double &First,const double &Pom,const double &Dc,const double &Signal,
-                           const double &Sl,const double &Tp);
+                           const double &Sl,const double &Tp,const double &StartVol,const double &MaxVol);
    //Close Position
    bool              ClosePosition(const string CustomComment);
    bool              CloseAllPositions(const string CustomComment);
@@ -114,7 +102,7 @@ public:
 //| Constructor                                                      |
 //+------------------------------------------------------------------+
 RCat::RCat(const string Pair,const double &Pom_Koef,const double &PomBuy,const double &PomSell,
-           const ushort &Fee,const uchar &SleepPage)
+           const ushort &Fee,const uchar &SleepPage,const ushort &MaxSpread)
   {
    m_pair=Pair;
    m_pom_koef= Pom_Koef;
@@ -124,6 +112,7 @@ RCat::RCat(const string Pair,const double &Pom_Koef,const double &PomBuy,const d
    m_sleeppage=SleepPage;
    m_buypos_count=0;
    m_sellpos_count=0;
+   m_max_spread=MaxSpread;
   }
 //+------------------------------------------------------------------+
 //| Destructor                                                       |
@@ -134,7 +123,8 @@ RCat::~RCat()
 //+------------------------------------------------------------------+
 //| Initialisation                                                   |
 //+------------------------------------------------------------------+
-bool RCat::Init(const char &Ck_Case,const ENUM_RT_OpenRule &OpenRule,const ENUM_RT_CloseRule &CloseRule)
+bool RCat::Init(const char &Ck_Case,const ENUM_RT_OpenRule &OpenRule,const ENUM_RT_CloseRule &CloseRule,
+                const double AddVol_Shift_Pt)
   {
    if(Ck_Case>4 || Ck_Case<0)
      {
@@ -144,13 +134,15 @@ bool RCat::Init(const char &Ck_Case,const ENUM_RT_OpenRule &OpenRule,const ENUM_
 
    m_current_open_rule=OpenRule;
    m_current_close_rule=CloseRule;
+   m_add_vol_shift_points=AddVol_Shift_Pt;
 
    return(true);
   }
 //+------------------------------------------------------------------+
-//| Main Real Trade Function                                         |
+//| Main Real Trade Function:True if Open\Close Position             |
 //+------------------------------------------------------------------+
-bool RCat::Trade(const double &First,const double &Pom,const double &Dc,const double &Signal,const double &Sl,const double &Tp)
+bool RCat::Trade(const double &First,const double &Pom,const double &Dc,const double &Signal,
+                 const double &Sl,const double &Tp,const double &StartVol,const double &MaxVol)
   {
 // Fill Latest Indicator Buffers
    m_first=First;
@@ -159,6 +151,8 @@ bool RCat::Trade(const double &First,const double &Pom,const double &Dc,const do
    m_signal=Signal;
    m_stoploss=Sl;
    m_takeprofit=Tp;
+   m_start_volume=StartVol;
+   m_max_volume=MaxVol;
 
 ///---MAIN CALCULATION---///
    m_TR_RES=-1;
@@ -169,12 +163,90 @@ bool RCat::Trade(const double &First,const double &Pom,const double &Dc,const do
 // CloseRule -> if close, exit
    if(m_CloseRule(m_current_close_rule)) return(true);
 
-// Check if Futured EndOFT - is NOW
+// Check Spread
+   if(m_max_spread >(int)SymbolInfoInteger(m_pair,SYMBOL_SPREAD)) return(false);
 
-//Check Spread     
+// NoSignal, Err -> Exit
+   if(m_TR_RES <0) return(false);
 
-//If Ok
-   return(true);
+//QuantMode here?
+
+//  If any Open Position?
+   bool Opened_Position=PositionSelect(m_pair);
+
+//-----NEW POSITION-----//
+   if(!Opened_Position)
+     {
+      switch(m_TR_RES)
+        {
+         //BUY
+         case  1005: OpenMarketOrder(m_start_volume,OP_BUY,m_stoploss,m_takeprofit,MAGIC_IB,
+                                     DoubleToString(m_pom)+"|"+DoubleToString(m_dc)+"|"+
+                                     TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
+            return(true); break;
+
+            //SELL
+         case  2006: OpenMarketOrder(m_start_volume,OP_SELL,m_stoploss,m_takeprofit,MAGIC_IS,
+                                     DoubleToString(m_pom)+"|"+DoubleToString(m_dc)+"|"+
+                                     TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
+            return(true); break;
+
+         default:
+            break;
+        }//END OF SWITCH
+     }//END OF NEW POSITION
+
+//-----ADD VOLUME-----//    
+   if(Opened_Position)
+     {
+
+      //Position Volume
+      double pos_volume=PositionGetDouble(POSITION_VOLUME);
+
+      //Check MaxVolume
+      if(pos_volume>=m_max_volume) {return(false);}
+
+      //Position Open Price
+      double pos_open_price=PositionGetDouble(POSITION_PRICE_OPEN);
+
+      //Current Price(Bid for BuyClose & Ask for SellClose)
+      double pos_current_price=PositionGetDouble(POSITION_PRICE_CURRENT);
+
+      //Position Direction
+      long pos_type=PositionGetInteger(POSITION_TYPE);
+
+      //Pair point
+      double point_size=SymbolInfoDouble(m_pair,SYMBOL_POINT);
+
+      //Add Volume BUY
+      if(pos_type==POSITION_TYPE_BUY && m_TR_RES==BUY1)
+        {
+         //If Price lower->Add Vol Buy, else Exit
+         if(pos_current_price>pos_open_price-(m_add_vol_shift_points*point_size)) return(false);
+
+         //Add BUY
+         OpenMarketOrder(m_start_volume,OP_BUY,m_stoploss,m_takeprofit,MAGIC_IB,"+AV:"+
+                         DoubleToString(m_pom)+"|"+DoubleToString(m_dc)+"|"+
+                         TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
+         return(true);
+        }//END OF ADD VOL BUY
+
+      //Add Volume SELL
+      if((pos_type==POSITION_TYPE_SELL) && (m_TR_RES==SELL1))
+        {
+         //If Price Higher->Add Vol Sell, else Exit
+         if(pos_current_price<pos_open_price+(m_add_vol_shift_points*point_size)) return(false);
+
+         //Add SELL
+         OpenMarketOrder(m_start_volume,OP_SELL,m_stoploss,m_takeprofit,MAGIC_IS,"+AV:"+
+                         DoubleToString(m_pom)+"|"+DoubleToString(m_dc)+"|"+
+                         TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
+         return(true);
+        }//END OF ADD VOL SELL
+     }//END OF ADD VOLUME
+
+//If No Opened Position then false
+   return(false);
   }
 //+------------------------------------------------------------------+
 //| Open Rule                                                        |
@@ -182,12 +254,16 @@ bool RCat::Trade(const double &First,const double &Pom,const double &Dc,const do
 int RCat::m_OpenRule(const ENUM_RT_OpenRule &OpenRule)
   {
    int TR_RES=-1;
-
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
    if(OpenRule<0)
      {
       return(-2);
      }
-
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
    switch(OpenRule)
      {
       case  0:TR_RES=m_POMI();
@@ -204,12 +280,16 @@ int RCat::m_OpenRule(const ENUM_RT_OpenRule &OpenRule)
 int RCat::m_CloseRule(const ENUM_RT_CloseRule &CloseRule)
   {
    int TR_RES=-1;
-
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
    if(CloseRule<0)
      {
       return(-2);
      }
-
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
    switch(CloseRule)
      {
       case  0:TR_RES=m_AutoCloseDcSpread();
@@ -227,17 +307,20 @@ int RCat::m_CloseRule(const ENUM_RT_CloseRule &CloseRule)
 int RCat::m_POMI()
   {
    int res=-1;
-
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
    if(m_signal==0)
      {
       return(-2);
      }
-
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
    if(m_first==0)
      {
       return(-2);
      }
-
 //---2:1 
 //(case 4) or (case14)
    if(m_current_ck==CkSell4 || m_current_ck==CkBuySell14)
@@ -248,7 +331,6 @@ int RCat::m_POMI()
          return(SELL1);
         }
      }//END of BUY
-
 //---1:2
 // (case 1) or (case14)
    if(m_current_ck==CkBuy1 || m_current_ck==CkBuySell14)
@@ -280,7 +362,6 @@ bool RCat::m_AutoCloseDcSpread(void)
 
 //GetCurrent Spread
    int temp_spread=(int)SymbolInfoInteger(m_pair,SYMBOL_SPREAD);
-
 //Check to close position   
    if(pos_profit>=MathAbs(dc*10)+(temp_spread*pos_volume)+(m_comission*pos_volume))
      {
@@ -310,14 +391,12 @@ bool RCat::ClosePosition(const string CustomComment)
 
 //Position Volume
    double pos_volume=PositionGetDouble(POSITION_VOLUME);
-
 //If Buy Opened, Close It  
    if(m_position_close_direction==POSITION_TYPE_BUY)
      {
       OpenMarketOrder(pos_volume,OP_SELL,m_stoploss,m_takeprofit,MAGIC_IS,CustomComment,false,0);
       res=true;
      }//END OF Close BUY
-
 //If Sell Opened, Close it   
    if(m_position_close_direction==POSITION_TYPE_SELL)
      {
@@ -336,7 +415,6 @@ int RCat::OpenMarketOrder(const double &Vol,const uchar &BuyOrSell,const double 
    double price=0;
    color cvet=clrBlack;
    double zsl=0,ztp=0;
-
 //Not Buy or Not Sell -?, exit
    if(BuyOrSell>1)
      {
@@ -353,7 +431,6 @@ int RCat::OpenMarketOrder(const double &Vol,const uchar &BuyOrSell,const double 
 //If Limit is to Close to price, then change to minimal value
    double shift=LimitShift_Pt;
    if(shift<5) shift=5;
-
 //+------------------------------------------------------------------+
 //| BUY                                                              |
 //+------------------------------------------------------------------+
@@ -388,7 +465,6 @@ int RCat::OpenMarketOrder(const double &Vol,const uchar &BuyOrSell,const double 
    ZeroMemory(z_mt_req);
    MqlTradeResult  z_mt_rez={0};
    ZeroMemory(z_mt_rez);
-
 //Limit Order Mode 
    if(LimitOrder)
      {
@@ -411,7 +487,6 @@ int RCat::OpenMarketOrder(const double &Vol,const uchar &BuyOrSell,const double 
 
 //added 9.02.2015 (error 10015)
    z_mt_req.price=price;
-
 //  Print("Current price: "+DoubleToString(price));
 
    if(BuyOrSell==OP_BUY)
@@ -426,7 +501,9 @@ int RCat::OpenMarketOrder(const double &Vol,const uchar &BuyOrSell,const double 
       //Market Order
       z_mt_req.type=ORDER_TYPE_BUY;
      }
-
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
    if(BuyOrSell==OP_SELL)
      {
       //If limits sets needed type
@@ -471,6 +548,9 @@ int RCat::OpenMarketOrder(const double &Vol,const uchar &BuyOrSell,const double 
 //|  Send Order                                                      |
 //+------------------------------------------------------------------+
    int res=OrderSend(z_mt_req,z_mt_rez);
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
    if(res)
      {
       ret=(int)z_mt_rez.retcode;
@@ -483,6 +563,9 @@ int RCat::OpenMarketOrder(const double &Vol,const uchar &BuyOrSell,const double 
          if(BuyOrSell==OP_SELL) m_sellpos_count++;
         }
      } // END of ORDER SENDED
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
    else
      {//If Order Error
       Print("res="+IntegerToString(res)+" ret:"+IntegerToString(ret)+" LastErr: "+IntegerToString(GetLastError())+z_mt_rez.comment);
@@ -502,6 +585,9 @@ bool RCat::CloseAllPositions(const string CustomComment)
    if(pos_total<1){return(false);}
 
    for(int i=0;i<pos_total;i++)
+      //+------------------------------------------------------------------+
+      //|                                                                  |
+      //+------------------------------------------------------------------+
      {
       string pair=PositionGetSymbol(i);
       if(pair=="")
