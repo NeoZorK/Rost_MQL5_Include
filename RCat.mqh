@@ -15,6 +15,9 @@ const uint MAGIC_IB=3000000;
 const uint MAGIC_IS=3100000;
 const uchar OP_BUY=0;
 const uchar OP_SELL=1;
+//Indicator POM3 Signals:
+const char Ind_Buy = 1;
+const char Ind_Sell=-1;
 //RealTime Open TR
 enum ENUM_RT_OpenRule
   {
@@ -164,7 +167,7 @@ bool RCat::Trade(const double &First,const double &Pom,const double &Dc,const do
    if(m_CloseRule(m_current_close_rule)) return(true);
 
 // Check Spread
-   if(m_max_spread >(int)SymbolInfoInteger(m_pair,SYMBOL_SPREAD)) return(false);
+   if(m_max_spread <(int)SymbolInfoInteger(m_pair,SYMBOL_SPREAD)) return(false);
 
 // NoSignal, Err -> Exit
    if(m_TR_RES <0) return(false);
@@ -325,7 +328,7 @@ int RCat::m_POMI()
 //(case 4) or (case14)
    if(m_current_ck==CkSell4 || m_current_ck==CkBuySell14)
      {
-      if((m_signal==SELL1) && (m_pom>=m_pom_sell) && (m_pom<m_pom_sell+m_pom_koef))
+      if((m_signal==Ind_Sell) && (m_pom>=m_pom_sell) && (m_pom<m_pom_sell+m_pom_koef))
         {
          //  Print("SELL PRISHEL");
          return(SELL1);
@@ -335,7 +338,7 @@ int RCat::m_POMI()
 // (case 1) or (case14)
    if(m_current_ck==CkBuy1 || m_current_ck==CkBuySell14)
      {
-      if((m_signal==BUY1) && (m_pom>=m_pom_buy) && (m_pom<m_pom_buy+m_pom_koef))
+      if((m_signal==Ind_Buy) && (m_pom>=m_pom_buy) && (m_pom<m_pom_buy+m_pom_koef))
         {
          return(BUY1);
         }
