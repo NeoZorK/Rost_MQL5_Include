@@ -184,13 +184,13 @@ bool RCat::Trade(const double &First,const double &Pom,const double &Dc,const do
         {
          //BUY
          case  1005: OpenMarketOrder(m_start_volume,OP_BUY,m_stoploss,m_takeprofit,MAGIC_IB,
-                                     DoubleToString(m_pom)+"|"+DoubleToString(m_dc)+"|"+
+                                     DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
                                      TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
             return(true); break;
 
             //SELL
          case  2006: OpenMarketOrder(m_start_volume,OP_SELL,m_stoploss,m_takeprofit,MAGIC_IS,
-                                     DoubleToString(m_pom)+"|"+DoubleToString(m_dc)+"|"+
+                                     DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
                                      TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
             return(true); break;
 
@@ -228,8 +228,8 @@ bool RCat::Trade(const double &First,const double &Pom,const double &Dc,const do
          if(pos_current_price>pos_open_price-(m_add_vol_shift_points*point_size)) return(false);
 
          //Add BUY
-         OpenMarketOrder(m_start_volume,OP_BUY,m_stoploss,m_takeprofit,MAGIC_IB,"+AV:"+
-                         DoubleToString(m_pom)+"|"+DoubleToString(m_dc)+"|"+
+         OpenMarketOrder(m_start_volume,OP_BUY,m_stoploss,m_takeprofit,MAGIC_IB,"+V"+
+                         DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
                          TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
          return(true);
         }//END OF ADD VOL BUY
@@ -241,8 +241,8 @@ bool RCat::Trade(const double &First,const double &Pom,const double &Dc,const do
          if(pos_current_price<pos_open_price+(m_add_vol_shift_points*point_size)) return(false);
 
          //Add SELL
-         OpenMarketOrder(m_start_volume,OP_SELL,m_stoploss,m_takeprofit,MAGIC_IS,"+AV:"+
-                         DoubleToString(m_pom)+"|"+DoubleToString(m_dc)+"|"+
+         OpenMarketOrder(m_start_volume,OP_SELL,m_stoploss,m_takeprofit,MAGIC_IS,"+V"+
+                         DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
                          TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
          return(true);
         }//END OF ADD VOL SELL
@@ -368,9 +368,8 @@ bool RCat::m_AutoCloseDcSpread(void)
 //Check to close position   
    if(pos_profit>=MathAbs(dc*10)+(temp_spread*pos_volume)+(m_comission*pos_volume))
      {
-      if(ClosePosition("Sprd"+IntegerToString(temp_spread)+" dC:"+DoubleToString(dc/inpDeltaC_koef)+
-         " "+TimeToString(TimeCurrent(),TIME_SECONDS)+
-         "|Closed by|dC|")) {res=true;}
+      if(ClosePosition("Sprd"+IntegerToString(temp_spread)+"dC"+DoubleToString(dc/inpDeltaC_koef,5)+
+         " "+TimeToString(TimeCurrent(),TIME_SECONDS))) {res=true;}
      }
 
    return(res);
