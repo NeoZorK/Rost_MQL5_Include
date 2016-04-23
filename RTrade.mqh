@@ -135,8 +135,15 @@ private:
    double            m_arr_First_P2[];
    double            m_arr_Pom_P1[];
    double            m_arr_Pom_P2[];
-   double            m_arr_dC_P1[];
-   double            m_arr_dC_P2[];
+   //OHLC DC
+   double            m_arr_dC_P1_Open[];
+   double            m_arr_dC_P2_Open[];
+   double            m_arr_dC_P1_High[];
+   double            m_arr_dC_P2_High[];
+   double            m_arr_dC_P1_Low[];
+   double            m_arr_dC_P2_Low[];
+   double            m_arr_dC_P1_Close[];
+   double            m_arr_dC_P2_Close[];
    //OHLC in a row
    double            m_arr_RowRates[];
 
@@ -176,7 +183,8 @@ public:
 
    //Init for Emulating                        
    bool              _InitPriming(const bool Priming1,MqlRates &arr_Rates[],int &arr_Spreads[],
-                                  double &arr_Signals[],double &arr_Firsts[],double &arr_Poms[],double &arr_Dc[]);
+                                  double &arr_Signals[],double &arr_Firsts[],double &arr_Poms[],
+                                  double &arr_Dc_Close[],double &arr_Dc_Open[],double &arr_Dc_High[],double &arr_Dc_Low[]);
    //Emulate                         
    bool              _InitEmul(const ENUM_EMUL_CloseRule CloseRuleNum,const ENUM_EMUL_OpenRule OpenRuleNum,const int MaxSpread,
                                const double PomBuy,const double PomSell,const double PomKoef,const double Comission);
@@ -211,8 +219,16 @@ RTrade::RTrade()
    ArraySetAsSeries(m_arr_Signal_P2,true);
    ArraySetAsSeries(m_arr_Spread_P1,true);
    ArraySetAsSeries(m_arr_Spread_P2,true);
-   ArraySetAsSeries(m_arr_dC_P1,true);
-   ArraySetAsSeries(m_arr_dC_P2,true);
+//OHLC DC
+   ArraySetAsSeries(m_arr_dC_P1_Open,true);
+   ArraySetAsSeries(m_arr_dC_P2_Open,true);
+   ArraySetAsSeries(m_arr_dC_P1_High,true);
+   ArraySetAsSeries(m_arr_dC_P2_High,true);
+   ArraySetAsSeries(m_arr_dC_P1_Low,true);
+   ArraySetAsSeries(m_arr_dC_P2_Low,true);
+   ArraySetAsSeries(m_arr_dC_P1_Close,true);
+   ArraySetAsSeries(m_arr_dC_P2_Close,true);
+
    m_Total_Minutes_in_period=0;
    m_CurrentPriming=0;
    m_debug=false;
@@ -256,7 +272,8 @@ bool RTrade::_Init(const string pair,const string path_to_ind,const uchar bottle
 //| CopyArrays to Local                                              |
 //+------------------------------------------------------------------+
 bool RTrade::_InitPriming(const bool Priming1,MqlRates &arr_Rates[],int &arr_Spreads[],double &arr_Signals[],
-                          double &arr_Firsts[],double &arr_Poms[],double &arr_Dc[])
+                          double &arr_Firsts[],double &arr_Poms[],
+                          double &arr_Dc_Close[],double &arr_Dc_Open[],double &arr_Dc_High[],double &arr_Dc_Low[])
   {
 //Start speed measuring
    uint Start_measure=GetTickCount();
@@ -269,7 +286,11 @@ bool RTrade::_InitPriming(const bool Priming1,MqlRates &arr_Rates[],int &arr_Spr
       if(ArrayCopy(m_arr_Signal_P1,arr_Signals,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
       if(ArrayCopy(m_arr_First_P1,arr_Firsts,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
       if(ArrayCopy(m_arr_Pom_P1,arr_Poms,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
-      if(ArrayCopy(m_arr_dC_P1,arr_Dc,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      //OHLC DC
+      if(ArrayCopy(m_arr_dC_P1_Open,arr_Dc_Open,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_arr_dC_P1_High,arr_Dc_High,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_arr_dC_P1_Low,arr_Dc_Low,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_arr_dC_P1_Close,arr_Dc_Close,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
       m_CurrentPriming=1;
 
       //Save total minutes in period
@@ -282,7 +303,11 @@ bool RTrade::_InitPriming(const bool Priming1,MqlRates &arr_Rates[],int &arr_Spr
       if(ArrayCopy(m_arr_Signal_P2,arr_Signals,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
       if(ArrayCopy(m_arr_First_P2,arr_Firsts,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
       if(ArrayCopy(m_arr_Pom_P2,arr_Poms,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
-      if(ArrayCopy(m_arr_dC_P2,arr_Dc,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      //OHLC DC
+      if(ArrayCopy(m_arr_dC_P2_Open,arr_Dc_Open,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_arr_dC_P2_High,arr_Dc_High,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_arr_dC_P2_Low,arr_Dc_Low,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_arr_dC_P2_Close,arr_Dc_Close,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
       m_CurrentPriming=2;
 
       //Save total minutes in period
@@ -290,10 +315,10 @@ bool RTrade::_InitPriming(const bool Priming1,MqlRates &arr_Rates[],int &arr_Spr
      }
 
 //Transform Primings ohlc rates to rows
-   if(!m_TransformPriming())
-     {
-      return(false);
-     }
+//  if(!m_TransformPriming())
+//     {
+//      return(false);
+//     }
 
 //Stop speed measuring     
 //  uint Stop_measuring=GetTickCount()-Start_measure;
