@@ -108,7 +108,7 @@ private:
    MqlRates          m_last_server_rate;        //Last loaded server rate
    uint              m_first_server_spread;     //First loaded server spread
    uint              m_last_server_spread;      //Last loaded server spread
-                                                //  datetime          m_last_server_time;        //Last loaded server time
+
    ENUM_HistResults  m_result;                  //String result of loading history 
    uint              m_total_working_days_count;//Total (working) days in all period
 
@@ -1042,7 +1042,8 @@ datetime RHistory::LastMinute_DaySearch(const datetime Date,const bool SearchDir
          //If trys out, exit
          if(day_counter>max_days)
            {
-            Print(__FUNCTION__+"Last minute not found, after all trys from:"+TimeToString(Date,TIME_DATE|TIME_MINUTES|TIME_SECONDS)+
+            Print(__FUNCTION__+"Last minute not found, after all trys from:"
+                  +TimeToString(Date,TIME_DATE|TIME_MINUTES|TIME_SECONDS)+
                   "To: "+TimeToString(circle_dt,TIME_DATE|TIME_MINUTES|TIME_SECONDS));
             return(0);
            }
@@ -1068,9 +1069,9 @@ datetime RHistory::LastMinute_DaySearch(const datetime Date,const bool SearchDir
    return(dt_result);
   }
 //+------------------------------------------------------------------+
-//| First minute by date                                             |
+//| First minute by date (True forward, false backward)              |
 //+------------------------------------------------------------------+ 
-datetime RHistory::FirstMinute_DaySearch(const datetime Date,const bool SearchDirection) //True forward, false backward)
+datetime RHistory::FirstMinute_DaySearch(const datetime Date,const bool SearchDirection)
   {
    CDateTime cdt;
    datetime dt_result=0;
@@ -1107,7 +1108,8 @@ datetime RHistory::FirstMinute_DaySearch(const datetime Date,const bool SearchDi
          //If trys out, exit
          if(day_counter>max_days)
            {
-            Print(__FUNCTION__+"First minute not found, after all trys from:"+TimeToString(Date,TIME_DATE|TIME_MINUTES|TIME_SECONDS)+
+            Print(__FUNCTION__+"First minute not found, after all trys from:"
+                  +TimeToString(Date,TIME_DATE|TIME_MINUTES|TIME_SECONDS)+
                   "To: "+TimeToString(circle_dt,TIME_DATE|TIME_MINUTES|TIME_SECONDS));
             return(0);
            }
@@ -1487,7 +1489,7 @@ datetime RHistory::First_Work_Day_In_Week(datetime Date)
 
    return(StructToTime(zdate));
   }
-//---------------------------------------------------------------------------------------------------------------------------------------//
+//----------------------------------------------------------------------------------------------------------------------//
 //+------------------------------------------------------------------+
 //| Last Work Day in the Month                                       |
 //+------------------------------------------------------------------+ 

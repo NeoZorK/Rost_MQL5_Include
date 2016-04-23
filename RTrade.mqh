@@ -24,9 +24,18 @@ const char CkBuySell14=2;
 const char CkSingularityBuy=3;
 const char CkSingularitySell=4;
 //+------------------------------------------------------------------+
-//|                                                                  |
+//| OHLC Mode in Emulation                                           |
 //+------------------------------------------------------------------+
-//Trade  Results
+enum ENUM_EMUL_OHLC_PRICE
+  {
+   OHLC_OpenPositionOnly,        //Append OHLC prices in OpenRule
+   OHLC_ClosePositionOnly,       //Append OHLC prices in CloseRule
+   OHLC_OpenAndClosePositions,   //Append OHLC prices in both 
+   ClosePricesOnly,              //Append only Close prices at Open&Close
+  };
+//+------------------------------------------------------------------+
+//| Trade  Results                                                   |
+//+------------------------------------------------------------------+
 enum ENUM_TradeResults
   {
    TRR_DONE=0,
@@ -163,8 +172,10 @@ private:
    int               m_EMUL_TR_Caterpillar(const char Case,const int IterationNum);
    //TR Open OHLC Caterpillar
    int               m_EMUL_TR_Caterpillar(const char Case,const int IterationNum,const double Current_OHLC_Price);
-   bool              m_EMUL_CloseRule(const ENUM_EMUL_CloseRule CloseRuleNum,const double CurrentProfit,const double CurrentDC,const uint CurrentSpread);
-   int               m_EMUL_OpenRule(const ENUM_EMUL_OpenRule OpenRuleNum,const char Case,const int IterationNum,const double Current_OHLC_Price);
+   bool              m_EMUL_CloseRule(const ENUM_EMUL_CloseRule CloseRuleNum,const double CurrentProfit,const double CurrentDC,
+                                      const uint CurrentSpread);
+   int               m_EMUL_OpenRule(const ENUM_EMUL_OpenRule OpenRuleNum,const char Case,const int IterationNum,
+                                     const double Current_OHLC_Price);
    //Calculate Ck Prediction 0,1,2 : 1,4,14
    char              m_BUILD_CK_TR18_0330_Virt(const bool USDFirst);
 public:
@@ -378,8 +389,8 @@ bool RTrade::Emulate_Trading1()
       //From first day 00:00 to 23:50 last day in Priming1
       for(int i=ArrSize-1;i>-1;i--)
         {
-         // Print(IntegerToString(i)+" First: "+TimeToString(m_arr_Rates_P1[ArraySize(m_arr_Rates_P1)-1].time,TIME_DATE|TIME_MINUTES));
-         //Print(IntegerToString(i)+" Last: "+TimeToString(m_arr_Rates_P1[i].time,TIME_DATE|TIME_MINUTES));
+         // Print(" First: "+TimeToString(m_arr_Rates_P1[ArraySize(m_arr_Rates_P1)-1].time,TIME_DATE|TIME_MINUTES));
+         //Print(" Last: "+TimeToString(m_arr_Rates_P1[i].time,TIME_DATE|TIME_MINUTES));
 
 /*
             //Reset parmas
@@ -501,9 +512,9 @@ bool RTrade::Emulate_Trading1()
       //Fill Omega Structures for Priming1:
       switch(Case)
         {
-         case  0: m_arr_sim_q[m_simulated_primings_total].P1_Q1_Simul=BUY_Signal_Count;  break; // Case1
-         case  1: m_arr_sim_q[m_simulated_primings_total].P1_Q4_Simul=SELL_Signal_Count;  break; // Case4
-         case  2: m_arr_sim_q[m_simulated_primings_total].P1_Q14_Simul=BUY_Signal_Count+SELL_Signal_Count;  break; // Case14
+         case  0: m_arr_sim_q[m_simulated_primings_total].P1_Q1_Simul=BUY_Signal_Count;  break;
+         case  1: m_arr_sim_q[m_simulated_primings_total].P1_Q4_Simul=SELL_Signal_Count;  break;
+         case  2: m_arr_sim_q[m_simulated_primings_total].P1_Q14_Simul=BUY_Signal_Count+SELL_Signal_Count;break;
 
          default:
             break;
@@ -577,7 +588,7 @@ bool RTrade::Emulate_Trading2()
       //From first day 00:00 to 23:50 last day in Priming1
       for(int i=ArrSize-1;i>-1;i--)
         {
-         // Print(IntegerToString(i)+" First: "+TimeToString(m_arr_Rates_P1[ArraySize(m_arr_Rates_P1)-1].time,TIME_DATE|TIME_MINUTES));
+         // Print(" First: "+TimeToString(m_arr_Rates_P1[ArraySize(m_arr_Rates_P1)-1].time,TIME_DATE|TIME_MINUTES));
          //Print(IntegerToString(i)+" Last: "+TimeToString(m_arr_Rates_P1[i].time,TIME_DATE|TIME_MINUTES));
 
 /*
@@ -764,7 +775,8 @@ bool  RTrade::m_EMUL_AutoCloseDCSpread(const double PositionProfit,const double 
 //+------------------------------------------------------------------+
 //| Emulated Choosing Close Rule                                     |
 //+------------------------------------------------------------------+
-bool  RTrade::m_EMUL_CloseRule(const ENUM_EMUL_CloseRule CloseRuleNum,const double CurrentProfit,const double CurrentDC,const uint CurrentSpread)
+bool  RTrade::m_EMUL_CloseRule(const ENUM_EMUL_CloseRule CloseRuleNum,const double CurrentProfit,
+                               const double CurrentDC,const uint CurrentSpread)
   {
 //TR_RESULT  
    bool TR_RES=-1;
@@ -788,7 +800,8 @@ bool  RTrade::m_EMUL_CloseRule(const ENUM_EMUL_CloseRule CloseRuleNum,const doub
 //+------------------------------------------------------------------+
 //| Emulated Choosing Open Rule                                      |
 //+------------------------------------------------------------------+
-int  RTrade::m_EMUL_OpenRule(const ENUM_EMUL_OpenRule OpenRuleNum,const char Case,const int IterationNum,const double Current_OHLC_Price)
+int  RTrade::m_EMUL_OpenRule(const ENUM_EMUL_OpenRule OpenRuleNum,const char Case,const int IterationNum,
+                             const double Current_OHLC_Price)
   {
 //TR_RESULT  
    int TR_RES=-1;
