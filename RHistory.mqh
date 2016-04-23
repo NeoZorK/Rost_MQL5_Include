@@ -197,7 +197,8 @@ public:
    //Forms primings data for prediction(copy rates\spreads\ind arrays)
    bool              _FormPrimingData(const bool Priming1,const TIMEMARKS &timemarks,MqlRates &arr_Rates[],
                                       int &arr_Spreads[],double &arr_Signals[],
-                                      double &arr_Firsts[],double &arr_Poms[],double &arr_Dc[]);
+                                      double &arr_Firsts[],double &arr_Poms[],double &arr_Dc_Close[],
+                                      double &arr_Dc_Open[],double &arr_Dc_High[],double &arr_Dc_Low[]);
   };
 //+------------------------------------------------------------------+
 //| Constructor                                                      |
@@ -1810,7 +1811,8 @@ bool RHistory::_ConnectIndicator(void)
 //| Form priming data rates\spreads\Indicator arrays                 |
 //+------------------------------------------------------------------+ 
 bool RHistory::_FormPrimingData(const bool Priming1,const TIMEMARKS &timemarks,MqlRates &arr_Rates[],int &arr_Spreads[],
-                                double &arr_Signals[],double &arr_Firsts[],double &arr_Poms[],double &arr_Dc[])
+                                double &arr_Signals[],double &arr_Firsts[],double &arr_Poms[],
+                                double &arr_Dc_Close[],double &arr_Dc_Open[],double &arr_Dc_High[],double &arr_Dc_Low[])
   {
 //Priming 1 =True , do with p1, else with p2
 
@@ -1878,16 +1880,40 @@ bool RHistory::_FormPrimingData(const bool Priming1,const TIMEMARKS &timemarks,M
       return(false);
      }
 
-//Dc
-   int copyed_dc=CopyBuffer(m_handle_ind_POM,3,Priming_Start,Priming_Stop,arr_Dc);
-   if(copyed_dc<0)
+//Dc Open
+   int copyed_dc_o=CopyBuffer(m_handle_ind_POM,7,Priming_Start,Priming_Stop,arr_Dc_Open);
+   if(copyed_dc_o<0)
+     {
+      m_result=-23;
+      return(false);
+     }
+
+//Dc High
+   int copyed_dc_h=CopyBuffer(m_handle_ind_POM,11,Priming_Start,Priming_Stop,arr_Dc_High);
+   if(copyed_dc_h<0)
+     {
+      m_result=-23;
+      return(false);
+     }
+
+//Dc Low
+   int copyed_dc_l=CopyBuffer(m_handle_ind_POM,15,Priming_Start,Priming_Stop,arr_Dc_Low);
+   if(copyed_dc_l<0)
+     {
+      m_result=-23;
+      return(false);
+     }
+
+//Dc Close
+   int copyed_dc_c=CopyBuffer(m_handle_ind_POM,3,Priming_Start,Priming_Stop,arr_Dc_Close);
+   if(copyed_dc_c<0)
      {
       m_result=-23;
       return(false);
      }
 
 //Check if arrays have identical elements count
-   if(((copyed_rates+copyed_singal+copyed_spread+copyed_pom+copyed_first+copyed_dc)/6)!=copyed_rates)
+   if(((copyed_rates+copyed_singal+copyed_spread+copyed_pom+copyed_first+copyed_dc_c)/6)!=copyed_rates)
      {
       m_result=-26;
       Print("Warning! Data not identical!");
