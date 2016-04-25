@@ -136,12 +136,21 @@ private:
    MqlRates          m_arr_Rates_P2[];
    int               m_arr_Spread_P1[];
    int               m_arr_Spread_P2[];
+   //OHLC Signal
    double            m_arr_Signal_P1[];
    double            m_arr_Signal_P2[];
+   //OHLC First
    double            m_arr_First_P1[];
    double            m_arr_First_P2[];
-   double            m_arr_Pom_P1[];
-   double            m_arr_Pom_P2[];
+   //OHLC POM
+   double            m_arr_Pom_P1_Open[];
+   double            m_arr_Pom_P2_Open[];
+   double            m_arr_Pom_P1_High[];
+   double            m_arr_Pom_P2_High[];
+   double            m_arr_Pom_P1_Low[];
+   double            m_arr_Pom_P2_Low[];
+   double            m_arr_Pom_P1_Close[];
+   double            m_arr_Pom_P2_Close[];
    //OHLC DC
    double            m_arr_dC_P1_Open[];
    double            m_arr_dC_P2_Open[];
@@ -224,14 +233,25 @@ public:
 //+------------------------------------------------------------------+
 RTrade::RTrade()
   {
+//OHLC First 
    ArraySetAsSeries(m_arr_First_P1,true);
    ArraySetAsSeries(m_arr_First_P2,true);
-   ArraySetAsSeries(m_arr_Pom_P1,true);
-   ArraySetAsSeries(m_arr_Pom_P2,true);
+//OHLC POM
+   ArraySetAsSeries(m_arr_Pom_P1_Open,true);
+   ArraySetAsSeries(m_arr_Pom_P2_Open,true);
+   ArraySetAsSeries(m_arr_Pom_P1_High,true);
+   ArraySetAsSeries(m_arr_Pom_P2_High,true);
+   ArraySetAsSeries(m_arr_Pom_P1_Low,true);
+   ArraySetAsSeries(m_arr_Pom_P2_Low,true);
+   ArraySetAsSeries(m_arr_Pom_P1_Close,true);
+   ArraySetAsSeries(m_arr_Pom_P2_Close,true);
+
    ArraySetAsSeries(m_arr_Rates_P1,true);
    ArraySetAsSeries(m_arr_Rates_P2,true);
+//OHLC Signal
    ArraySetAsSeries(m_arr_Signal_P1,true);
    ArraySetAsSeries(m_arr_Signal_P2,true);
+
    ArraySetAsSeries(m_arr_Spread_P1,true);
    ArraySetAsSeries(m_arr_Spread_P2,true);
 //OHLC DC
@@ -300,7 +320,12 @@ bool RTrade::_InitPriming(const bool Priming1,MqlRates &arr_Rates[],int &arr_Spr
       if(ArrayCopy(m_arr_Spread_P1,arr_Spreads,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
       if(ArrayCopy(m_arr_Signal_P1,arr_Signals,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
       if(ArrayCopy(m_arr_First_P1,arr_Firsts,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
-      if(ArrayCopy(m_arr_Pom_P1,arr_Poms,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      //OHLC POM
+      if(ArrayCopy(m_arr_Pom_P1_Open,arr_Poms,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_arr_Pom_P1_High,arr_Poms,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_arr_Pom_P1_Low,arr_Poms,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_arr_Pom_P1_Close,arr_Poms,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+
       //OHLC DC
       if(ArrayCopy(m_arr_dC_P1_Open,arr_Dc_Open,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
       if(ArrayCopy(m_arr_dC_P1_High,arr_Dc_High,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
@@ -317,7 +342,12 @@ bool RTrade::_InitPriming(const bool Priming1,MqlRates &arr_Rates[],int &arr_Spr
       if(ArrayCopy(m_arr_Spread_P2,arr_Spreads,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
       if(ArrayCopy(m_arr_Signal_P2,arr_Signals,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
       if(ArrayCopy(m_arr_First_P2,arr_Firsts,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
-      if(ArrayCopy(m_arr_Pom_P2,arr_Poms,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      //OHLC POM
+      if(ArrayCopy(m_arr_Pom_P2_Open,arr_Poms,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_arr_Pom_P2_High,arr_Poms,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_arr_Pom_P2_Low,arr_Poms,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_arr_Pom_P2_Close,arr_Poms,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+
       //OHLC DC
       if(ArrayCopy(m_arr_dC_P2_Open,arr_Dc_Open,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
       if(ArrayCopy(m_arr_dC_P2_High,arr_Dc_High,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
@@ -662,14 +692,14 @@ int RTrade::m_EMUL_TR_Caterpillar(const char Case,const int IterationNum,const d
       //PRIMING 1
       datetime a=m_arr_Rates_P1[i].time;
       signal=m_arr_Signal_P1[i];
-      pom=m_arr_Pom_P1[i];
+      pom=m_arr_Pom_P1_Close[i];
       whofirst=m_arr_First_P1[i];
      }
    else
      {
       //PRIMING2
       signal=m_arr_Signal_P2[i];
-      pom=m_arr_Pom_P2[i];
+      pom=m_arr_Pom_P2_Close[i];
       whofirst=m_arr_First_P2[i];
      }
 
@@ -720,7 +750,7 @@ int RTrade::m_EMUL_TR_Caterpillar(const char Case,const int IterationNum)
       //PRIMING 1
       datetime a=m_arr_Rates_P1[i].time;
       signal=m_arr_Signal_P1[i];
-      pom=m_arr_Pom_P1[i];
+      pom=m_arr_Pom_P1_Close[i];
       whofirst=m_arr_First_P1[i];
 
      }
@@ -728,7 +758,7 @@ int RTrade::m_EMUL_TR_Caterpillar(const char Case,const int IterationNum)
      {
       //PRIMING2
       signal=m_arr_Signal_P2[i];
-      pom=m_arr_Pom_P2[i];
+      pom=m_arr_Pom_P2_Close[i];
       whofirst=m_arr_First_P2[i];
      }
 
