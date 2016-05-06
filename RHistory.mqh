@@ -5,10 +5,10 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, Shcherbyna Rostyslav"
 #property link      ""
-#property version   "1.01"
+#property version   "1.1"
 
 #include <Tools\DateTime.mqh>
-//+------------------------------------------------------------------+
+#include <RInclude\RStructs.mqh>
 /*
 Class for determining first & last days of each working day with user period.
 With additional information on getting server data.
@@ -17,57 +17,12 @@ Can determine last & first day minute, last week minute, last month minute, last
 + Search time\spread\rate forward & Backward
 + working with pom3 copybuffer
 */
-//+------------------------------------------------------------------+
-
-//History Load Results
-enum ENUM_HistResults
-  {
-   HIST_DEFAULT=0,
-   HIST_LOCAL_READY=1,
-   HIST_TERMINAL_DATA_READY=2,
-   HIST_LOAD_FROM_INDICATOR=-1,
-   HIST_TOO_OLD_SERVER_DATA=-2,
-   HIST_BARS_MUCH_MORE_TERMINAL=-3,
-   HIST_BARS_COPY_ERR=-4,
-   HIST_TRYS_OUT=-5,
-   HIST_TRYS_ISSTOPPED=-6,
-   HIST_SET_TIMESERIES_ERR=-7,
-   HIST_CANT_COPY_ALLHIST_TIMES=-8,
-   HIST_CANT_RESIZE_ARRAY=-9,
-   HIST_DATA_NOT_FOUND=-10,
-   HIST_DATA_NOT_INITIALISED=-11,
-   HIST_DB_IS_EMTPY=-12,
-   HIST_DATA_NOT_PROCESSED=-13,
-   HIST_UNKNOWN_SYMBOL=-14,
-   HIST_STOPDATE_BEFORE_STARTDATE=-15,
-   HIST_REQUESTED_DATE_NOT_EXIST_IN_DB=-16,
-   HIST_CANT_COPY_ALLHIST_RATES=-17,
-   HIST_CANT_COPY_ALLHIST_SPREADS=-18,
-   HIST_MRS_COUNT_NOT_IDENTICAL=-19,
-   HIST_MRS_FIRST_MINUTE_NOT_IDENTICAL=-20,
-   HIST_MRS_LAST_MINUTE_NOT_IDENTICAL=-21,
-   HIST_CANT_CONNECT_INDICATOR=-22,
-   HIST_CANT_COPY_IND_BUFFER=-23,
-   HIST_CANT_COPY_RATES=-24,
-   HIST_CANT_COPY_SPREADS=-25,
-   HIST_DATA_NOT_IDENTICAL=-26,
-  };
-//Struct for DB (first & last minute)
-struct FLM
-  {
-   datetime          day_first_minute;
-   datetime          day_last_minute;
-  };
-//---Structure for time marks
-struct TIMEMARKS
-  {
-   datetime          P1_Start;
-   datetime          P1_Stop;
-   datetime          P2_Start;
-   datetime          P2_Stop;
-   datetime          Now_Start;
-   datetime          Now_Stop;
-  };
+/*
++++++CHANGE LOG+++++
+1.2
+1.1 6.05.2016 --Version with working RStructs (separate file)
+--Ver 1.0 Stable
+*/
 //+------------------------------------------------------------------+
 //|  CLASS RHISTORY                                                  |
 //+------------------------------------------------------------------+
@@ -249,19 +204,19 @@ m_debug(false)
 //Save Path to indicator
    m_ind_path=path_to_ind;
 
+//Get Server Broker Name
+   string Server=AccountInfoString(ACCOUNT_SERVER);
+
+//+If ok, save path to DB(FL- first & last minute)
+   m_path=Server+m_pair+".FLM";
+   
 //Connect Indicator
    if(!_ConnectIndicator())
      {
       m_result=-22;
       return;
      }
-
-   string Server=AccountInfoString(ACCOUNT_SERVER);
-
-//+If ok, save path to DB(FL- first & last minute)
-   m_path=Server+m_pair+".FLM";
-
-  }
+  }//End of Constructor
 //+------------------------------------------------------------------+
 //| Destructor                                                       |
 //+------------------------------------------------------------------+
