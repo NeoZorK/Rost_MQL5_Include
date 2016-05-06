@@ -5,86 +5,16 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, Shcherbyna Rostyslav"
 #property link      ""
-#property version   "1.00"
+#property version   "1.1"
 
 #include <Tools\DateTime.mqh>
-
-//CONSTANTS
-const int BUY1=1005;
-const int SELL1=2006;
-const char HighFirst= 1;
-const char LowFirst = -1;
-const char EqualFirst=0; //High==Open or other Private Case
-const ushort     inpDeltaC_koef=1000; //Dc * 
-                                      //Constants for Ck signals:
-const char CkNoSignal=-1;
-const char CkBuy1=0;
-const char CkSell4=1;
-const char CkBuySell14=2;
-const char CkSingularityBuy=3;
-const char CkSingularitySell=4;
-//+------------------------------------------------------------------+
-//| OHLC Mode in Emulation                                           |
-//+------------------------------------------------------------------+
-enum ENUM_EMUL_OHLC_PRICE
-  {
-   OHLC_Prcies,   //Append OHLC prices (4)
-   Close_Prices,  //Append only Close prices 
-  };
-//+------------------------------------------------------------------+
-//| Trade  Results                                                   |
-//+------------------------------------------------------------------+
-enum ENUM_TradeResults
-  {
-   TRR_DONE=0,
-   TRR_CANT_COPY_ARR=-1,
-   TRR_NOT_INIT_EMUL=-2,
-   TRR_CANT_CONVERT_OHLC_TO_ROW=-3,
-   TRR_BAD_SYMBOL_POINT=-4,
-  };
-//+------------------------------------------------------------------+
-//| Open Position Trading rules  Emulated                            |
-//+------------------------------------------------------------------+
-enum ENUM_EMUL_OpenRule
-  {
-   OpenTR_POMI
-  };
-//+------------------------------------------------------------------+
-//| Auto Close Trading rules   Emulated                              |
-//+------------------------------------------------------------------+
-enum ENUM_EMUL_CloseRule
-  {
-   CloseTR_DcSpread
-  };
-//+------------------------------------------------------------------+
-//| Trading Rule for Ck                                              |
-//+------------------------------------------------------------------+
-enum ENUM_TRCK
-  {
-   CK_TR18_0330_Virt
-  };
-//+------------------------------------------------------------------+
-//| Prediction Period                                                |
-//+------------------------------------------------------------------+
-enum ENUM_myPredictPeriod
-  {
-   Day,
-   Week,
-   Month,
-   Quarter
-  };
-//---Structure for simulated Qs
-struct SIMUL_Q
-  {
-   int               P1_Q1_Simul;
-   int               P1_Q4_Simul;
-   int               P1_Q14_Simul;
-   int               P2_Q1_Simul;
-   int               P2_Q4_Simul;
-   int               P2_Q14_Simul;
-  };
-//------GLOBAL VARIABLES
-
+#include <RInclude\RStructs.mqh>
+/*
++++++CHANGE LOG+++++
+1.2
+1.1 6.05.2016 --Version with working RStructs (separate file)
+--Ver 1.0 Stable
+*/
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+

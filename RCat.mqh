@@ -5,34 +5,15 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, Shcherbyna Rostyslav"
 #property link      ""
-#property version   "1.00"
+#property version   "1.1"
 
 #include <Tools\DateTime.mqh>
 #include <RInclude\RTrade.mqh>
-
-//CONSTANTS
-const uint MAGIC_IB=3000000;
-const uint MAGIC_IS=3100000;
-const uchar OP_BUY=0;
-const uchar OP_SELL=1;
-//Indicator POM3 Signals:
-const char Ind_Buy = 1;
-const char Ind_Sell=-1;
-//RealTime Open TR
-enum ENUM_RT_OpenRule
-  {
-   POMI
-  };
-//RealTime Close TR
-enum ENUM_RT_CloseRule
-  {
-   AutoCloseDcSpread
-  };
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
 /*
-2. Calculate Lot ?   
++++++CHANGE LOG+++++
+1.2
+1.1 6.05.2016 --Version with working RStructs (separate file)
+--Ver 1.0 Stable
 */
 //+------------------------------------------------------------------+
 //| Class for Real Time Trading                                      |
