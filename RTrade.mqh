@@ -173,9 +173,9 @@ public:
 //+------------------------------------------------------------------+
 RTrade::RTrade()
   {
-  MassiveSetAsSeries(m_P1);
-  MassiveSetAsSeries(m_P2);
-  
+   MassiveSetAsSeries(m_P1);
+   MassiveSetAsSeries(m_P2);
+
 //OHLC First 
    ArraySetAsSeries(m_arr_First_P1,true);
    ArraySetAsSeries(m_arr_First_P2,true);
@@ -251,6 +251,89 @@ bool RTrade::_Init(const string pair,const string path_to_ind,const uchar bottle
 //+------------------------------------------------------------------+
 bool RTrade::_CopyPrimingToLocal(const bool Priming1,STRUCT_Priming &Priming)
   {
+//Start speed measuring
+   uint Start_measure=GetTickCount();
+
+//if Priming 1
+   if(Priming1)
+     {
+      //Rates
+      if(ArrayCopy(m_P1.Rates,Priming.Rates,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      //Spread
+      if(ArrayCopy(m_P1.Spread,Priming.Spread,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+
+      //First
+      if(ArrayCopy(m_P1.First_Open,Priming.First_Open,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P1.First_High,Priming.First_High,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P1.First_Low,Priming.First_Low,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P1.First_Close,Priming.First_Close,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+
+      //Pom
+      if(ArrayCopy(m_P1.Pom_Open,Priming.Pom_Open,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P1.Pom_High,Priming.Pom_High,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P1.Pom_Low,Priming.Pom_Low,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P1.Pom_Close,Priming.Pom_Close,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+
+      //Signal
+      if(ArrayCopy(m_P1.Signal_Open,Priming.Signal_Open,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P1.Signal_High,Priming.Signal_High,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P1.Signal_Low,Priming.Signal_Low,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P1.Signal_Close,Priming.Signal_Close,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+
+      //Dc
+      if(ArrayCopy(m_P1.Dc_Open,Priming.Dc_Open,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P1.Dc_High,Priming.Dc_High,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P1.Dc_Low,Priming.Dc_Low,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P1.Dc_Close,Priming.Dc_Close,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+
+      m_CurrentPriming=1;
+
+      //Save total minutes in period
+      m_Total_Minutes_in_period=ArraySize(m_P1.Rates);
+     }//end of priming 1
+   else//Priming 2
+     {
+      //Rates
+      if(ArrayCopy(m_P2.Rates,Priming.Rates,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      //Spread
+      if(ArrayCopy(m_P2.Spread,Priming.Spread,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+
+      //First
+      if(ArrayCopy(m_P2.First_Open,Priming.First_Open,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P2.First_High,Priming.First_High,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P2.First_Low,Priming.First_Low,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P2.First_Close,Priming.First_Close,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+
+      //Pom
+      if(ArrayCopy(m_P2.Pom_Open,Priming.Pom_Open,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P2.Pom_High,Priming.Pom_High,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P2.Pom_Low,Priming.Pom_Low,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P2.Pom_Close,Priming.Pom_Close,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+
+      //Signal
+      if(ArrayCopy(m_P2.Signal_Open,Priming.Signal_Open,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P2.Signal_High,Priming.Signal_High,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P2.Signal_Low,Priming.Signal_Low,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P2.Signal_Close,Priming.Signal_Close,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+
+      //Dc
+      if(ArrayCopy(m_P2.Dc_Open,Priming.Dc_Open,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P2.Dc_High,Priming.Dc_High,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P2.Dc_Low,Priming.Dc_Low,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P2.Dc_Close,Priming.Dc_Close,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+
+      m_CurrentPriming=2;
+
+      //Save total minutes in period
+      m_Total_Minutes_in_period=ArraySize(m_P2.Rates);
+     }//end of priming2
+
+//Stop speed measuring     
+//  uint Stop_measuring=GetTickCount()-Start_measure;
+//  PrintFormat("Init Primings complete in %d ms",Stop_measuring);
+
+//If Ok
+   m_Result=0;
 
    return(true);
   }//End of copy priming to local
