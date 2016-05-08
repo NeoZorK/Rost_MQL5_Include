@@ -9,6 +9,9 @@
 
 #include <Tools\DateTime.mqh>
 #include <RInclude\RStructs.mqh>
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
 /*
 +++++CHANGE LOG+++++
 1.2
@@ -62,6 +65,10 @@ private:
    //Elements count in each array (rates,spreads,buffers)
    uint              m_Total_Minutes_in_period;
    //---Emulate Primings
+
+   STRUCT_Priming    m_P1;
+   STRUCT_Priming    m_P2;
+
    MqlRates          m_arr_Rates_P1[];
    MqlRates          m_arr_Rates_P2[];
    int               m_arr_Spread_P1[];
@@ -139,6 +146,9 @@ public:
    bool              _InitPriming(const bool Priming1,MqlRates &arr_Rates[],int &arr_Spreads[],
                                   double &arr_Signals[],double &arr_Firsts[],double &arr_Poms[],
                                   double &arr_Dc_Close[],double &arr_Dc_Open[],double &arr_Dc_High[],double &arr_Dc_Low[]);
+   //Copy Priming To Local
+   bool              _CopyPrimingToLocal(const bool Priming1,STRUCT_Priming &Priming);
+
    //Emulate                         
    bool              _InitEmul(const ENUM_EMUL_CloseRule CloseRuleNum,const ENUM_EMUL_OpenRule OpenRuleNum,const int MaxSpread,
                                const double PomBuy,const double PomSell,const double PomKoef,const double Comission);
@@ -163,6 +173,9 @@ public:
 //+------------------------------------------------------------------+
 RTrade::RTrade()
   {
+  MassiveSetAsSeries(m_P1);
+  MassiveSetAsSeries(m_P2);
+  
 //OHLC First 
    ArraySetAsSeries(m_arr_First_P1,true);
    ArraySetAsSeries(m_arr_First_P2,true);
@@ -232,7 +245,15 @@ bool RTrade::_Init(const string pair,const string path_to_ind,const uchar bottle
 
 //if ok 
    return(true);
-  }
+  }//End of Init
+//+------------------------------------------------------------------+
+//| Copy Priming to Local                                            |
+//+------------------------------------------------------------------+
+bool RTrade::_CopyPrimingToLocal(const bool Priming1,STRUCT_Priming &Priming)
+  {
+
+   return(true);
+  }//End of copy priming to local
 //+------------------------------------------------------------------+
 //| CopyArrays to Local                                              |
 //+------------------------------------------------------------------+
