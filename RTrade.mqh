@@ -122,6 +122,8 @@ private:
                                       const uint CurrentSpread);
    int               m_EMUL_OpenRule(const ENUM_EMUL_OpenRule OpenRuleNum,const char Case,const int IterationNum,
                                      const double Current_OHLC_Price);
+   int               m_EMUL_OpenRule2(const ENUM_EMUL_OpenRule OpenRuleNum,const char Case,const int IterationNum,
+                                      const double Current_OHLC_Price);
    //Calculate Ck Prediction 0,1,2 : 1,4,14
    char              m_BUILD_CK_TR18_0330_Virt(const bool USDFirst);
    //Check for Close Position (:true->continue)
@@ -1360,7 +1362,7 @@ bool RTrade::Emulate_Trading_AllClose(const bool Priming1)
       for(int i=ArrSize-1;i>-1;i--)
         {
          //1. Check Open Rule 
-         int OTR_RESULT=m_EMUL_TR_Caterpillar2(Case,i);
+         int OTR_RESULT=m_EMUL_OpenRule2(m_open_rule_num_emul,Case,i,0);
 
          //2. Pass first 3 bars for DC
          if(i>ArrSize-3) continue;
@@ -1538,4 +1540,30 @@ int RTrade::m_EMUL_TR_Caterpillar2(const char Case,const int IterationNum)
 //If No Signal
    return(-1);
   }//END OF Emulated Open TR Caterpillar2 
+//+------------------------------------------------------------------+
+//| Open Rule 2 For emulation                                        |
+//+------------------------------------------------------------------+
+int RTrade::m_EMUL_OpenRule2(const ENUM_EMUL_OpenRule OpenRuleNum,const char Case,const int IterationNum,const double Current_OHLC_Price)
+  {
+//TR_RESULT  
+   int TR_RES=-1;
+
+   if(OpenRuleNum<0)
+     {
+      return(-2);
+     }
+
+   switch(OpenRuleNum)
+     {
+      case  0:TR_RES=m_EMUL_TR_Caterpillar2(Case,IterationNum);
+
+      break;
+      default:
+         break;
+     }
+//If Ok
+   return(TR_RES);
+//If Ok 
+   return(true);
+  }//End of EmulOpenRule 2  
 //+------------------------------------------------------------------+
