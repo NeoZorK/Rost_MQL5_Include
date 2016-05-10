@@ -221,7 +221,29 @@ bool MassiveSetAsSeries(STRUCT_Priming &Priming)
 //If Ok
    res=true;
    return(res);
-  }
+  }//End Of MassiveSetAsSeries
+//+------------------------------------------------------------------+
+// Compare 2 arrays by elements                                      |
+//+------------------------------------------------------------------+ 
+bool CompareDoubleArrays(const double &Arr1[],const double &Arr2[])
+  {
+//Get size of 2 arrays
+   int ArrSize1 = ArraySize(Arr1);
+   int ArrSize2 = ArraySize(Arr2);
+
+//Check identical size
+   if(ArrSize1!=ArrSize2) return(false);
+
+//Compare every element in arrays 
+   for(int i=0;i<ArrSize1;i++)
+     {
+      if(Arr1[i]!=Arr2[i])
+         return(false);
+     }//End of for
+
+//If Ok
+   return(true);
+  }//End of compare arrays
 //+------------------------------------------------------------------+
 //| defines                                                          |
 //+------------------------------------------------------------------+
