@@ -241,6 +241,7 @@ bool CompareDoubleArrays(const double &Arr1[],const double &Arr2[])
          return(false);
      }//End of for
 
+   Print(__FUNCTION__+" Arrays don`t much!!");
 //If Ok
    return(true);
   }//End of compare arrays
