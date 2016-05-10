@@ -398,6 +398,17 @@ bool RTrade::_InitPriming(const bool Priming1,MqlRates &arr_Rates[],int &arr_Spr
       if(ArrayCopy(m_arr_dC_P1_High,arr_Dc_High,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
       if(ArrayCopy(m_arr_dC_P1_Low,arr_Dc_Low,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
       if(ArrayCopy(m_arr_dC_P1_Close,arr_Dc_Close,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+
+      //Compare 2 arrays in old interpetation and new
+      if(!CompareDoubleArrays(m_arr_First_P1,arr_Firsts)) return(false);
+      //  if(!CompareDoubleArrays(arr_First_P2,_P2_.First_Close)) return(false);
+      if(!CompareDoubleArrays(m_arr_Pom_P1_Close,arr_Poms)) return(false);
+      //if(!CompareDoubleArrays(arr_Pom_P2_Close,_P2_.Pom_Close)) return(false);
+      if(!CompareDoubleArrays(m_arr_Signal_P1,arr_Signals)) return(false);
+      //if(!CompareDoubleArrays(arr_Signal_P2,_P2_.Signal_Close)) return(false);
+      if(!CompareDoubleArrays(m_arr_dC_P1_Close,arr_Dc_Close)) return(false);
+      //if(!CompareDoubleArrays(arr_dC_P2_Close,_P2_.Dc_Close)) return(false);
+
       m_CurrentPriming=1;
 
       //Save total minutes in period
@@ -420,6 +431,17 @@ bool RTrade::_InitPriming(const bool Priming1,MqlRates &arr_Rates[],int &arr_Spr
       if(ArrayCopy(m_arr_dC_P2_High,arr_Dc_High,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
       if(ArrayCopy(m_arr_dC_P2_Low,arr_Dc_Low,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
       if(ArrayCopy(m_arr_dC_P2_Close,arr_Dc_Close,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+
+      //Compare 2 arrays in old interpetation and new
+      if(!CompareDoubleArrays(m_arr_First_P2,arr_Firsts)) return(false);
+      //  if(!CompareDoubleArrays(arr_First_P2,_P2_.First_Close)) return(false);
+      if(!CompareDoubleArrays(m_arr_Pom_P2_Close,arr_Poms)) return(false);
+      //if(!CompareDoubleArrays(arr_Pom_P2_Close,_P2_.Pom_Close)) return(false);
+      if(!CompareDoubleArrays(m_arr_Signal_P2,arr_Signals)) return(false);
+      //if(!CompareDoubleArrays(arr_Signal_P2,_P2_.Signal_Close)) return(false);
+      if(!CompareDoubleArrays(m_arr_dC_P2_Close,arr_Dc_Close)) return(false);
+      //if(!CompareDoubleArrays(arr_dC_P2_Close,_P2_.Dc_Close)) return(false);
+
       m_CurrentPriming=2;
 
       //Save total minutes in period
