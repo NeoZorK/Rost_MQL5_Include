@@ -232,16 +232,22 @@ bool CompareDoubleArrays(const double &Arr1[],const double &Arr2[])
    int ArrSize2 = ArraySize(Arr2);
 
 //Check identical size
-   if(ArrSize1!=ArrSize2) return(false);
+   if(ArrSize1!=ArrSize2)
+     {
+      Print(__FUNCTION__+" Arrays don`t much in size!!");
+      return(false);
+     }
 
 //Compare every element in arrays 
    for(int i=0;i<ArrSize1;i++)
      {
       if(Arr1[i]!=Arr2[i])
+        {
+         Print(__FUNCTION__+" Arrays don`t much!! "+IntegerToString(i));
          return(false);
+        }
      }//End of for
 
-   Print(__FUNCTION__+" Arrays don`t much!!");
 //If Ok
    return(true);
   }//End of compare arrays
