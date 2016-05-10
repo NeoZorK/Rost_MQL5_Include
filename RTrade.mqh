@@ -297,6 +297,16 @@ bool RTrade::_CopyPrimingToLocal(const bool Priming1,STRUCT_Priming &Priming)
       if(ArrayCopy(m_P1.Dc_Low,Priming.Dc_Low,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
       if(ArrayCopy(m_P1.Dc_Close,Priming.Dc_Close,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
 
+      //Compare 2 arrays in old interpetation and new
+      if(!CompareDoubleArrays(m_P1.First_Close,Priming.First_Close)) return(false);
+      //  if(!CompareDoubleArrays(arr_First_P2,_P2_.First_Close)) return(false);
+      if(!CompareDoubleArrays(m_P1.Pom_Close,Priming.Pom_Close)) return(false);
+      //if(!CompareDoubleArrays(arr_Pom_P2_Close,_P2_.Pom_Close)) return(false);
+      if(!CompareDoubleArrays(m_P1.Signal_Close,Priming.Signal_Close)) return(false);
+      //if(!CompareDoubleArrays(arr_Signal_P2,_P2_.Signal_Close)) return(false);
+      if(!CompareDoubleArrays(m_P1.Dc_Close,Priming.Dc_Close)) return(false);
+      //if(!CompareDoubleArrays(arr_dC_P2_Close,_P2_.Dc_Close)) return(false);
+
       m_CurrentPriming=1;
 
       //Save total minutes in period
@@ -332,6 +342,16 @@ bool RTrade::_CopyPrimingToLocal(const bool Priming1,STRUCT_Priming &Priming)
       if(ArrayCopy(m_P2.Dc_High,Priming.Dc_High,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
       if(ArrayCopy(m_P2.Dc_Low,Priming.Dc_Low,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
       if(ArrayCopy(m_P2.Dc_Close,Priming.Dc_Close,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+
+      //Compare 2 arrays in old interpetation and new
+      // if(!CompareDoubleArrays(arr_First_P1,_P1_.First_Close)) return(false);
+      if(!CompareDoubleArrays(m_P2.First_Close,Priming.First_Close)) return(false);
+      // if(!CompareDoubleArrays(arr_Pom_P1_Close,_P1_.Pom_Close)) return(false);
+      if(!CompareDoubleArrays(m_P2.Pom_Close,Priming.Pom_Close)) return(false);
+      //if(!CompareDoubleArrays(arr_Signal_P1,_P1_.Signal_Close)) return(false);
+      if(!CompareDoubleArrays(m_P2.Signal_Close,Priming.Signal_Close)) return(false);
+      //if(!CompareDoubleArrays(arr_dC_P1_Close,_P1_.Dc_Close)) return(false);
+      if(!CompareDoubleArrays(m_P2.Dc_Close,Priming.Dc_Close)) return(false);
 
       m_CurrentPriming=2;
 
