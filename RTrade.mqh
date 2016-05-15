@@ -1447,6 +1447,13 @@ bool RTrade::Emulate_Trading_AllClose(const bool Priming1)
             case  1: m_arr_sim_q[m_simulated_primings_total].P2_Q4_Simul=SELL_Signal_Count;  break;
             case  2: m_arr_sim_q[m_simulated_primings_total].P2_Q14_Simul=BUY_Signal_Count+SELL_Signal_Count;break;
 
+            //del comments after delete old version Emulate2()
+            //Only in Second Priming : Add +1 Cell to Dynamic Array of Primings Omegas
+            // ArrayResize(m_arr_sim_q,ArraySize(m_arr_sim_q)+1);
+
+            //Always increase by 1 this counter, otherwise program writes to [0]
+            // m_simulated_primings_total++;
+
             default:
                break;
            }//End of Switch FILLING Priming1 Omega Structures
