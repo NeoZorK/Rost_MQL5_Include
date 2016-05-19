@@ -5,13 +5,17 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, Shcherbyna Rostyslav"
 #property link      ""
-#property version   "1.1"
+#property version   "1.3"
 
 #include <Tools\DateTime.mqh>
 #include <RInclude\RTrade.mqh>
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
 /*
 +++++CHANGE LOG+++++
-1.2
+1.3 19.05.2016--Stable, without Copy Arrays
+1.2 15.05.2016--Version with Commented Addition code
 1.1 6.05.2016 --Version with working RStructs (separate file)
 --Ver 1.0 Stable
 */
