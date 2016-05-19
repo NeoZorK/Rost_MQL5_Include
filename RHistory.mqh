@@ -5,10 +5,13 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, Shcherbyna Rostyslav"
 #property link      ""
-#property version   "1.1"
+#property version   "1.3"
 
 #include <Tools\DateTime.mqh>
 #include <RInclude\RStructs.mqh>
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
 /*
 Class for determining first & last days of each working day with user period.
 With additional information on getting server data.
@@ -19,7 +22,8 @@ Can determine last & first day minute, last week minute, last month minute, last
 */
 /*
 +++++CHANGE LOG+++++
-1.2
+1.3 19.05.2016--Stable, without Copy Arrays
+1.2 15.05.2016--Version with Commented Addition code
 1.1 6.05.2016 --Version with working RStructs (separate file)
 --Ver 1.0 Stable
 */
@@ -154,6 +158,8 @@ public:
                                       int &arr_Spreads[],double &arr_Signals[],
                                       double &arr_Firsts[],double &arr_Poms[],double &arr_Dc_Close[],
                                       double &arr_Dc_Open[],double &arr_Dc_High[],double &arr_Dc_Low[]);
+   //Version with struct only
+   bool              _FormPrimingData(const bool Priming1,const TIMEMARKS &TimeMarks,STRUCT_Priming &Priming);
   };
 //+------------------------------------------------------------------+
 //| Constructor                                                      |
@@ -209,7 +215,7 @@ m_debug(false)
 
 //+If ok, save path to DB(FL- first & last minute)
    m_path=Server+m_pair+".FLM";
-   
+
 //Connect Indicator
    if(!_ConnectIndicator())
      {
@@ -1879,7 +1885,193 @@ bool RHistory::_FormPrimingData(const bool Priming1,const TIMEMARKS &timemarks,M
 
 //If Ok
    return(true);
-  }
+  }//END of FormPrimingData 
+//+------------------------------------------------------------------+
+//| Form Priming data with Struct only                               |
+//+------------------------------------------------------------------+ 
+bool RHistory::_FormPrimingData(const bool Priming1,const TIMEMARKS &TimeMarks,STRUCT_Priming &Priming)
+  {
+//Priming 1 =True , do with p1, else with p2
+
+   datetime Priming_Start=0;
+   datetime Priming_Stop=0;
+
+//If bars not calculated in indicator, then exit
+   int bars_calc=BarsCalculated(m_handle_ind_POM);
+
+   if(bars_calc<0)
+     {
+      //  Print("Waiting for POM calculations...");
+      return(false);
+     }
+
+//Check Priming1 or Priming2
+   if(Priming1)
+     {
+      Priming_Start=TimeMarks.P1_Start;
+      Priming_Stop=TimeMarks.P1_Stop;
+     }
+   else //Priming2
+     {
+      Priming_Start=TimeMarks.P2_Start;
+      Priming_Stop=TimeMarks.P2_Stop;
+     }
+
+//Rates
+   int copyed_rates=CopyRates(m_pair,0,Priming_Start,Priming_Stop,Priming.Rates);
+   if(copyed_rates<0)
+     {
+      m_result=-24;
+      return(false);
+     }
+
+//Spread
+   int copyed_spread=CopySpread(m_pair,0,Priming_Start,Priming_Stop,Priming.Spread);
+   if(copyed_spread<0)
+     {
+      m_result=-25;
+      return(false);
+     }
+
+//Signal Open
+   int copyed_singal_o=CopyBuffer(m_handle_ind_POM,4,Priming_Start,Priming_Stop,Priming.Signal_Open);
+   if(copyed_singal_o<0)
+     {
+      m_result=-23;
+      return(false);
+     }
+
+//Signal High
+   int copyed_singal_h=CopyBuffer(m_handle_ind_POM,8,Priming_Start,Priming_Stop,Priming.Signal_High);
+   if(copyed_singal_h<0)
+     {
+      m_result=-23;
+      return(false);
+     }
+
+//Signal Low
+   int copyed_singal_l=CopyBuffer(m_handle_ind_POM,12,Priming_Start,Priming_Stop,Priming.Signal_Low);
+   if(copyed_singal_l<0)
+     {
+      m_result=-23;
+      return(false);
+     }
+
+//Signal Close
+   int copyed_singal_c=CopyBuffer(m_handle_ind_POM,0,Priming_Start,Priming_Stop,Priming.Signal_Close);
+   if(copyed_singal_c<0)
+     {
+      m_result=-23;
+      return(false);
+     }
+
+//First Open
+   int copyed_first_o=CopyBuffer(m_handle_ind_POM,5,Priming_Start,Priming_Stop,Priming.First_Open);
+   if(copyed_first_o<0)
+     {
+      m_result=-23;
+      return(false);
+     }
+
+//First High
+   int copyed_first_h=CopyBuffer(m_handle_ind_POM,9,Priming_Start,Priming_Stop,Priming.First_High);
+   if(copyed_first_h<0)
+     {
+      m_result=-23;
+      return(false);
+     }
+
+//First Low
+   int copyed_first_l=CopyBuffer(m_handle_ind_POM,13,Priming_Start,Priming_Stop,Priming.First_Low);
+   if(copyed_first_l<0)
+     {
+      m_result=-23;
+      return(false);
+     }
+
+//First Close
+   int copyed_first_c=CopyBuffer(m_handle_ind_POM,1,Priming_Start,Priming_Stop,Priming.First_Close);
+   if(copyed_first_c<0)
+     {
+      m_result=-23;
+      return(false);
+     }
+
+//Pom Open
+   int copyed_pom_o=CopyBuffer(m_handle_ind_POM,6,Priming_Start,Priming_Stop,Priming.Pom_Open);
+   if(copyed_pom_o<0)
+     {
+      m_result=-23;
+      return(false);
+     }
+
+//Pom High
+   int copyed_pom_h=CopyBuffer(m_handle_ind_POM,10,Priming_Start,Priming_Stop,Priming.Pom_High);
+   if(copyed_pom_h<0)
+     {
+      m_result=-23;
+      return(false);
+     }
+
+//Pom Low
+   int copyed_pom_l=CopyBuffer(m_handle_ind_POM,14,Priming_Start,Priming_Stop,Priming.Pom_Low);
+   if(copyed_pom_l<0)
+     {
+      m_result=-23;
+      return(false);
+     }
+
+//Pom Close
+   int copyed_pom_c=CopyBuffer(m_handle_ind_POM,2,Priming_Start,Priming_Stop,Priming.Pom_Close);
+   if(copyed_pom_c<0)
+     {
+      m_result=-23;
+      return(false);
+     }
+
+//Dc Open
+   int copyed_dc_o=CopyBuffer(m_handle_ind_POM,7,Priming_Start,Priming_Stop,Priming.Dc_Open);
+   if(copyed_dc_o<0)
+     {
+      m_result=-23;
+      return(false);
+     }
+
+//Dc High
+   int copyed_dc_h=CopyBuffer(m_handle_ind_POM,11,Priming_Start,Priming_Stop,Priming.Dc_High);
+   if(copyed_dc_h<0)
+     {
+      m_result=-23;
+      return(false);
+     }
+
+//Dc Low
+   int copyed_dc_l=CopyBuffer(m_handle_ind_POM,15,Priming_Start,Priming_Stop,Priming.Dc_Low);
+   if(copyed_dc_l<0)
+     {
+      m_result=-23;
+      return(false);
+     }
+
+//Dc Close
+   int copyed_dc_c=CopyBuffer(m_handle_ind_POM,3,Priming_Start,Priming_Stop,Priming.Dc_Close);
+   if(copyed_dc_c<0)
+     {
+      m_result=-23;
+      return(false);
+     }
+
+//Check if arrays have identical elements count
+   if(((copyed_rates+copyed_singal_c+copyed_spread+copyed_pom_c+copyed_first_c+copyed_dc_c)/6)!=copyed_rates)
+     {
+      m_result=-26;
+      Print("Warning! Data not identical!");
+      return(false);
+     }
+
+//If Ok
+   return(true);
+  }//END of FormPrimingData (structure)  
 //+------------------------------------------------------------------+
 //| CheckLoadHistory                                                 |
 //+------------------------------------------------------------------+ 

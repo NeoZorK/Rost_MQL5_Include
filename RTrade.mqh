@@ -5,13 +5,17 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, Shcherbyna Rostyslav"
 #property link      ""
-#property version   "1.1"
+#property version   "1.3"
 
 #include <Tools\DateTime.mqh>
 #include <RInclude\RStructs.mqh>
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
 /*
 +++++CHANGE LOG+++++
-1.2
+1.3 19.05.2016--Stable, without Copy Arrays
+1.2 15.05.2016--Version with Commented Addition code
 1.1 6.05.2016 --Version with working RStructs (separate file)
 --Ver 1.0 Stable
 */
@@ -62,6 +66,10 @@ private:
    //Elements count in each array (rates,spreads,buffers)
    uint              m_Total_Minutes_in_period;
    //---Emulate Primings
+
+   STRUCT_Priming    m_P1;
+   STRUCT_Priming    m_P2;
+
    MqlRates          m_arr_Rates_P1[];
    MqlRates          m_arr_Rates_P2[];
    int               m_arr_Spread_P1[];
@@ -105,14 +113,18 @@ private:
    //TR Close Positions
    bool              m_EMUL_AutoCloseDCSpread(const double PositionProfit,const double Dc,const uint Spread,const double Commission);
    double            m_EMUL_CalculateDc(const uint Iteration);
+   double            m_EMUL_CalculateDc2(const uint Iteration,const STRUCT_Priming &Priming);
    //TR Open Positions(-1,-2=none,-1=sell,+1=buy)
    int               m_EMUL_TR_Caterpillar(const char Case,const int IterationNum);
+   int               m_EMUL_TR_Caterpillar2(const char Case,const int IterationNum,const STRUCT_Priming &Priming);
    //TR Open OHLC Caterpillar
    int               m_EMUL_TR_Caterpillar(const char Case,const int IterationNum,const double Current_OHLC_Price);
    bool              m_EMUL_CloseRule(const ENUM_EMUL_CloseRule CloseRuleNum,const double CurrentProfit,const double CurrentDC,
                                       const uint CurrentSpread);
    int               m_EMUL_OpenRule(const ENUM_EMUL_OpenRule OpenRuleNum,const char Case,const int IterationNum,
                                      const double Current_OHLC_Price);
+   int               m_EMUL_OpenRule2(const ENUM_EMUL_OpenRule OpenRuleNum,const char Case,const int IterationNum,
+                                      const double Current_OHLC_Price,const STRUCT_Priming &Priming);
    //Calculate Ck Prediction 0,1,2 : 1,4,14
    char              m_BUILD_CK_TR18_0330_Virt(const bool USDFirst);
    //Check for Close Position (:true->continue)
@@ -132,20 +144,32 @@ public:
                            const datetime from_date,const datetime to_date,const bool debug);
 
    bool              CheckSpread(const uint MaxSpread,const uint CurrentSpread);
-   //For compounding
+   //For Compounding
    double            CalcLot();
 
    //Init for Emulating                        
    bool              _InitPriming(const bool Priming1,MqlRates &arr_Rates[],int &arr_Spreads[],
                                   double &arr_Signals[],double &arr_Firsts[],double &arr_Poms[],
                                   double &arr_Dc_Close[],double &arr_Dc_Open[],double &arr_Dc_High[],double &arr_Dc_Low[]);
+   //Copy Priming To Local
+   bool              _CopyPrimingToLocal(const bool Priming1,STRUCT_Priming &Priming);
+
    //Emulate                         
    bool              _InitEmul(const ENUM_EMUL_CloseRule CloseRuleNum,const ENUM_EMUL_OpenRule OpenRuleNum,const int MaxSpread,
                                const double PomBuy,const double PomSell,const double PomKoef,const double Comission);
 
-   //Emulate trading inside Priming1 & 2:
+   //Choose Quant Mode for Emulation
+   bool              ChooseEmul_QuantMode(const ENUM_EMUL_OHLC_PRICE &QuantMode);
+
+   //Emulate Trading inside Priming1 & 2: (OLD STYLE)
    bool              Emulate_Trading1();
    bool              Emulate_Trading2();
+
+   //4 Quant Mods for Emulation
+   bool              Emulate_Trading_AllClose(const bool Priming1,const STRUCT_Priming &CurP);
+   bool              Emulate_Trading_AllOHLC(const bool Priming1);
+   bool              Emulate_Trading_OHLC_OpenOnly(const bool Priming1);
+   bool              Emulate_Trading_OHLC_CloseOnly(const bool Priming1);
 
    //Get Selected Results after Emulation
    bool              EmulationResult_Selected(const uint EmulNumber,SIMUL_Q &SimulStruct);
@@ -163,6 +187,9 @@ public:
 //+------------------------------------------------------------------+
 RTrade::RTrade()
   {
+   MassiveSetAsSeries(m_P1);
+   MassiveSetAsSeries(m_P2);
+
 //OHLC First 
    ArraySetAsSeries(m_arr_First_P1,true);
    ArraySetAsSeries(m_arr_First_P2,true);
@@ -203,7 +230,7 @@ RTrade::RTrade()
 
 //Add +1 Cell to Dynamic Array of Primings Omega
    ArrayResize(m_arr_sim_q,ArraySize(m_arr_sim_q)+1);
-  }
+  }//END OF CONSTRUCTOR
 //+------------------------------------------------------------------+
 //| Deinit                                                           |
 //+------------------------------------------------------------------+
@@ -232,7 +259,118 @@ bool RTrade::_Init(const string pair,const string path_to_ind,const uchar bottle
 
 //if ok 
    return(true);
-  }
+  }//End of Init
+//+------------------------------------------------------------------+
+//| Copy Priming to Local                                            |
+//+------------------------------------------------------------------+
+bool RTrade::_CopyPrimingToLocal(const bool Priming1,STRUCT_Priming &Priming)
+  {
+//Start speed measuring
+   uint Start_measure=GetTickCount();
+
+//if Priming 1
+   if(Priming1)
+     {
+      //Rates
+      if(ArrayCopy(m_P1.Rates,Priming.Rates,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      //Spread
+      if(ArrayCopy(m_P1.Spread,Priming.Spread,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+
+      //First
+      if(ArrayCopy(m_P1.First_Open,Priming.First_Open,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P1.First_High,Priming.First_High,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P1.First_Low,Priming.First_Low,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P1.First_Close,Priming.First_Close,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+
+      //Pom
+      if(ArrayCopy(m_P1.Pom_Open,Priming.Pom_Open,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P1.Pom_High,Priming.Pom_High,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P1.Pom_Low,Priming.Pom_Low,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P1.Pom_Close,Priming.Pom_Close,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+
+      //Signal
+      if(ArrayCopy(m_P1.Signal_Open,Priming.Signal_Open,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P1.Signal_High,Priming.Signal_High,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P1.Signal_Low,Priming.Signal_Low,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P1.Signal_Close,Priming.Signal_Close,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+
+      //Dc
+      if(ArrayCopy(m_P1.Dc_Open,Priming.Dc_Open,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P1.Dc_High,Priming.Dc_High,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P1.Dc_Low,Priming.Dc_Low,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P1.Dc_Close,Priming.Dc_Close,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+/*
+      //Compare 2 arrays in old interpetation and new
+      if(!CompareDoubleArrays(m_P1.First_Close,Priming.First_Close)) return(false);
+      //  if(!CompareDoubleArrays(arr_First_P2,_P2_.First_Close)) return(false);
+      if(!CompareDoubleArrays(m_P1.Pom_Close,Priming.Pom_Close)) return(false);
+      //if(!CompareDoubleArrays(arr_Pom_P2_Close,_P2_.Pom_Close)) return(false);
+      if(!CompareDoubleArrays(m_P1.Signal_Close,Priming.Signal_Close)) return(false);
+      //if(!CompareDoubleArrays(arr_Signal_P2,_P2_.Signal_Close)) return(false);
+      if(!CompareDoubleArrays(m_P1.Dc_Close,Priming.Dc_Close)) return(false);
+      //if(!CompareDoubleArrays(arr_dC_P2_Close,_P2_.Dc_Close)) return(false);
+*/
+      m_CurrentPriming=1;
+
+      //Save total minutes in period
+      m_Total_Minutes_in_period=ArraySize(m_P1.Rates);
+     }//end of priming 1
+   else//Priming 2
+     {
+      //Rates
+      if(ArrayCopy(m_P2.Rates,Priming.Rates,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      //Spread
+      if(ArrayCopy(m_P2.Spread,Priming.Spread,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+
+      //First
+      if(ArrayCopy(m_P2.First_Open,Priming.First_Open,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P2.First_High,Priming.First_High,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P2.First_Low,Priming.First_Low,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P2.First_Close,Priming.First_Close,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+
+      //Pom
+      if(ArrayCopy(m_P2.Pom_Open,Priming.Pom_Open,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P2.Pom_High,Priming.Pom_High,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P2.Pom_Low,Priming.Pom_Low,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P2.Pom_Close,Priming.Pom_Close,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+
+      //Signal
+      if(ArrayCopy(m_P2.Signal_Open,Priming.Signal_Open,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P2.Signal_High,Priming.Signal_High,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P2.Signal_Low,Priming.Signal_Low,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P2.Signal_Close,Priming.Signal_Close,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+
+      //Dc
+      if(ArrayCopy(m_P2.Dc_Open,Priming.Dc_Open,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P2.Dc_High,Priming.Dc_High,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P2.Dc_Low,Priming.Dc_Low,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+      if(ArrayCopy(m_P2.Dc_Close,Priming.Dc_Close,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+/*
+      //Compare 2 arrays in old interpetation and new
+      // if(!CompareDoubleArrays(arr_First_P1,_P1_.First_Close)) return(false);
+      if(!CompareDoubleArrays(m_P2.First_Close,Priming.First_Close)) return(false);
+      // if(!CompareDoubleArrays(arr_Pom_P1_Close,_P1_.Pom_Close)) return(false);
+      if(!CompareDoubleArrays(m_P2.Pom_Close,Priming.Pom_Close)) return(false);
+      //if(!CompareDoubleArrays(arr_Signal_P1,_P1_.Signal_Close)) return(false);
+      if(!CompareDoubleArrays(m_P2.Signal_Close,Priming.Signal_Close)) return(false);
+      //if(!CompareDoubleArrays(arr_dC_P1_Close,_P1_.Dc_Close)) return(false);
+      if(!CompareDoubleArrays(m_P2.Dc_Close,Priming.Dc_Close)) return(false);
+*/
+      m_CurrentPriming=2;
+
+      //Save total minutes in period
+      m_Total_Minutes_in_period=ArraySize(m_P2.Rates);
+     }//end of priming2
+
+//Stop speed measuring     
+//  uint Stop_measuring=GetTickCount()-Start_measure;
+//  PrintFormat("Init Primings complete in %d ms",Stop_measuring);
+
+//If Ok
+   m_Result=0;
+
+   return(true);
+  }//End of copy priming to local
 //+------------------------------------------------------------------+
 //| CopyArrays to Local                                              |
 //+------------------------------------------------------------------+
@@ -261,6 +399,17 @@ bool RTrade::_InitPriming(const bool Priming1,MqlRates &arr_Rates[],int &arr_Spr
       if(ArrayCopy(m_arr_dC_P1_High,arr_Dc_High,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
       if(ArrayCopy(m_arr_dC_P1_Low,arr_Dc_Low,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
       if(ArrayCopy(m_arr_dC_P1_Close,arr_Dc_Close,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+/*
+      //Compare 2 arrays in old interpetation and new
+      if(!CompareDoubleArrays(m_arr_First_P1,arr_Firsts)) return(false);
+      //  if(!CompareDoubleArrays(arr_First_P2,_P2_.First_Close)) return(false);
+      if(!CompareDoubleArrays(m_arr_Pom_P1_Close,arr_Poms)) return(false);
+      //if(!CompareDoubleArrays(arr_Pom_P2_Close,_P2_.Pom_Close)) return(false);
+      if(!CompareDoubleArrays(m_arr_Signal_P1,arr_Signals)) return(false);
+      //if(!CompareDoubleArrays(arr_Signal_P2,_P2_.Signal_Close)) return(false);
+      if(!CompareDoubleArrays(m_arr_dC_P1_Close,arr_Dc_Close)) return(false);
+      //if(!CompareDoubleArrays(arr_dC_P2_Close,_P2_.Dc_Close)) return(false);
+*/
       m_CurrentPriming=1;
 
       //Save total minutes in period
@@ -283,6 +432,17 @@ bool RTrade::_InitPriming(const bool Priming1,MqlRates &arr_Rates[],int &arr_Spr
       if(ArrayCopy(m_arr_dC_P2_High,arr_Dc_High,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
       if(ArrayCopy(m_arr_dC_P2_Low,arr_Dc_Low,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
       if(ArrayCopy(m_arr_dC_P2_Close,arr_Dc_Close,0,0,WHOLE_ARRAY)<=0){m_Result=-1; return(false);}
+/*
+      //Compare 2 arrays in old interpetation and new
+      if(!CompareDoubleArrays(m_arr_First_P2,arr_Firsts)) return(false);
+      //  if(!CompareDoubleArrays(arr_First_P2,_P2_.First_Close)) return(false);
+      if(!CompareDoubleArrays(m_arr_Pom_P2_Close,arr_Poms)) return(false);
+      //if(!CompareDoubleArrays(arr_Pom_P2_Close,_P2_.Pom_Close)) return(false);
+      if(!CompareDoubleArrays(m_arr_Signal_P2,arr_Signals)) return(false);
+      //if(!CompareDoubleArrays(arr_Signal_P2,_P2_.Signal_Close)) return(false);
+      if(!CompareDoubleArrays(m_arr_dC_P2_Close,arr_Dc_Close)) return(false);
+      //if(!CompareDoubleArrays(arr_dC_P2_Close,_P2_.Dc_Close)) return(false);
+*/
       m_CurrentPriming=2;
 
       //Save total minutes in period
@@ -302,7 +462,7 @@ bool RTrade::_InitPriming(const bool Priming1,MqlRates &arr_Rates[],int &arr_Spr
 //If Ok
    m_Result=0;
    return(true);
-  }
+  }//END OF CopyArrays to Local
 //+------------------------------------------------------------------+
 //| Main Emulating Priming 1                                         |
 //+------------------------------------------------------------------+
@@ -512,13 +672,7 @@ bool  RTrade::CheckSpread(const uint MaxSpread,const uint CurrentSpread)
      {
       return(true);
      }
-  }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
+  }//END OF Check Maximum Spread
 //+------------------------------------------------------------------+
 //| Emulated AutoClose Dc+Spread+Commisstion                         |
 //+------------------------------------------------------------------+
@@ -535,13 +689,7 @@ bool  RTrade::m_EMUL_AutoCloseDCSpread(const double PositionProfit,const double 
      }
 
    return(res);
-  }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
+  }//END OF Emulated AutoClose 
 //+------------------------------------------------------------------+
 //| Emulated Choosing Close Rule                                     |
 //+------------------------------------------------------------------+
@@ -566,13 +714,7 @@ bool  RTrade::m_EMUL_CloseRule(const ENUM_EMUL_CloseRule CloseRuleNum,const doub
      }
 //If Ok
    return(TR_RES);
-  }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
+  }//END OF Emulated Choosing Close Rule 
 //+------------------------------------------------------------------+
 //| Emulated Choosing Open Rule                                      |
 //+------------------------------------------------------------------+
@@ -597,13 +739,7 @@ int  RTrade::m_EMUL_OpenRule(const ENUM_EMUL_OpenRule OpenRuleNum,const char Cas
      }
 //If Ok
    return(TR_RES);
-  }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
+  }//END OF  Emulated Choosing Open Rule
 //+------------------------------------------------------------------+
 //| Emulated Open TR Caterpillar OHLC                                |
 //+------------------------------------------------------------------+
@@ -655,13 +791,7 @@ int RTrade::m_EMUL_TR_Caterpillar(const char Case,const int IterationNum,const d
 
 //If NO Signal
    return(-1);
-  }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
+  }//END OF Emulated Open TR Caterpillar OHLC
 //+------------------------------------------------------------------+
 //| Emulated Open TR Caterpillar                                     |
 //+------------------------------------------------------------------+
@@ -714,13 +844,7 @@ int RTrade::m_EMUL_TR_Caterpillar(const char Case,const int IterationNum)
 
 //If No Signal
    return(-1);
-  }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
+  }//END OF Emulated Open TR Caterpillar 
 //+------------------------------------------------------------------+
 //| Emulation Initialisation                                         |
 //+------------------------------------------------------------------+
@@ -740,13 +864,7 @@ bool RTrade::_InitEmul(const ENUM_EMUL_CloseRule CloseRuleNum,const ENUM_EMUL_Op
 
 //If Ok
    return(true);
-  }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
+  }//END OF Emulation Initialisation  
 //+------------------------------------------------------------------+
 //| Virtual Caterpillar: POM,WF,SIGNAL,DC                            |
 //+------------------------------------------------------------------+
@@ -763,13 +881,7 @@ bool RTrade::m_EMUL_VirtualCaterpillar(const uint CurrentIteration,double &Pom,d
 
 //If Ok
    return(true);
-  }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
+  }//END OF Virtual Caterpillar
 //+------------------------------------------------------------------+
 //| Converts OHLC to row array, returns Elements Count               |
 //+------------------------------------------------------------------+
@@ -799,13 +911,7 @@ uint RTrade::m_OHLC_To_Row(const MqlRates &OHLC[])
      }
 
    return(j-4);
-  }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
+  }//END OF  Converts OHLC to row array,
 //+------------------------------------------------------------------+
 //| Transform priming ohlc rates to row                              |
 //+------------------------------------------------------------------+
@@ -832,13 +938,7 @@ bool RTrade::m_TransformPriming(void)
 
 //If ok
    return(true);
-  }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
+  }//END OF Transform priming ohlc rates to row 
 //+------------------------------------------------------------------+
 //| Who will be first High or low ? 0,1,2 |No,Low,High               |
 //+------------------------------------------------------------------+
@@ -855,14 +955,7 @@ char RTrade::m_EMUL_WhoFirst(const uint iter_start)
    if(index_H==index_L) return(EqualFirst);
 
    return(0);
-
   }//End of who first  
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
 //+------------------------------------------------------------------+
 //| Emulate dc by 3 bars forward                                     |
 //+------------------------------------------------------------------+
@@ -917,13 +1010,7 @@ double RTrade::m_EMUL_CalculateDc(const uint Iteration)
      }
 //If Ok
    return(res);
-  }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
+  }//END of Emulate dc by 3 bars forward  
 //+------------------------------------------------------------------+
 //| Emulation Result after Emulation 2 primings (selected)           |
 //+------------------------------------------------------------------+
@@ -942,12 +1029,6 @@ bool RTrade::EmulationResult_Selected(const uint EmulNumber,SIMUL_Q &SimulStruct
    return(true);
   }//END OF SELECTED EMULATION RESULTS
 //+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-//+------------------------------------------------------------------+
 //| Emulation Result after Emulation 2 primings (latest)             |
 //+------------------------------------------------------------------+
 bool RTrade::EmulationResult_Latest(SIMUL_Q &SimulStruct)
@@ -961,12 +1042,6 @@ bool RTrade::EmulationResult_Latest(SIMUL_Q &SimulStruct)
 //If Ok
    return(true);
   }//END OF LATEST EMULATION RESULTS  
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
 //+------------------------------------------------------------------+
 //| Choose TR for Ck                                                 |
 //+------------------------------------------------------------------+
@@ -1006,13 +1081,7 @@ char RTrade::TR_PredictCk(const ENUM_TRCK TRCk_Name,const bool USDFirst)
      }
 //If Ok
    return(TR_RES);
-  }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
+  }//End of Choose TR for Ck
 //+------------------------------------------------------------------+
 //| TR18_0330_Virt (Ck) 0,1,2,3,4:1,4,14,SingulBuy,SingulSell        |
 //+------------------------------------------------------------------+
@@ -1136,13 +1205,7 @@ char RTrade::m_BUILD_CK_TR18_0330_Virt(const bool USDFirst)
 
 //If No Signal
    return(CkNoSignal);
-  }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
+  }//End of m_BUILD_CK_TR18_0330_Virt
 //+------------------------------------------------------------------+
 //| Converts Ck Prediction to string                                 |
 //+------------------------------------------------------------------+
@@ -1162,12 +1225,6 @@ string RTrade::CkResultToString(const char Ck)
       break;
      }
   }//END OF CK to Sring
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
 //+------------------------------------------------------------------+
 //| Returns Ck prediction by Index                                   |
 //+------------------------------------------------------------------+
@@ -1214,9 +1271,6 @@ bool RTrade::m_CheckClose(const double Price,bool &BUY_OPENED,bool &SELL_OPENED,
    return(false);
   }//END OF CHECKCLOSE
 //+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-//+------------------------------------------------------------------+
 //| Check for Open                                                   |
 //+------------------------------------------------------------------+
 bool RTrade::m_CheckOpen(const double Price,const int OTR_RESULT,bool &BUY_OPENED,bool &SELL_OPENED,
@@ -1256,5 +1310,238 @@ bool RTrade::m_CheckOpen(const double Price,const int OTR_RESULT,bool &BUY_OPENE
       return(true);
      }//END OF SELL
    return(false);
-  }
+  }//End of m_Check_Open
+//+------------------------------------------------------------------+
+//| Choose Quant mode (4 option)                                     |
+//+------------------------------------------------------------------+
+bool RTrade::ChooseEmul_QuantMode(const ENUM_EMUL_OHLC_PRICE &QuantMode)
+  {
+   switch(QuantMode)
+     {
+      case  ALL_Close: //Use only Close prices in Open\Close positions
+
+         break;
+
+      case ALL_OHLC:      //Use OHLC prices (4)
+
+         break;
+
+      case  OHLC_onOpenOnly:   //Use OHLC on Open, and CloseValues on Close positions
+         break;
+
+      case OHLC_onCloseOnly:  //Use OHLC on Close, and CloseValues on Open positions 
+         break;
+
+      default: //ALL_Close;
+         break;
+     }
+   return(true);
+  }//End of Choose quant mode
+//+------------------------------------------------------------------+
+//| Emulate Trading All Close                                        |
+//+------------------------------------------------------------------+
+bool RTrade::Emulate_Trading_AllClose(const bool Priming1,const STRUCT_Priming &CurP)
+  {
+
+//If not initialised, then exit
+   if(!m_initialised_emul)
+     {
+      m_Result=-2;
+      return(false);
+     }
+
+//Priming length
+   int ArrSize=0;
+
+//Set Current Priming
+   if(Priming1)
+     {
+      m_CurrentPriming=true;
+     }//Priming 2
+   else
+     {
+      m_CurrentPriming=false;
+     }
+
+//Get Size of arr
+   ArrSize=ArraySize(CurP.Rates);
+
+//+++++EMULATION++++++\\
+//+++++EMULATION++++++\\
+//+++++EMULATION++++++\\
+
+//Do it for 3 Cases :case 1, Case 4, Case14
+   for(char Case=0;Case<3;Case++)
+     {
+      int BUY_Signal_Count=0;
+      int SELL_Signal_Count=0;
+      bool BUY_OPENED=false;
+      double BUY_OPENED_PRICE=0;
+      double SELL_OPENED_PRICE=0;
+      bool SELL_OPENED=false;
+      double Calculated_Dc=0;
+      double PositionProfit=0;
+
+      //From first day 00:00 to 23:50 last day in Priming1
+      for(int i=ArrSize-1;i>-1;i--)
+        {
+         //1. Check Open Rule 
+         int OTR_RESULT=m_EMUL_OpenRule2(m_open_rule_num_emul,Case,i,0,CurP);
+
+         //2. Pass first 3 bars for DC
+         if(i>ArrSize-3) continue;
+
+         //2.1 Calculate DC
+         Calculated_Dc=0;
+         Calculated_Dc= m_EMUL_CalculateDc2(i,CurP)*inpDeltaC_koef;
+
+         //3. Check if pos opened, try to close,if closed continue   
+         if(m_CheckClose(CurP.Rates[i].close,BUY_OPENED,SELL_OPENED,PositionProfit,BUY_OPENED_PRICE,SELL_OPENED_PRICE,
+            Calculated_Dc,CurP.Spread[i])) continue;
+
+         //4. Check Spread (if > max then next iteration)
+         if(CheckSpread(m_max_spread_emul,CurP.Spread[i])) continue;
+
+         //5. +++OPEN POSITION+++ (:true -> next iteration)
+         if(m_CheckOpen(CurP.Rates[i].close,OTR_RESULT,BUY_OPENED,SELL_OPENED,BUY_OPENED_PRICE,
+            SELL_OPENED_PRICE,BUY_Signal_Count,SELL_Signal_Count)) continue;
+
+        }//END OF CASE
+
+      //Fill Omega Structures for Priming1:
+      if(m_CurrentPriming)
+        {
+         //Priming 1
+         switch(Case)
+           {
+            case  0: m_arr_sim_q[m_simulated_primings_total].P1_Q1_Simul=BUY_Signal_Count;  break;
+            case  1: m_arr_sim_q[m_simulated_primings_total].P1_Q4_Simul=SELL_Signal_Count;  break;
+            case  2: m_arr_sim_q[m_simulated_primings_total].P1_Q14_Simul=BUY_Signal_Count+SELL_Signal_Count;break;
+
+            default:
+               break;
+           }//End of Switch FILLING Priming1 Omega Structures
+        }//End of Priming1 Switch
+      else
+        {
+         //Priming 2
+         switch(Case)
+           {
+            case  0: m_arr_sim_q[m_simulated_primings_total].P2_Q1_Simul=BUY_Signal_Count;  break;
+            case  1: m_arr_sim_q[m_simulated_primings_total].P2_Q4_Simul=SELL_Signal_Count;  break;
+            case  2: m_arr_sim_q[m_simulated_primings_total].P2_Q14_Simul=BUY_Signal_Count+SELL_Signal_Count;
+
+            //Only after Second Priming Case2 : Add +1 Cell to Dynamic Array of Primings Omegas
+            ArrayResize(m_arr_sim_q,ArraySize(m_arr_sim_q)+1);
+
+            //Always increase by 1 this counter, otherwise program writes to [0]
+            m_simulated_primings_total++;
+            break;
+
+            default:
+               break;
+           }//End of Switch FILLING Priming1 Omega Structures
+
+        }//End of Priming 2 Switch
+
+     }//END OF ALL CASES
+
+//If Ok
+   return(true);
+  }//END OF Emulate Trading All Close 
+//+------------------------------------------------------------------+
+//| Emulate dc by 3 bars forward  (Ver 2)                            |
+//+------------------------------------------------------------------+
+double RTrade::m_EMUL_CalculateDc2(const uint Iteration,const STRUCT_Priming &Priming)
+  {
+   double res=-1;
+   uint i=Iteration;
+
+   double r0=Priming.Rates[i].high-Priming.Rates[i].low;
+
+   double r2=Priming.Rates[i+2].high-Priming.Rates[i+2].low;
+
+   long t1=Priming.Rates[i+2].tick_volume-Priming.Rates[i+1].tick_volume;
+
+   double t2=t1*r2;
+   if(t2==0)return(res=0); //div 0 exception
+
+   double t3=Priming.Rates[i+1].close-Priming.Rates[i+2].close;
+
+   double t4=t3/t2;
+
+   long t6=Priming.Rates[i+1].tick_volume-Priming.Rates[i].tick_volume;
+
+   res=t6*t4*r0;
+   res= NormalizeDouble(res,5);
+
+//If Ok
+   return(res);
+  }//END of Emulate dc by 3 bars forward    
+//+------------------------------------------------------------------+
+//| Emulated Open TR Caterpillar2                                    |
+//+------------------------------------------------------------------+
+int RTrade::m_EMUL_TR_Caterpillar2(const char Case,const int IterationNum,const STRUCT_Priming &Priming)
+  {
+//Cases: Case0=1,Case1=4,Case2=14
+   int i=IterationNum;
+
+   double signal=0;
+   double pom=0;
+   double whofirst=0;
+
+   signal=Priming.Signal_Close[i];
+   pom=Priming.Pom_Close[i];
+   whofirst=Priming.First_Close[i];
+
+//Check if Signal==0 then exit
+   if(signal==0) return(-2);
+
+//Check if WhoFirst==0 then exit
+   if(whofirst==0) return(-2);
+
+// (Case 1) or Case4
+   if(Case==0 || Case==2)
+     {
+      if((signal==1) && (pom>=m_pom_buy_emul) && (pom<m_pom_buy_emul+m_pom_koef_emul))
+         return(BUY1);
+     }//END OF CASE1
+
+//(Case 4) or Case14
+   if(Case==1 || Case==2)
+     {
+      if((signal==-1) && (pom>=m_pom_sell_emul) && (pom<m_pom_sell_emul+m_pom_koef_emul))
+         return(SELL1);
+     }
+
+//If No Signal
+   return(-1);
+  }//END OF Emulated Open TR Caterpillar2 
+//+------------------------------------------------------------------+
+//| Open Rule 2 For emulation                                        |
+//+------------------------------------------------------------------+
+int RTrade::m_EMUL_OpenRule2(const ENUM_EMUL_OpenRule OpenRuleNum,const char Case,const int IterationNum,
+                             const double Current_OHLC_Price,const STRUCT_Priming &Priming)
+  {
+//TR_RESULT  
+   int TR_RES=-1;
+
+   if(OpenRuleNum<0)
+     {
+      return(-2);
+     }
+
+   switch(OpenRuleNum)
+     {
+      case  0:TR_RES=m_EMUL_TR_Caterpillar2(Case,IterationNum,Priming);
+
+      break;
+      default:
+         break;
+     }
+//If Ok
+   return(TR_RES);
+//If Ok 
+   return(true);
+  }//End of EmulOpenRule 2  
 //+------------------------------------------------------------------+
