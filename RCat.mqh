@@ -536,8 +536,14 @@ int RCat::OpenMarketOrder(const double &Vol,const uchar &BuyOrSell,const double 
      {
       Print(__FUNCTION__+" Verify send order failed with : "+z_mt_cr.comment+" Code="+IntegerToString(z_mt_cr.retcode));
       //     Print("check retcode="+z_mt_cr.retcode);
+      //If wrong volume, show it
+      if((z_mt_cr.retcode==TRADE_RETCODE_INVALID_VOLUME) && (MQLInfoInteger(MQL_TESTER)==true))
+        {
+         Print("Open Position Volume: "+DoubleToString(z_mt_req.volume));
+         ExpertRemove();
+        }
 
-      //Id no money in HISTORY_TESTER_MODE, remove expert
+      //If no money in HISTORY_TESTER_MODE, remove expert
       if((z_mt_cr.retcode==TRADE_RETCODE_NO_MONEY) && (MQLInfoInteger(MQL_TESTER)==true))
         {
          ExpertRemove();
@@ -632,7 +638,7 @@ bool RCat::AutoCompounding(const ENUM_AutoLot &Enum_AutoLot)
 //Get Maximum Availables Volume on broker
    double max_broker_vol=SymbolInfoDouble(m_pair,SYMBOL_VOLUME_MAX);
 
-//Check if first run : Calculate fixed lot
+//Check if first run : Calculate fixed lot koef
    if(m_start_vol_koef==0 || m_max_vol_koef==0)
      {
       //Calculate first start volume koeficient
@@ -676,9 +682,6 @@ bool RCat::AutoCompounding(const ENUM_AutoLot &Enum_AutoLot)
                return(false);
               }//End of compare
 
-            //Set to new fixed koeficient
-            m_start_vol_koef=current_start_vol_koef;
-            m_max_vol_koef=current_max_vol_koef;
             return(true);
            }
          break;
@@ -705,10 +708,6 @@ bool RCat::AutoCompounding(const ENUM_AutoLot &Enum_AutoLot)
                m_max_volume=saved_max_vol;
                return(false);
               }//End of compare
-
-            //Set to new fixed koeficient
-            m_start_vol_koef=current_start_vol_koef;
-            m_max_vol_koef=current_max_vol_koef;
             return(true);
            }
          break;
