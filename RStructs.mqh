@@ -5,7 +5,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, Shcherbyna Rostyslav"
 #property link      ""
-#property version   "1.3"
+#property version   "1.4"
 
 #include <Tools\DateTime.mqh>
 
@@ -14,6 +14,7 @@ Include all structures and global constants
 */
 /*
 +++++CHANGE LOG+++++
+1.4 20.05.2016--Stable with AutoCompounding
 1.3 19.05.2016--Stable, without Copy Arrays
 1.2 15.05.2016--Version with Commented Addition code
 1.1 6.05.2016 --Version with working RStructs (separate file)
@@ -93,6 +94,15 @@ struct SIMUL_Q
    int               P2_Q1_Simul;
    int               P2_Q4_Simul;
    int               P2_Q14_Simul;
+  };
+//+------------------------------------------------------------------+
+//| Compounding (Dynamic or Maximal Only)                            |
+//+------------------------------------------------------------------+
+enum ENUM_AutoLot
+  {
+   Disabled,
+   Dynamic,
+   MaximalOnly
   };
 //+------------------------------------------------------------------+
 //| Prediction Period                                                |
