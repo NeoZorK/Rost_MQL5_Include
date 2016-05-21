@@ -51,6 +51,8 @@ private:
    double            m_start_volume;
    double            m_step_volume;
    double            m_max_volume;
+   double            m_start_vol_koef;
+   double            m_max_vol_koef;
    double            m_add_vol_shift_points;
 
    ENUM_RT_OpenRule  m_current_open_rule;
@@ -77,13 +79,16 @@ public:
                           const double AddVol_Shift_Pt);
    //Main          
    bool              Trade(const double &First,const double &Pom,const double &Dc,const double &Signal,
-                           const double &Sl,const double &Tp,const double &StartVol,const double &MaxVol);
+                           const double &Sl,const double &Tp,const double &StartVol,const double &MaxVol,
+                           const ENUM_AutoLot &AutoLot);
    //Close Position
    bool              ClosePosition(const string CustomComment);
    bool              CloseAllPositions(const string CustomComment);
    //Open Position
    int               OpenMarketOrder(const double &Vol,const uchar &BuyOrSell,const double &Sl,const double &Tp,
                                      const uint &Magic,const string _Comment,const bool LimitOrder,const ushort LimitShift_Pt);
+   //Compounding (AutoLot)
+   bool              AutoCompounding(const ENUM_AutoLot &Enum_AutoLot);
 
   };
 //+------------------------------------------------------------------+
@@ -101,6 +106,8 @@ RCat::RCat(const string Pair,const double &Pom_Koef,const double &PomBuy,const d
    m_buypos_count=0;
    m_sellpos_count=0;
    m_max_spread=MaxSpread;
+   m_start_vol_koef=0;
+   m_max_vol_koef=0;
   }
 //+------------------------------------------------------------------+
 //| Destructor                                                       |
@@ -130,7 +137,8 @@ bool RCat::Init(const char &Ck_Case,const ENUM_RT_OpenRule &OpenRule,const ENUM_
 //| Main Real Trade Function:True if Open\Close Position             |
 //+------------------------------------------------------------------+
 bool RCat::Trade(const double &First,const double &Pom,const double &Dc,const double &Signal,
-                 const double &Sl,const double &Tp,const double &StartVol,const double &MaxVol)
+                 const double &Sl,const double &Tp,const double &StartVol,const double &MaxVol,
+                 const ENUM_AutoLot &AutoLot)
   {
 // Fill Latest Indicator Buffers
    m_first=First;
@@ -141,6 +149,14 @@ bool RCat::Trade(const double &First,const double &Pom,const double &Dc,const do
    m_takeprofit=Tp;
    m_start_volume=StartVol;
    m_max_volume=MaxVol;
+
+//Compounding   
+//Check if enabled
+   if(AutoLot!=Disabled)
+     {
+      bool compound_result=AutoCompounding(AutoLot);
+      //if true - lots changed, false - not changed
+     }//End of Compounding
 
 ///---MAIN CALCULATION---///
    m_TR_RES=-1;
@@ -605,4 +621,105 @@ bool RCat::CloseAllPositions(const string CustomComment)
      }//END of FOR
    return(res);
   }//END OF CLOSE ALL POSITIONS  
+//+------------------------------------------------------------------+
+//| AutoCompounding                                                  |
+//+------------------------------------------------------------------+
+bool RCat::AutoCompounding(const ENUM_AutoLot &Enum_AutoLot)
+  {
+//Get Current Balance
+   double balance=AccountInfoDouble(ACCOUNT_BALANCE);
+
+//Get Maximum Availables Volume on broker
+   double max_broker_vol=SymbolInfoDouble(m_pair,SYMBOL_VOLUME_MAX);
+
+//Check if first run : Calculate fixed lot
+   if(m_start_vol_koef==0 || m_max_vol_koef==0)
+     {
+      //Calculate first start volume koeficient
+      m_start_vol_koef=NormalizeDouble(balance/m_start_volume,2);
+
+      //Calculate first max volume koeficient
+      m_max_vol_koef=NormalizeDouble(balance/m_max_volume,2);
+     }//End of first run
+
+//Save Start\Max Volume
+   double   saved_start_vol=m_start_volume;
+   double   saved_max_vol=m_max_volume;
+
+//Calculate lot
+   double current_start_vol_koef=0;
+   double current_max_vol_koef=0;
+
+//Select Calculation mode Dynamic or MaximalOnly
+   switch(Enum_AutoLot)
+     {
+      case  Dynamic:
+         //Calculate Current Start volume koeficient
+         current_start_vol_koef=NormalizeDouble(balance/m_start_volume,2);
+
+         //Calculate Current Max volume koeficient
+         current_max_vol_koef=NormalizeDouble(balance/m_max_volume,2);
+
+         //Check if balance changed
+         if(current_start_vol_koef!=m_start_vol_koef)
+           {
+            //if changed set current lot to new
+            m_start_volume=NormalizeDouble(balance/m_start_vol_koef,2);
+            m_max_volume=NormalizeDouble(balance/m_max_vol_koef,2);
+
+            //Compare Maximum broker volume with our calculated
+            if(m_start_volume>max_broker_vol || m_max_volume>max_broker_vol)
+              {
+               //return to saved volume
+               m_start_volume=saved_start_vol;
+               m_max_volume=saved_max_vol;
+               return(false);
+              }//End of compare
+
+            //Set to new fixed koeficient
+            m_start_vol_koef=current_start_vol_koef;
+            m_max_vol_koef=current_max_vol_koef;
+            return(true);
+           }
+         break;
+
+      case  MaximalOnly:
+         //Calculate Current Start volume koeficient
+         current_start_vol_koef=NormalizeDouble(balance/m_start_volume,2);
+
+         //Calculate Current Max volume koeficient
+         current_max_vol_koef=NormalizeDouble(balance/m_max_volume,2);
+
+         //Check if balance > previous
+         if(current_start_vol_koef>m_start_vol_koef)
+           {
+            //if changed set current lot to new
+            m_start_volume=NormalizeDouble(balance/m_start_vol_koef,2);
+            m_max_volume=NormalizeDouble(balance/m_max_vol_koef,2);
+
+            //Compare Maximum broker volume with our calculated
+            if(m_start_volume>max_broker_vol || m_max_volume>max_broker_vol)
+              {
+               //return to saved volume
+               m_start_volume=saved_start_vol;
+               m_max_volume=saved_max_vol;
+               return(false);
+              }//End of compare
+
+            //Set to new fixed koeficient
+            m_start_vol_koef=current_start_vol_koef;
+            m_max_vol_koef=current_max_vol_koef;
+            return(true);
+           }
+         break;
+
+      case Disabled:return(false); break;
+
+      default:
+         break;
+     }//End of switch
+
+//If Not Change 
+   return(false);
+  }//End of AutoCompounding
 //+------------------------------------------------------------------+
