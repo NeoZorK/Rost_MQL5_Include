@@ -5,7 +5,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, Shcherbyna Rostyslav"
 #property link      ""
-#property version   "1.4"
+#property version   "1.41"
 
 #include <Tools\DateTime.mqh>
 #include <RInclude\RTrade.mqh>
@@ -14,6 +14,7 @@
 //+------------------------------------------------------------------+
 /*
 +++++CHANGE LOG+++++
+1.41 28.05.2016--Minor version with ability to Export OHLC to CSV & BIN
 1.4 20.05.2016--Stable with AutoCompounding
 1.3 19.05.2016--Stable, without Copy Arrays
 1.2 15.05.2016--Version with Commented Addition code

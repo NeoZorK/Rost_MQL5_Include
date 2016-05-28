@@ -5,7 +5,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, Shcherbyna Rostyslav"
 #property link      ""
-#property version   "1.4"
+#property version   "1.41"
 
 #include <Tools\DateTime.mqh>
 #include <RInclude\RStructs.mqh>
@@ -22,6 +22,7 @@ Can determine last & first day minute, last week minute, last month minute, last
 */
 /*
 +++++CHANGE LOG+++++
+1.41 28.05.2016--Minor version with ability to Export OHLC to CSV & BIN
 1.4 20.05.2016--Stable with AutoCompounding
 1.3 19.05.2016--Stable, without Copy Arrays
 1.2 15.05.2016--Version with Commented Addition code
@@ -40,7 +41,7 @@ private:
    bool              m_debug;                   //Is Debug
    bool              m_initialised;             //Is Initialised  
    bool              m_processed;               //Is Processed
-   bool              m_imported;                //Is Imported
+   bool              m_imported;                //Is Imported first & last minutes
    bool              m_MRS_identical;           //Is 3 arrays identical
 
                                                 // Main   
@@ -142,23 +143,43 @@ public:
 
    //Main
    bool              _Init(const datetime from_date,const datetime to_date,const bool debug);
+
    //Call onInit                         
    bool              _Check_Load_History(const uchar TrysCount,const ENUM_TIMEFRAMES TimeFrame);
+
    //Calculate(days\weeks\months\quarters)  RequestMode = Don`t load rates,spread,Indicator
    bool              _ProcessDays(const ushort MinSessionMinutes,const bool TimesOnly);
+
    //Export  first & last minutes               
-   bool              _ExportDB();
-   //Export to readable txt file
-   bool              _ExportText();
-   //Test Import DB
-   bool              _ImportDB(const string pair);
+   bool              _ExportFLMToDB();
+
+   //Export first & last minutes to readable txt file
+   bool              _ExportFLMToText();
+
+   //Export Rates structure to CSV file
+   bool              _ExportRatesToCSV(const bool ReverseWrite);
+
+   //Export Rates to binary file
+   bool              _ExportRatesToBIN(const bool ReverseWrite);
+
+   //Test Import Rates from CSV file
+   bool              _ImportRatesFromCSV();
+
+   //Test Import Rates from BIN file
+   bool              _ImportRatesFromBIN();
+
+   //Test Import first & last minutes DB
+   bool              _ImportFLMFromDB(const string pair);
+
    //Get latest Indicator buffers           
    bool              _GetInd_LastBuffers(double &Signal,double &First,double &Pom,double &Dc);
+
    //Forms primings data for prediction(copy rates\spreads\ind arrays)
    bool              _FormPrimingData(const bool Priming1,const TIMEMARKS &timemarks,MqlRates &arr_Rates[],
                                       int &arr_Spreads[],double &arr_Signals[],
                                       double &arr_Firsts[],double &arr_Poms[],double &arr_Dc_Close[],
                                       double &arr_Dc_Open[],double &arr_Dc_High[],double &arr_Dc_Low[]);
+
    //Version with struct only
    bool              _FormPrimingData(const bool Priming1,const TIMEMARKS &TimeMarks,STRUCT_Priming &Priming);
   };
@@ -236,7 +257,7 @@ RHistory::~RHistory()
 //+------------------------------------------------------------------+
 //| Export first & last days as text file                            |
 //+------------------------------------------------------------------+
-bool  RHistory::_ExportText(void)
+bool  RHistory::_ExportFLMToText(void)
   {
 //Start speed measuring
    uint Start_measure=GetTickCount();
@@ -337,7 +358,7 @@ void RHistory::_ClearArrays()
 //+------------------------------------------------------------------+
 //| Import DB                                                        |
 //+------------------------------------------------------------------+
-bool  RHistory::_ImportDB(const string pair)
+bool  RHistory::_ImportFLMFromDB(const string pair)
   {
 //Start speed measuring
    uint Start_measure=GetTickCount();
@@ -405,9 +426,9 @@ bool  RHistory::_ImportDB(const string pair)
    return(true);
   }
 //+------------------------------------------------------------------+
-//| Export DB                                                        |
+//| Export FLM to DB                                                 |
 //+------------------------------------------------------------------+
-bool RHistory::_ExportDB(void)
+bool RHistory::_ExportFLMToDB(void)
   {
 //Start speed measuring  
    uint Start_measure=GetTickCount();
@@ -2074,8 +2095,142 @@ bool RHistory::_FormPrimingData(const bool Priming1,const TIMEMARKS &TimeMarks,S
    return(true);
   }//END of FormPrimingData (structure)  
 //+------------------------------------------------------------------+
-//| CheckLoadHistory                                                 |
+//| Export Rates to CSV                                              |
 //+------------------------------------------------------------------+ 
+bool RHistory::_ExportRatesToCSV(const bool ReverseWrite)
+  {
+//Check if Rates already loaded to memory
+   if(!m_processed)
+     {
+      Print(__FUNCTION__+" Data not loaded yet..");
+      return(false);
+     }
+
+//Get Server Broker Name
+   string Server=AccountInfoString(ACCOUNT_SERVER);
+
+//Path for Export ServerRatesEURUSD2010.01.01_2016.04.01
+   string path=Server+"Rates"+m_pair+TimeToString(m_from_date,TIME_DATE)+"_"+TimeToString(m_to_date,TIME_DATE)+".csv";
+
+//If BD not NULL
+   if(m_copyed_all_rates<=1)
+     {
+      m_result=-12;
+      return(false);
+     }
+
+//If exist delete
+   if(FileIsExist(path,FILE_COMMON)) FileDelete(path,FILE_COMMON);
+
+//Init file for write (csv) \r\n
+   int file_h1=FileOpen(path,FILE_READ|FILE_WRITE|FILE_BIN|FILE_COMMON|FILE_CSV|FILE_ANSI);
+   if(file_h1==INVALID_HANDLE) return(false);
+
+//---Export to CSV
+//Get Size of Rates Array
+   int arrSize=ArraySize(m_arr_all_rate);
+   string s1;
+
+//Main Circle
+//If not Reverse Write
+   if(!ReverseWrite)
+     {
+      //Write oldest rate to the end of file (and NOW date to the first string)
+      for(int i=0;i<arrSize;i++)
+        {
+         s1=IntegerToString(i)+","                                     //#ID
+            +TimeToString(m_arr_all_rate[i].time,TIME_DATE|TIME_MINUTES|TIME_SECONDS)+","     //Time in seconds 
+            +DoubleToString(m_arr_all_rate[i].open,5)+","              //OPEN 
+            +DoubleToString(m_arr_all_rate[i].high,5)+","              //HIGH
+            +DoubleToString(m_arr_all_rate[i].low,5)+","               //LOW
+            +DoubleToString(m_arr_all_rate[i].close,5)+","             //CLOSE
+            +IntegerToString(m_arr_all_rate[i].tick_volume)+","        //Tick Volume
+            +IntegerToString(m_arr_all_rate[i].real_volume)+","        //Real Volume
+            +IntegerToString(m_arr_all_rate[i].spread)                 //Spread
+            +"\r\n";
+         FileWrite(file_h1,s1);
+        }//End of for
+     }//End of NOT Reverse Write
+
+   if(ReverseWrite)
+     {
+      //Write oldest date first to file and NOW date to the End of file   
+      for(int i=arrSize-1;i>-1;i--)
+        {
+         s1=IntegerToString(i)+","                                     //#ID
+            +TimeToString(m_arr_all_rate[i].time,TIME_DATE|TIME_MINUTES|TIME_SECONDS)+","     //Time in seconds 
+            +DoubleToString(m_arr_all_rate[i].open,5)+","              //OPEN 
+            +DoubleToString(m_arr_all_rate[i].high,5)+","              //HIGH
+            +DoubleToString(m_arr_all_rate[i].low,5)+","               //LOW
+            +DoubleToString(m_arr_all_rate[i].close,5)+","             //CLOSE
+            +IntegerToString(m_arr_all_rate[i].tick_volume)+","        //Tick Volume
+            +IntegerToString(m_arr_all_rate[i].real_volume)+","        //Real Volume
+            +IntegerToString(m_arr_all_rate[i].spread)                 //Spread
+            +"\r\n";
+         FileWrite(file_h1,s1);
+        }//End of for
+     }//END OF Reverse Write  
+
+//Close file
+   FileClose(file_h1);
+
+//If ok    
+   Alert("Ok, File Created in COMMON folder: "+path);
+   return(true);
+  }//END of ExportRates to CSV
 //+------------------------------------------------------------------+
-//| CheckLoadHistory                                                 |
+//| Export Rates to BIN                                              |
 //+------------------------------------------------------------------+ 
+bool RHistory::_ExportRatesToBIN(const bool ReverseWrite)
+  {
+//Check if Rates already loaded to memory
+   if(!m_processed)
+     {
+      Print(__FUNCTION__+" Data not loaded yet..");
+      return(false);
+     }
+
+//If BD not NULL
+   if(m_copyed_all_rates<=1)
+     {
+      m_result=-12;
+      return(false);
+     }
+
+//Get Server Broker Name
+   string Server=AccountInfoString(ACCOUNT_SERVER);
+
+//Path for Export ServerRatesEURUSD2010.01.01_2016.04.01
+   string path=Server+"Rates"+m_pair+TimeToString(m_from_date,TIME_DATE)+"_"+TimeToString(m_to_date,TIME_DATE)+".bin";
+
+//If exist delete
+   if(FileIsExist(path,FILE_COMMON)) FileDelete(path,FILE_COMMON);
+
+//Init file
+   int  file_h1=FileOpen(path,FILE_READ|FILE_WRITE|FILE_BIN|FILE_COMMON);
+   if(file_h1==INVALID_HANDLE)  return(false);
+
+//Get Size of Rates Array
+   int arrSize=ArraySize(m_arr_all_rate);
+
+//If not Reverse Write
+   if(!ReverseWrite)
+     {
+      //Write oldest rate to the end of file (and NOW date to the first string)
+      for(int i=0;i<arrSize;i++)
+         FileWriteStruct(file_h1,m_arr_all_rate[i]);
+     }//End of NOT Reverse Write
+   else
+     {
+      //Write oldest date first to file and NOW date to the End of file   
+      for(int i=arrSize-1;i>-1;i--)
+         FileWriteStruct(file_h1,m_arr_all_rate[i]);
+     }//END OF Reverse Write  
+
+//Close file
+   FileClose(file_h1);
+
+//If ok    
+   Alert("Ok, File Created in COMMON folder: "+path);
+   return(true);
+  }//END of ExportRates to BIN
