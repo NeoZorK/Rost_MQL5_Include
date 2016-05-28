@@ -2134,7 +2134,7 @@ bool RHistory::_ExportRatesToCSV(const bool ReverseWrite)
 //If not Reverse Write
    if(!ReverseWrite)
      {
-     //Write oldest rate to the end of file (and NOW date to the first string)
+      //Write oldest rate to the end of file (and NOW date to the first string)
       for(int i=0;i<arrSize;i++)
         {
          s1=IntegerToString(i)+","                                     //#ID
@@ -2150,12 +2150,12 @@ bool RHistory::_ExportRatesToCSV(const bool ReverseWrite)
          FileWrite(file_h1,s1);
         }//End of for
      }//End of NOT Reverse Write
-     
-  if(ReverseWrite)
-    {
-     //Write oldest date first to file and NOW date to the End of file   
-     for(int i=arrSize-1;i>-1;i--)
-       {
+
+   if(ReverseWrite)
+     {
+      //Write oldest date first to file and NOW date to the End of file   
+      for(int i=arrSize-1;i>-1;i--)
+        {
          s1=IntegerToString(i)+","                                     //#ID
             +TimeToString(m_arr_all_rate[i].time,TIME_DATE|TIME_MINUTES|TIME_SECONDS)+","     //Time in seconds 
             +DoubleToString(m_arr_all_rate[i].open,5)+","              //OPEN 
@@ -2168,7 +2168,7 @@ bool RHistory::_ExportRatesToCSV(const bool ReverseWrite)
             +"\r\n";
          FileWrite(file_h1,s1);
         }//End of for
-       }//END OF Reverse Write  
+     }//END OF Reverse Write  
 
 //Close file
    FileClose(file_h1);
@@ -2176,7 +2176,60 @@ bool RHistory::_ExportRatesToCSV(const bool ReverseWrite)
 //If ok    
    Alert("Ok, File Created in COMMON folder: "+path);
    return(true);
-  }//END of ExportRates
+  }//END of ExportRates to CSV
 //+------------------------------------------------------------------+
-//| CheckLoadHistory                                                 |
+//| Export Rates to BIN                                              |
 //+------------------------------------------------------------------+ 
+bool RHistory::_ExportRatesToBIN(const bool ReverseWrite)
+  {
+//Check if Rates already loaded to memory
+   if(!m_processed)
+     {
+      Print(__FUNCTION__+" Data not loaded yet..");
+      return(false);
+     }
+
+//If BD not NULL
+   if(m_copyed_all_rates<=1)
+     {
+      m_result=-12;
+      return(false);
+     }
+
+//Get Server Broker Name
+   string Server=AccountInfoString(ACCOUNT_SERVER);
+
+//Path for Export ServerRatesEURUSD2010.01.01_2016.04.01
+   string path=Server+"Rates"+m_pair+TimeToString(m_from_date,TIME_DATE)+"_"+TimeToString(m_to_date,TIME_DATE)+".bin";
+
+//If exist delete
+   if(FileIsExist(path,FILE_COMMON)) FileDelete(path,FILE_COMMON);
+
+//Init file
+   int  file_h1=FileOpen(path,FILE_READ|FILE_WRITE|FILE_BIN|FILE_COMMON);
+   if(file_h1==INVALID_HANDLE)  return(false);
+
+//Get Size of Rates Array
+   int arrSize=ArraySize(m_arr_all_rate);
+
+//If not Reverse Write
+   if(!ReverseWrite)
+     {
+      //Write oldest rate to the end of file (and NOW date to the first string)
+      for(int i=0;i<arrSize;i++)
+         FileWriteStruct(file_h1,m_arr_all_rate[i]);
+     }//End of NOT Reverse Write
+   else
+     {
+      //Write oldest date first to file and NOW date to the End of file   
+      for(int i=arrSize-1;i>-1;i--)
+         FileWriteStruct(file_h1,m_arr_all_rate[i]);
+     }//END OF Reverse Write  
+
+//Close file
+   FileClose(file_h1);
+
+//If ok    
+   Alert("Ok, File Created in COMMON folder: "+path);
+   return(true);
+  }//END of ExportRates to BIN
