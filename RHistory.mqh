@@ -156,10 +156,10 @@ public:
    bool              _ExportFLMToText();
 
    //Export Rates structure to CSV file
-   bool              _ExportRatesToCSV();
+   bool              _ExportRatesToCSV(const bool ReverseWrite);
 
    //Export Rates to binary file
-   bool              _ExportRatesToBIN();
+   bool              _ExportRatesToBIN(const bool ReverseWrite);
 
    //Test Import Rates from CSV file
    bool              _ImportRatesFromCSV();
@@ -2096,7 +2096,7 @@ bool RHistory::_FormPrimingData(const bool Priming1,const TIMEMARKS &TimeMarks,S
 //+------------------------------------------------------------------+
 //| Export Rates to CSV                                              |
 //+------------------------------------------------------------------+ 
-bool RHistory::_ExportRatesToCSV(void)
+bool RHistory::_ExportRatesToCSV(const bool ReverseWrite)
   {
 //Check if Rates already loaded to memory
    if(!m_processed)
@@ -2109,7 +2109,7 @@ bool RHistory::_ExportRatesToCSV(void)
    string Server=AccountInfoString(ACCOUNT_SERVER);
 
 //Path for Export ServerRatesEURUSD2010.01.01_2016.04.01
-   string path=Server+"Rates"+m_pair+TimeToString(m_from_date,TIME_DATE)+"_"+TimeToString(m_to_date,TIME_DATE);
+   string path=Server+"Rates"+m_pair+TimeToString(m_from_date,TIME_DATE)+"_"+TimeToString(m_to_date,TIME_DATE)+".csv";
 
 //If BD not NULL
    if(m_copyed_all_rates<=1)
@@ -2131,25 +2131,50 @@ bool RHistory::_ExportRatesToCSV(void)
    string s1;
 
 //Main Circle
-   for(int i=0;i<arrSize;i++)
+//If not Reverse Write
+   if(!ReverseWrite)
      {
-      s1=IntegerToString(i)+","                                     //#ID
-         +TimeToString(m_arr_all_rate[i].time,TIME_SECONDS)+","     //Time in seconds 
-         +DoubleToString(m_arr_all_rate[i].open,5)+","              //OPEN 
-         +DoubleToString(m_arr_all_rate[i].high,5)+","              //HIGH
-         +DoubleToString(m_arr_all_rate[i].low,5)+","               //LOW
-         +DoubleToString(m_arr_all_rate[i].close,5)+","             //CLOSE
-         +IntegerToString(m_arr_all_rate[i].tick_volume)+","        //Tick Volume
-         +IntegerToString(m_arr_all_rate[i].real_volume)+","        //Real Volume
-         +IntegerToString(m_arr_all_rate[i].spread)                 //Spread
-         +"\r\n";
-      FileWrite(file_h1,s1);
-     }//End of for
+     //Write oldest rate to the end of file (and NOW date to the first string)
+      for(int i=0;i<arrSize;i++)
+        {
+         s1=IntegerToString(i)+","                                     //#ID
+            +TimeToString(m_arr_all_rate[i].time,TIME_DATE|TIME_MINUTES|TIME_SECONDS)+","     //Time in seconds 
+            +DoubleToString(m_arr_all_rate[i].open,5)+","              //OPEN 
+            +DoubleToString(m_arr_all_rate[i].high,5)+","              //HIGH
+            +DoubleToString(m_arr_all_rate[i].low,5)+","               //LOW
+            +DoubleToString(m_arr_all_rate[i].close,5)+","             //CLOSE
+            +IntegerToString(m_arr_all_rate[i].tick_volume)+","        //Tick Volume
+            +IntegerToString(m_arr_all_rate[i].real_volume)+","        //Real Volume
+            +IntegerToString(m_arr_all_rate[i].spread)                 //Spread
+            +"\r\n";
+         FileWrite(file_h1,s1);
+        }//End of for
+     }//End of NOT Reverse Write
+     
+  if(ReverseWrite)
+    {
+     //Write oldest date first to file and NOW date to the End of file   
+     for(int i=arrSize-1;i>-1;i--)
+       {
+         s1=IntegerToString(i)+","                                     //#ID
+            +TimeToString(m_arr_all_rate[i].time,TIME_DATE|TIME_MINUTES|TIME_SECONDS)+","     //Time in seconds 
+            +DoubleToString(m_arr_all_rate[i].open,5)+","              //OPEN 
+            +DoubleToString(m_arr_all_rate[i].high,5)+","              //HIGH
+            +DoubleToString(m_arr_all_rate[i].low,5)+","               //LOW
+            +DoubleToString(m_arr_all_rate[i].close,5)+","             //CLOSE
+            +IntegerToString(m_arr_all_rate[i].tick_volume)+","        //Tick Volume
+            +IntegerToString(m_arr_all_rate[i].real_volume)+","        //Real Volume
+            +IntegerToString(m_arr_all_rate[i].spread)                 //Spread
+            +"\r\n";
+         FileWrite(file_h1,s1);
+        }//End of for
+       }//END OF Reverse Write  
 
 //Close file
    FileClose(file_h1);
 
-//If ok 
+//If ok    
+   Alert("Ok, File Created in COMMON folder: "+path);
    return(true);
   }//END of ExportRates
 //+------------------------------------------------------------------+
