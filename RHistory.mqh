@@ -174,12 +174,6 @@ public:
    //Get latest Indicator buffers           
    bool              _GetInd_LastBuffers(double &Signal,double &First,double &Pom,double &Dc);
 
-   //Forms primings data for prediction(copy rates\spreads\ind arrays)
-   bool              _FormPrimingData(const bool Priming1,const TIMEMARKS &timemarks,MqlRates &arr_Rates[],
-                                      int &arr_Spreads[],double &arr_Signals[],
-                                      double &arr_Firsts[],double &arr_Poms[],double &arr_Dc_Close[],
-                                      double &arr_Dc_Open[],double &arr_Dc_High[],double &arr_Dc_Low[]);
-
    //Version with struct only
    bool              _FormPrimingData(const bool Priming1,const TIMEMARKS &TimeMarks,STRUCT_Priming &Priming);
   };
@@ -252,8 +246,7 @@ RHistory::~RHistory()
   {
 //---Delete Indicator
    IndicatorRelease(m_handle_ind_POM);
-  }
-//+------------------------------------------------------------------+
+  }//END OF Destructor
 //+------------------------------------------------------------------+
 //| Export first & last days as text file                            |
 //+------------------------------------------------------------------+
@@ -313,7 +306,7 @@ bool  RHistory::_ExportFLMToText(void)
    PrintFormat("Export to text in %d ms",Stop_measuring);
 
    return(true);
-  }
+  }//END OF FLM To TXT
 //+------------------------------------------------------------------+
 //| Reset Private members                                            |
 //+------------------------------------------------------------------+
@@ -339,7 +332,7 @@ void  RHistory::_Reset(void)
                                 //m_err="";                    //Error Description
    m_ind_path="";
    m_bottle_size=0;
-  }
+  }//END OF RESET members
 //+------------------------------------------------------------------+
 //| Clear Arrays                                                     |
 //+------------------------------------------------------------------+
@@ -350,11 +343,7 @@ void RHistory::_ClearArrays()
    ArrayResize(m_arr_day_ends,0);
    ArrayResize(m_arr_all_rate,0);
    ArrayResize(m_arr_all_spread,0);
-
-//   ArrayFill(m_arr_day_begins,0,1,0);
-//   ArrayFill(m_arr_day_ends,0,1,0);
-//   ArrayFill(m_arr_all_time,0,1,0);
-  }
+  }//END OF ClearArrays
 //+------------------------------------------------------------------+
 //| Import DB                                                        |
 //+------------------------------------------------------------------+
@@ -424,7 +413,7 @@ bool  RHistory::_ImportFLMFromDB(const string pair)
    PrintFormat("Import complete in %d ms",Stop_measuring);
 
    return(true);
-  }
+  }//END OF Import FLM From DB
 //+------------------------------------------------------------------+
 //| Export FLM to DB                                                 |
 //+------------------------------------------------------------------+
@@ -481,7 +470,7 @@ bool RHistory::_ExportFLMToDB(void)
    PrintFormat("Export complete in %d ms",Stop_measuring);
 
    return(true);
-  }
+  }//END OF Export FLM To DB
 //+------------------------------------------------------------------+
 //| GetFirstMinute                                                   |
 //+------------------------------------------------------------------+
@@ -543,7 +532,7 @@ datetime RHistory::First_DayMinute(const datetime Date)
 //if not found  
    m_result=-10;
    return(0);
-  }
+  }//END OF GetFirst Day Minute
 //+------------------------------------------------------------------+
 //| GetLastMinute                                                    |
 //+------------------------------------------------------------------+
@@ -597,7 +586,7 @@ datetime RHistory::Last_DayMinute(const datetime Date)
 //if not found  
    m_result=-10;
    return(0);
-  }
+  }//END OF GetLast Day Minute
 //+------------------------------------------------------------------+
 //| ProcessDays                                                      |
 //+------------------------------------------------------------------+
@@ -814,7 +803,7 @@ bool RHistory::_ProcessDays(const ushort MinSessionMinutes,const bool TimesOnly)
 
 //+If Ok
    return(true);
-  }
+  }//END OF PROCESS (FORM FLM IN MEMORY)
 //+------------------------------------------------------------------+
 //| Initialisation                                                   |
 //+------------------------------------------------------------------+
@@ -986,7 +975,7 @@ bool RHistory::_Check_Load_History(const uchar TrysCount,const ENUM_TIMEFRAMES p
 
 //---if stopped 
    return(false);
-  }
+  }//END OF CHECK LOAD HOSTORY
 //+------------------------------------------------------------------+
 //| Latest Minute by date                                            |
 //+------------------------------------------------------------------+ 
@@ -1050,7 +1039,7 @@ datetime RHistory::LastMinute_DaySearch(const datetime Date,const bool SearchDir
 //+If ok Print Last Minute
 //   Print("Day:"+TimeToString(Date)+" Last minute = "+TimeToString(dt_result));
    return(dt_result);
-  }
+  }//END OF Latest Minute By Date
 //+------------------------------------------------------------------+
 //| First minute by date (True forward, false backward)              |
 //+------------------------------------------------------------------+ 
@@ -1116,7 +1105,7 @@ datetime RHistory::FirstMinute_DaySearch(const datetime Date,const bool SearchDi
 //+If ok in circle -> Print First Minute
 //   Print("Day:"+TimeToString(Date)+" First minute = "+TimeToString(dt_result));
    return(dt_result);
-  }
+  }//END OF First Minute By Date
 //+------------------------------------------------------------------+
 //| First Minute in next period                                      |
 //+------------------------------------------------------------------+   
@@ -1222,7 +1211,7 @@ datetime RHistory::FirstMinute_NextPeriod(const uchar period,const datetime Star
          break;
      }
    return(1);
-  }
+  }//END OF First Minute at the Next Period
 //+------------------------------------------------------------------+
 //| First Minute in previous period                                  |
 //+------------------------------------------------------------------+   
@@ -1345,7 +1334,7 @@ datetime RHistory::FirstMinute_PreviousPeriod(const uchar period,const datetime 
          break;
      }
    return(1);
-  }
+  }//END OF the First Minute in Previous Period
 //+------------------------------------------------------------------+
 //| LastMinuteInPeriod                                               |
 //+------------------------------------------------------------------+ 
@@ -1440,7 +1429,7 @@ datetime RHistory::LastMinute_NextPeriod(const uchar period,const datetime Start
          break;
      }
    return(1);
-  }
+  }//END OF Last Minute at the Next Period
 //+------------------------------------------------------------------+
 //| Last working day in the week                                     |
 //+------------------------------------------------------------------+ 
@@ -1455,9 +1444,9 @@ datetime RHistory::Last_Work_Day_In_Week(datetime Date)
      }
 
    return(StructToTime(zdate));
-  }
+  }//END OF Last Working Day of the Week
 //+------------------------------------------------------------------+
-//| First working day in the week                                     |
+//| First working day in the week                                    |
 //+------------------------------------------------------------------+ 
 datetime RHistory::First_Work_Day_In_Week(datetime Date)
   {
@@ -1471,8 +1460,7 @@ datetime RHistory::First_Work_Day_In_Week(datetime Date)
      }
 
    return(StructToTime(zdate));
-  }
-//----------------------------------------------------------------------------------------------------------------------//
+  }//End of First Working Day in the Week
 //+------------------------------------------------------------------+
 //| Last Work Day in the Month                                       |
 //+------------------------------------------------------------------+ 
@@ -1497,7 +1485,7 @@ uchar RHistory::Last_Work_Day_In_Month(datetime Date)
       zdate.DayDec(1);
      }
    return((uchar)zdate.day);
-  }
+  }//END of last work day in the month
 //+------------------------------------------------------------------+
 //| First Work Day in the Month                                       |
 //+------------------------------------------------------------------+ 
@@ -1514,7 +1502,7 @@ uchar RHistory::First_Work_Day_In_Month(datetime Date)
       zdate.DayInc(1);
      }
    return((uchar)zdate.day);
-  }
+  }//END of first work day in month
 //+------------------------------------------------------------------+
 //| Find Rate by Index                                               |
 //+------------------------------------------------------------------+
@@ -1529,7 +1517,7 @@ bool RHistory::FindRate_by_Index(const uint Index,MqlRates &Rate)
 //If Ok
    Rate=m_arr_all_rate[Index];
    return(true);
-  }
+  }//END of Find Rate by Index
 //+------------------------------------------------------------------+
 //| Find Rate by Date in minutes or seconds accuracy                 |
 //+------------------------------------------------------------------+ 
@@ -1575,7 +1563,7 @@ int RHistory::FindRate_by_Date(const datetime Date,const bool SecondsAccuracy,Mq
 
 //If Not Found 
    return(-3);
-  }
+  }//END OF Find Rate by Date in minutes or seconds accuracy  
 //+------------------------------------------------------------------+
 //| Find Rate by Date, Forward or backward in time                   |
 //+------------------------------------------------------------------+  
@@ -1681,7 +1669,7 @@ int RHistory::FindRate_by_Date_Nearest(const bool SearchDirection,const bool Sec
    res=-4;
 
    return(res);
-  }
+  }//END OF Find Rate by Date, Forward or backward in time
 //+------------------------------------------------------------------+
 //| Check Minutes,Rates,Spreads by Count & First|Last date           |
 //+------------------------------------------------------------------+ 
@@ -1712,7 +1700,7 @@ bool RHistory::_CheckMRS(void)
 
 //If Ok
    return(true);
-  }
+  }//END OF CHECK MRS
 //+------------------------------------------------------------------+
 //| Find Spread by Index returns spread                              |
 //+------------------------------------------------------------------+
@@ -1726,7 +1714,7 @@ uint RHistory::FindSpread_by_Index(const uint Index)
 
 //If Ok
    return(m_arr_all_spread[Index]);
-  }
+  }//END OF Fins Spread by Index
 //+------------------------------------------------------------------+
 // Get Indicator Last Buffers                                        |
 //+------------------------------------------------------------------+ 
@@ -1791,123 +1779,7 @@ bool RHistory::_ConnectIndicator(void)
       return(false);
      }
    return(true);
-  }
-//+------------------------------------------------------------------+
-//| Form priming data rates\spreads\Indicator arrays                 |
-//+------------------------------------------------------------------+ 
-bool RHistory::_FormPrimingData(const bool Priming1,const TIMEMARKS &timemarks,MqlRates &arr_Rates[],int &arr_Spreads[],
-                                double &arr_Signals[],double &arr_Firsts[],double &arr_Poms[],
-                                double &arr_Dc_Close[],double &arr_Dc_Open[],double &arr_Dc_High[],double &arr_Dc_Low[])
-  {
-//Priming 1 =True , do with p1, else with p2
-
-   datetime Priming_Start=0;
-   datetime Priming_Stop=0;
-
-//If bars not calculated in indicator, then exit
-   int bars_calc=BarsCalculated(m_handle_ind_POM);
-
-   if(bars_calc<0)
-     {
-      //  Print("Waiting for POM calculations...");
-      return(false);
-     }
-
-//Check Priming1 or Priming2
-   if(Priming1)
-     {
-      Priming_Start=timemarks.P1_Start;
-      Priming_Stop=timemarks.P1_Stop;
-     }
-   else //Priming2
-     {
-      Priming_Start=timemarks.P2_Start;
-      Priming_Stop=timemarks.P2_Stop;
-     }
-
-//Rates
-   int copyed_rates=CopyRates(m_pair,0,Priming_Start,Priming_Stop,arr_Rates);
-   if(copyed_rates<0)
-     {
-      m_result=-24;
-      return(false);
-     }
-
-//Spread
-   int copyed_spread=CopySpread(m_pair,0,Priming_Start,Priming_Stop,arr_Spreads);
-   if(copyed_spread<0)
-     {
-      m_result=-25;
-      return(false);
-     }
-
-//Signal
-   int copyed_singal=CopyBuffer(m_handle_ind_POM,0,Priming_Start,Priming_Stop,arr_Signals);
-   if(copyed_singal<0)
-     {
-      m_result=-23;
-      return(false);
-     }
-
-//First
-   int copyed_first=CopyBuffer(m_handle_ind_POM,1,Priming_Start,Priming_Stop,arr_Firsts);
-   if(copyed_first<0)
-     {
-      m_result=-23;
-      return(false);
-     }
-
-//Pom
-   int copyed_pom=CopyBuffer(m_handle_ind_POM,2,Priming_Start,Priming_Stop,arr_Poms);
-   if(copyed_pom<0)
-     {
-      m_result=-23;
-      return(false);
-     }
-
-//Dc Open
-   int copyed_dc_o=CopyBuffer(m_handle_ind_POM,7,Priming_Start,Priming_Stop,arr_Dc_Open);
-   if(copyed_dc_o<0)
-     {
-      m_result=-23;
-      return(false);
-     }
-
-//Dc High
-   int copyed_dc_h=CopyBuffer(m_handle_ind_POM,11,Priming_Start,Priming_Stop,arr_Dc_High);
-   if(copyed_dc_h<0)
-     {
-      m_result=-23;
-      return(false);
-     }
-
-//Dc Low
-   int copyed_dc_l=CopyBuffer(m_handle_ind_POM,15,Priming_Start,Priming_Stop,arr_Dc_Low);
-   if(copyed_dc_l<0)
-     {
-      m_result=-23;
-      return(false);
-     }
-
-//Dc Close
-   int copyed_dc_c=CopyBuffer(m_handle_ind_POM,3,Priming_Start,Priming_Stop,arr_Dc_Close);
-   if(copyed_dc_c<0)
-     {
-      m_result=-23;
-      return(false);
-     }
-
-//Check if arrays have identical elements count
-   if(((copyed_rates+copyed_singal+copyed_spread+copyed_pom+copyed_first+copyed_dc_c)/6)!=copyed_rates)
-     {
-      m_result=-26;
-      Print("Warning! Data not identical!");
-      return(false);
-     }
-
-//If Ok
-   return(true);
-  }//END of FormPrimingData 
+  }//END OF Connect Indicator
 //+------------------------------------------------------------------+
 //| Form Priming data with Struct only                               |
 //+------------------------------------------------------------------+ 
