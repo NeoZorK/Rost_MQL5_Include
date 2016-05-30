@@ -110,13 +110,13 @@ RCat::RCat(const string Pair,const double &Pom_Koef,const double &PomBuy,const d
    m_max_spread=MaxSpread;
    m_start_vol_koef=0;
    m_max_vol_koef=0;
-  }
+  }//END OF Constructor
 //+------------------------------------------------------------------+
 //| Destructor                                                       |
 //+------------------------------------------------------------------+
 RCat::~RCat()
   {
-  }
+  }//END OF Destructor
 //+------------------------------------------------------------------+
 //| Initialisation                                                   |
 //+------------------------------------------------------------------+
@@ -134,7 +134,7 @@ bool RCat::Init(const char &Ck_Case,const ENUM_RT_OpenRule &OpenRule,const ENUM_
    m_add_vol_shift_points=AddVol_Shift_Pt;
 
    return(true);
-  }
+  }//END OF Init
 //+------------------------------------------------------------------+
 //| Main Real Trade Function:True if Open\Close Position             |
 //+------------------------------------------------------------------+
@@ -205,7 +205,6 @@ bool RCat::Trade(const double &First,const double &Pom,const double &Dc,const do
 //-----ADD VOLUME-----//    
    if(Opened_Position)
      {
-
       //Position Volume
       double pos_volume=PositionGetDouble(POSITION_VOLUME);
 
@@ -253,23 +252,19 @@ bool RCat::Trade(const double &First,const double &Pom,const double &Dc,const do
 
 //If No Opened Position then false
    return(false);
-  }
+  }//+++++++END OF TRADE!
 //+------------------------------------------------------------------+
 //| Open Rule                                                        |
 //+------------------------------------------------------------------+
 int RCat::m_OpenRule(const ENUM_RT_OpenRule &OpenRule)
   {
    int TR_RES=-1;
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
+
    if(OpenRule<0)
      {
       return(-2);
      }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
+
    switch(OpenRule)
      {
       case  0:TR_RES=m_POMI();
@@ -279,23 +274,19 @@ int RCat::m_OpenRule(const ENUM_RT_OpenRule &OpenRule)
          break;
      }
    return(TR_RES);
-  }
+  }//END OF OPEN RULE
 //+------------------------------------------------------------------+
 //| Close Rule                                                       |
 //+------------------------------------------------------------------+
 int RCat::m_CloseRule(const ENUM_RT_CloseRule &CloseRule)
   {
    int TR_RES=-1;
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
+
    if(CloseRule<0)
      {
       return(-2);
      }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
+
    switch(CloseRule)
      {
       case  0:TR_RES=m_AutoCloseDcSpread();
@@ -306,23 +297,19 @@ int RCat::m_CloseRule(const ENUM_RT_CloseRule &CloseRule)
      }
 
    return(TR_RES);
-  }
+  }//END OF CLOSE RULE
 //+------------------------------------------------------------------+
 //| Open TR #0 POMI                                                  |
 //+------------------------------------------------------------------+
 int RCat::m_POMI()
   {
    int res=-1;
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
+
    if(m_signal==0)
      {
       return(-2);
      }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
+
    if(m_first==0)
      {
       return(-2);
@@ -348,7 +335,7 @@ int RCat::m_POMI()
      }//END OF SELL
 
    return(res);
-  }
+  }//END OF POMI
 //+------------------------------------------------------------------+
 //| AutoClose by |DeltaC|+Spread+Commission                          |
 //+------------------------------------------------------------------+
@@ -376,7 +363,7 @@ bool RCat::m_AutoCloseDcSpread(void)
      }
 
    return(res);
-  }
+  }//END OF AutoCloseDCSpread
 //+------------------------------------------------------------------+
 //|  CLOSE POSITION                                                  |
 //+------------------------------------------------------------------+
@@ -463,7 +450,7 @@ int RCat::OpenMarketOrder(const double &Vol,const uchar &BuyOrSell,const double 
 
       if(Tp!=0) {ztp=z_ts.bid-(Tp*point_size);}
       else {ztp=0;}
-     }
+     }//END OF SELL
 
 //Prepare SendOrder Struct
    MqlTradeRequest z_mt_req={0};
@@ -479,7 +466,7 @@ int RCat::OpenMarketOrder(const double &Vol,const uchar &BuyOrSell,const double 
       z_mt_req.expiration=0;// TimeCurrent()+_LimitOrder_PlaceExpiration_Seconds;
                             //When price touch her, set order upper or lower 
       z_mt_req.price=0;//NormalizeDouble(price,5);
-     }
+     }//END OF LIMIT ORDER
    else z_mt_req.action=TRADE_ACTION_DEAL;  //Set to Market Order
 
    z_mt_req.symbol=m_pair;
@@ -505,10 +492,8 @@ int RCat::OpenMarketOrder(const double &Vol,const uchar &BuyOrSell,const double 
         }
       //Market Order
       z_mt_req.type=ORDER_TYPE_BUY;
-     }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
+     }//END OF BUY
+
    if(BuyOrSell==OP_SELL)
      {
       //If limits sets needed type
@@ -520,7 +505,7 @@ int RCat::OpenMarketOrder(const double &Vol,const uchar &BuyOrSell,const double 
         }
       //Market Order 
       z_mt_req.type=ORDER_TYPE_SELL;
-     }
+     }//END OF BUY
 
 // z_mt_req.type_filling=ORDER_FILLING_RETURN; //For market and limit orders  
 // z_mt_req.type_time=ORDER_TIME_GTC;
@@ -559,9 +544,7 @@ int RCat::OpenMarketOrder(const double &Vol,const uchar &BuyOrSell,const double 
 //|  Send Order                                                      |
 //+------------------------------------------------------------------+
    int res=OrderSend(z_mt_req,z_mt_rez);
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
+
    if(res)
      {
       ret=(int)z_mt_rez.retcode;
@@ -574,9 +557,6 @@ int RCat::OpenMarketOrder(const double &Vol,const uchar &BuyOrSell,const double 
          if(BuyOrSell==OP_SELL) m_sellpos_count++;
         }
      } // END of ORDER SENDED
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
    else
      {//If Order Error
       Print("res="+IntegerToString(res)+" ret:"+IntegerToString(ret)+" LastErr: "+IntegerToString(GetLastError())+z_mt_rez.comment);
@@ -596,9 +576,6 @@ bool RCat::CloseAllPositions(const string CustomComment)
    if(pos_total<1){return(false);}
 
    for(int i=0;i<pos_total;i++)
-      //+------------------------------------------------------------------+
-      //|                                                                  |
-      //+------------------------------------------------------------------+
      {
       string pair=PositionGetSymbol(i);
       if(pair=="")
