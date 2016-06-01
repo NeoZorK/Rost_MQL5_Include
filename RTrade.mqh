@@ -729,6 +729,7 @@ bool RTrade::Emulate_Trading_AllOHLC(const bool Priming1,const STRUCT_Priming &C
       double SELL_OPENED_PRICE=0;
       bool SELL_OPENED=false;
       double Calculated_Dc=0;
+      double Calculated_DcOld=0;
       double PositionProfit=0;
       double Current_OHLC_Price=0;
 
@@ -786,6 +787,9 @@ bool RTrade::Emulate_Trading_AllOHLC(const bool Priming1,const STRUCT_Priming &C
 
             //2. Pass first 3 bars for DC
             if(i>ArrSize-3) continue;
+            
+            //????? How Calculate dc for Open,High,Low,Close ???? Is it one price or many different prices ?
+            Calculated_DcOld=m_EMUL_CalculateDc(i,CurP)*inpDeltaC_koef;
 
             //3. Check if pos opened, try to close,if closed continue   
             if(m_CheckClose(Current_OHLC_Price,BUY_OPENED,SELL_OPENED,PositionProfit,BUY_OPENED_PRICE,SELL_OPENED_PRICE,
