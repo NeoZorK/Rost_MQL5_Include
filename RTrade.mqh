@@ -747,27 +747,35 @@ bool RTrade::Emulate_Trading_AllOHLC(const bool Priming1,const STRUCT_Priming &C
         Close = 3
         */
 
+            //Reset DC
+            Calculated_Dc=0;
+
             //Switch Current O,H,L,C
             switch(OHLC)
               {
                case  -1://All OHLC 
                   Current_OHLC_Price=CurP.Rates[i].close;
+                  Calculated_Dc=CurP.Dc_Close[i];
                   break;
 
                case  0://OPEN 
                   Current_OHLC_Price=CurP.Rates[i].open;
+                  Calculated_Dc=CurP.Dc_Open[i];
                   break;
 
                case  1://HIGH 
                   Current_OHLC_Price=CurP.Rates[i].high;
+                  Calculated_Dc=CurP.Dc_High[i];
                   break;
 
                case  2://LOW 
                   Current_OHLC_Price=CurP.Rates[i].low;
+                  Calculated_Dc=CurP.Dc_Low[i];
                   break;
 
                case  3://CLOSE 
                   Current_OHLC_Price=CurP.Rates[i].close;
+                  Calculated_Dc=CurP.Dc_Close[i];
                   break;
                default:
                   break;
@@ -778,12 +786,6 @@ bool RTrade::Emulate_Trading_AllOHLC(const bool Priming1,const STRUCT_Priming &C
 
             //2. Pass first 3 bars for DC
             if(i>ArrSize-3) continue;
-
-            //2.1 Calculate DC
-            Calculated_Dc=0;
-
-            //????? How Calculate dc for Open,High,Low,Close ???? Is it one price or many different prices ?
-            Calculated_Dc=m_EMUL_CalculateDc(i,CurP)*inpDeltaC_koef;
 
             //3. Check if pos opened, try to close,if closed continue   
             if(m_CheckClose(Current_OHLC_Price,BUY_OPENED,SELL_OPENED,PositionProfit,BUY_OPENED_PRICE,SELL_OPENED_PRICE,
