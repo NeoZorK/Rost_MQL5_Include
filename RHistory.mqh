@@ -159,6 +159,9 @@ public:
    //Export Rates structure to CSV file
    bool              _ExportRatesToCSV(const bool ReverseWrite);
 
+   //Export Feed  to CSV file (date,ohlc,spread,tickvol,WF,POM,DC,SIGNAL)
+   bool              _ExportFeedToCSV(const bool ReverseWrite,const STRUCT_Priming &Priming,const bool Priming1);
+
    //Export Rates to binary file
    bool              _ExportRatesToBIN(const bool ReverseWrite);
 
@@ -1955,6 +1958,9 @@ bool RHistory::_FormPrimingData(const bool Priming1,const TIMEMARKS &TimeMarks,S
       return(false);
      }
 
+//Debug
+   _ExportFeedToCSV(true,Priming,Priming1);
+
 //Check if arrays have identical elements count
    if(((copyed_rates+copyed_singal_c+copyed_spread+copyed_pom_c+copyed_first_c+copyed_dc_c)/6)!=copyed_rates)
      {
@@ -2106,3 +2112,120 @@ bool RHistory::_ExportRatesToBIN(const bool ReverseWrite)
    Alert("Ok, File Created in COMMON folder: "+path);
    return(true);
   }//END of ExportRates to BIN
+//+------------------------------------------------------------------+
+//| Export Feed to CSV (date,ohlc,spread,tickvol,WF,POM,DC,SIGNAL)   |
+//+------------------------------------------------------------------+ 
+bool RHistory::_ExportFeedToCSV(const bool ReverseWrite,const STRUCT_Priming &Priming,const bool Priming1)
+  {
+//Check if Rates already loaded to memory
+   if(!m_processed)
+     {
+      Print(__FUNCTION__+" Data not loaded yet..");
+      return(false);
+     }
+
+//Get Server Broker Name
+   string Server=AccountInfoString(ACCOUNT_SERVER);
+
+//Path for Export (0=Priming1 or 1=Priming2)ServerRatesEURUSD2010.01.01_2016.04.01
+   string path=(string)(int)Priming1+Server+"Feed"+m_pair+TimeToString(m_from_date,TIME_DATE)+
+               "_"+TimeToString(m_to_date,TIME_DATE)+".csv";
+
+//If BD not NULL
+   if(m_copyed_all_rates<=1)
+     {
+      m_result=-12;
+      return(false);
+     }
+
+//If exist delete
+   if(FileIsExist(path,FILE_COMMON)) FileDelete(path,FILE_COMMON);
+
+//Init file for write (csv) \r\n
+   int file_h1=FileOpen(path,FILE_READ|FILE_WRITE|FILE_BIN|FILE_COMMON|FILE_CSV|FILE_ANSI);
+   if(file_h1==INVALID_HANDLE) return(false);
+
+//---Export to CSV
+//Get Size of Rates Array
+   int arrSize=ArraySize(Priming.Rates);
+   string s1;
+
+//Main Circle
+//If not Reverse Write
+   if(!ReverseWrite)
+     {
+      //Write oldest rate to the end of file (and NOW date to the first string)
+      for(int i=0;i<arrSize;i++)
+        {
+         s1=IntegerToString(i)+","                                     //#ID
+            +TimeToString(Priming.Rates[i].time,TIME_DATE|TIME_MINUTES|TIME_SECONDS)+","     //Time in seconds 
+            +DoubleToString(Priming.Rates[i].open,5)+","              //OPEN 
+            +DoubleToString(Priming.Rates[i].high,5)+","              //HIGH
+            +DoubleToString(Priming.Rates[i].low,5)+","               //LOW
+            +DoubleToString(Priming.Rates[i].close,5)+","             //CLOSE
+            +IntegerToString(Priming.Rates[i].tick_volume)+","        //Tick Volume
+            +IntegerToString(Priming.Rates[i].real_volume)+","        //Real Volume
+            +IntegerToString(Priming.Rates[i].spread)+","             //Spread
+            +DoubleToString(Priming.First_Open[i],1)+","              //First Open
+            +DoubleToString(Priming.First_High[i],1)+","              //First High  
+            +DoubleToString(Priming.First_Low[i],1)+","               //Fist Low
+            +DoubleToString(Priming.First_Close[i],1)+","             //First Close
+            +DoubleToString(Priming.Pom_Open[i],2)+","                //Pom Open
+            +DoubleToString(Priming.Pom_High[i],2)+","                //Pom High  
+            +DoubleToString(Priming.Pom_Low[i],2)+","                 //Pom Low
+            +DoubleToString(Priming.Pom_Close[i],2)+","               //Pom Close  
+            +DoubleToString(Priming.Signal_Open[i],1)+","             //Signal Open
+            +DoubleToString(Priming.Signal_High[i],1)+","             //Signal High  
+            +DoubleToString(Priming.Signal_Low[i],1)+","              //Signal Low
+            +DoubleToString(Priming.Signal_Close[i],1)+","            //Signal Close
+            +DoubleToString(Priming.Dc_Open[i],2)+","                 //Dc Open
+            +DoubleToString(Priming.Dc_High[i],2)+","                 //Dc High  
+            +DoubleToString(Priming.Dc_Low[i],2)+","                  //Dc Low
+            +DoubleToString(Priming.Dc_Close[i],2)+","                //Dc Close
+            +"\r\n";
+         FileWrite(file_h1,s1);
+        }//End of for
+     }//End of NOT Reverse Write
+
+   if(ReverseWrite)
+     {
+      //Write oldest date first to file and NOW date to the End of file   
+      for(int i=arrSize-1;i>-1;i--)
+        {
+         s1=IntegerToString(i)+","                                     //#ID
+            +TimeToString(Priming.Rates[i].time,TIME_DATE|TIME_MINUTES|TIME_SECONDS)+","     //Time in seconds 
+            +DoubleToString(Priming.Rates[i].open,5)+","              //OPEN 
+            +DoubleToString(Priming.Rates[i].high,5)+","              //HIGH
+            +DoubleToString(Priming.Rates[i].low,5)+","               //LOW
+            +DoubleToString(Priming.Rates[i].close,5)+","             //CLOSE
+            +IntegerToString(Priming.Rates[i].tick_volume)+","        //Tick Volume
+            +IntegerToString(Priming.Rates[i].real_volume)+","        //Real Volume
+            +IntegerToString(Priming.Rates[i].spread)+","             //Spread
+            +DoubleToString(Priming.First_Open[i],1)+","              //First Open
+            +DoubleToString(Priming.First_High[i],1)+","              //First High  
+            +DoubleToString(Priming.First_Low[i],1)+","               //Fist Low
+            +DoubleToString(Priming.First_Close[i],1)+","             //First Close
+            +DoubleToString(Priming.Pom_Open[i],2)+","                //Pom Open
+            +DoubleToString(Priming.Pom_High[i],2)+","                //Pom High  
+            +DoubleToString(Priming.Pom_Low[i],2)+","                 //Pom Low
+            +DoubleToString(Priming.Pom_Close[i],2)+","               //Pom Close  
+            +DoubleToString(Priming.Signal_Open[i],1)+","             //Signal Open
+            +DoubleToString(Priming.Signal_High[i],1)+","             //Signal High  
+            +DoubleToString(Priming.Signal_Low[i],1)+","              //Signal Low
+            +DoubleToString(Priming.Signal_Close[i],1)+","            //Signal Close
+            +DoubleToString(Priming.Dc_Open[i],2)+","                 //Dc Open
+            +DoubleToString(Priming.Dc_High[i],2)+","                 //Dc High  
+            +DoubleToString(Priming.Dc_Low[i],2)+","                  //Dc Low
+            +DoubleToString(Priming.Dc_Close[i],2)+","                //Dc Close
+            +"\r\n";
+         FileWrite(file_h1,s1);
+        }//End of for
+     }//END OF Reverse Write  
+
+//Close file
+   FileClose(file_h1);
+
+//If ok    
+   Alert("Ok, File Created in COMMON folder: "+path);
+   return(true);
+  }//END of ExportFeed to CSV
