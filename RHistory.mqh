@@ -1962,7 +1962,7 @@ bool RHistory::_FormPrimingData(const bool Priming1,const TIMEMARKS &TimeMarks,S
      }
 
 //Debug
-   _ExportFeedToCSV(true,Priming,Priming1);
+//  _ExportFeedToCSV(true,Priming,Priming1);
 
 //Check if arrays have identical elements count
    if(((copyed_rates+copyed_singal_c+copyed_spread+copyed_pom_c+copyed_first_c+copyed_dc_c)/6)!=copyed_rates)

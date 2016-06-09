@@ -45,6 +45,35 @@ const char CkBuySell14=2;
 const char CkSingularityBuy=3;
 const char CkSingularitySell=4;
 //---Primings structs
+struct STRUCT_TICKVOL_OHLC
+  {
+   datetime          Time;
+   double            Open_TickVol;
+   double            High_TickVol;
+   double            Low_TickVol;
+   double            Close_TickVol;
+   bool              High_First;// (true or low first =false)
+  };
+//---Feed Struct
+struct STRUCT_FEED_OHLC
+  {
+   datetime          Time;
+   char              Open_WhoFirst;
+   char              High_WhoFirst;
+   char              Low_WhoFirst;
+   char              Close_WhoFirst;
+
+   double            Open_pom;
+   double            High_pom;
+   double            Low_pom;
+   double            Close_pom;
+
+   double            Open_dc;
+   double            High_dc;
+   double            Low_dc;
+   double            Close_dc;
+  };
+//Old Priming Structs
 struct STRUCT_Priming
   {
    MqlRates          Rates[];
