@@ -71,14 +71,14 @@ private:
    //TR Close Positions
    bool              m_EMUL_AutoCloseDCSpread(const double PositionProfit,const double Dc,const uint Spread,const double Commission);
 
-   double            m_EMUL_CalculateDc2(const uint Iteration,const STRUCT_Priming &Priming);
+   double            m_EMUL_CalculateDc(const uint Iteration,const STRUCT_Priming &Priming);
    //TR Open Positions(-1,-2=none,-1=sell,+1=buy)
-   int               m_EMUL_TR_Caterpillar2(const char Case,const int IterationNum,const STRUCT_Priming &Priming);
+   int               m_EMUL_TR_Caterpillar(const char Case,const int IterationNum,const STRUCT_Priming &Priming,const int OHLC);
 
    bool              m_EMUL_CloseRule(const ENUM_EMUL_CloseRule CloseRuleNum,const double CurrentProfit,const double CurrentDC,
                                       const uint CurrentSpread);
-   int               m_EMUL_OpenRule2(const ENUM_EMUL_OpenRule OpenRuleNum,const char Case,const int IterationNum,
-                                      const double Current_OHLC_Price,const STRUCT_Priming &Priming);
+   int               m_EMUL_OpenRule(const ENUM_EMUL_OpenRule OpenRuleNum,const char Case,const int IterationNum,
+                                     const int OHLC,const STRUCT_Priming &Priming);
    //Calculate Ck Prediction 0,1,2 : 1,4,14
    char              m_BUILD_CK_TR18_0330_Virt(const bool USDFirst);
    //Check for Close Position (:true->continue)
@@ -110,7 +110,7 @@ public:
 
    //4 Quant Mods for Emulation
    bool              Emulate_Trading_AllClose(const bool Priming1,const STRUCT_Priming &CurP);
-   bool              Emulate_Trading_AllOHLC(const bool Priming1);
+   bool              Emulate_Trading_AllOHLC(const bool Priming1,const STRUCT_Priming &CurP);
    bool              Emulate_Trading_OHLC_OpenOnly(const bool Priming1);
    bool              Emulate_Trading_OHLC_CloseOnly(const bool Priming1);
 
@@ -623,14 +623,14 @@ bool RTrade::Emulate_Trading_AllClose(const bool Priming1,const STRUCT_Priming &
       for(int i=ArrSize-1;i>-1;i--)
         {
          //1. Check Open Rule 
-         int OTR_RESULT=m_EMUL_OpenRule2(m_open_rule_num_emul,Case,i,0,CurP);
+         int OTR_RESULT=m_EMUL_OpenRule(m_open_rule_num_emul,Case,i,-1,CurP);
 
          //2. Pass first 3 bars for DC
          if(i>ArrSize-3) continue;
 
          //2.1 Calculate DC
          Calculated_Dc=0;
-         Calculated_Dc= m_EMUL_CalculateDc2(i,CurP)*inpDeltaC_koef;
+         Calculated_Dc= m_EMUL_CalculateDc(i,CurP)*inpDeltaC_koef;
 
          //3. Check if pos opened, try to close,if closed continue   
          if(m_CheckClose(CurP.Rates[i].close,BUY_OPENED,SELL_OPENED,PositionProfit,BUY_OPENED_PRICE,SELL_OPENED_PRICE,
@@ -687,9 +687,168 @@ bool RTrade::Emulate_Trading_AllClose(const bool Priming1,const STRUCT_Priming &
    return(true);
   }//END OF Emulate Trading All Close 
 //+------------------------------------------------------------------+
+//| Emulate Trading All OHLC                                         |
+//+------------------------------------------------------------------+
+bool RTrade::Emulate_Trading_AllOHLC(const bool Priming1,const STRUCT_Priming &CurP)
+  {
+
+//If not initialised, then exit
+   if(!m_initialised_emul)
+     {
+      m_Result=-2;
+      return(false);
+     }
+
+//Priming length
+   int ArrSize=0;
+
+//Set Current Priming
+   if(Priming1)
+     {
+      m_CurrentPriming=true;
+     }//Priming 2
+   else
+     {
+      m_CurrentPriming=false;
+     }
+
+//Get Size of arr
+   ArrSize=ArraySize(CurP.Rates);
+
+//+++++EMULATION++++++\\
+//+++++EMULATION++++++\\
+//+++++EMULATION++++++\\
+
+//Do it for 3 Cases :case 1, Case 4, Case14
+   for(char Case=0;Case<3;Case++)
+     {
+      int BUY_Signal_Count=0;
+      int SELL_Signal_Count=0;
+      bool BUY_OPENED=false;
+      double BUY_OPENED_PRICE=0;
+      double SELL_OPENED_PRICE=0;
+      bool SELL_OPENED=false;
+      double Calculated_Dc=0;
+      double Calculated_DcOld=0;
+      double PositionProfit=0;
+      double Current_OHLC_Price=0;
+
+      //From first day 00:00 to 23:50 last day in Priming1
+      for(int i=ArrSize-1;i>-1;i--)
+        {
+
+         //SWITCH between O,H,L,C
+         for(int OHLC=0;OHLC<4;OHLC++)
+           {
+/*
+        NONE = -1 
+        Open  = 0 
+        High  = 1
+        Low   = 2
+        Close = 3
+        */
+
+            //Reset DC
+            Calculated_Dc=0;
+
+            //Switch Current O,H,L,C
+            switch(OHLC)
+              {
+               case  -1://All OHLC 
+                  Current_OHLC_Price=CurP.Rates[i].close;
+                  Calculated_Dc=CurP.Dc_Close[i];
+                  break;
+
+               case  0://OPEN 
+                  Current_OHLC_Price=CurP.Rates[i].open;
+                  Calculated_Dc=CurP.Dc_Open[i];
+                  break;
+
+               case  1://HIGH 
+                  Current_OHLC_Price=CurP.Rates[i].high;
+                  Calculated_Dc=CurP.Dc_High[i];
+                  break;
+
+               case  2://LOW 
+                  Current_OHLC_Price=CurP.Rates[i].low;
+                  Calculated_Dc=CurP.Dc_Low[i];
+                  break;
+
+               case  3://CLOSE 
+                  Current_OHLC_Price=CurP.Rates[i].close;
+                  Calculated_Dc=CurP.Dc_Close[i];
+                  break;
+               default:
+                  break;
+              }//END of switch OHLC
+
+            //1. Check Open Rule 
+            int OTR_RESULT=m_EMUL_OpenRule(m_open_rule_num_emul,Case,i,OHLC,CurP);
+
+            //2. Pass first 3 bars for DC
+            if(i>ArrSize-3) continue;
+            
+            //????? How Calculate dc for Open,High,Low,Close ???? Is it one price or many different prices ?
+            Calculated_DcOld=m_EMUL_CalculateDc(i,CurP)*inpDeltaC_koef;
+            
+          //  Print("OHLC: "+IntegerToString(OHLC)+",dc: "+DoubleToString(Calculated_Dc));
+
+            //3. Check if pos opened, try to close,if closed continue   
+            if(m_CheckClose(Current_OHLC_Price,BUY_OPENED,SELL_OPENED,PositionProfit,BUY_OPENED_PRICE,SELL_OPENED_PRICE,
+               Calculated_Dc,CurP.Spread[i])) continue;
+
+            //4. Check Spread (if > max then next iteration)
+            if(CheckSpread(m_max_spread_emul,CurP.Spread[i])) continue;
+
+            //5. +++OPEN POSITION+++ (:true -> next iteration)
+            if(m_CheckOpen(Current_OHLC_Price,OTR_RESULT,BUY_OPENED,SELL_OPENED,BUY_OPENED_PRICE,
+               SELL_OPENED_PRICE,BUY_Signal_Count,SELL_Signal_Count)) continue;
+           }//END OF OHLC SWITCH
+        }//END OF CASE
+
+      //Fill Omega Structures for Priming1:
+      if(m_CurrentPriming)
+        {
+         //Priming 1
+         switch(Case)
+           {
+            case  0: m_arr_sim_q[m_simulated_primings_total].P1_Q1_Simul=BUY_Signal_Count;  break;
+            case  1: m_arr_sim_q[m_simulated_primings_total].P1_Q4_Simul=SELL_Signal_Count;  break;
+            case  2: m_arr_sim_q[m_simulated_primings_total].P1_Q14_Simul=BUY_Signal_Count+SELL_Signal_Count;break;
+
+            default:
+               break;
+           }//End of Switch FILLING Priming1 Omega Structures
+        }//End of Priming1 Switch
+      else
+        {
+         //Priming 2
+         switch(Case)
+           {
+            case  0: m_arr_sim_q[m_simulated_primings_total].P2_Q1_Simul=BUY_Signal_Count;  break;
+            case  1: m_arr_sim_q[m_simulated_primings_total].P2_Q4_Simul=SELL_Signal_Count;  break;
+            case  2: m_arr_sim_q[m_simulated_primings_total].P2_Q14_Simul=BUY_Signal_Count+SELL_Signal_Count;
+
+            //Only after Second Priming Case2 : Add +1 Cell to Dynamic Array of Primings Omegas
+            ArrayResize(m_arr_sim_q,ArraySize(m_arr_sim_q)+1);
+
+            //Always increase by 1 this counter, otherwise program writes to [0]
+            m_simulated_primings_total++;
+            break;
+
+            default:
+               break;
+           }//End of Switch FILLING Priming1 Omega Structures
+        }//End of Priming 2 Switch
+     }//END OF ALL CASES
+
+//If Ok
+   return(true);
+  }//END OF Emulate Trading All OHLC
+//+------------------------------------------------------------------+
 //| Emulate dc by 3 bars forward  (Ver 2)                            |
 //+------------------------------------------------------------------+
-double RTrade::m_EMUL_CalculateDc2(const uint Iteration,const STRUCT_Priming &Priming)
+double RTrade::m_EMUL_CalculateDc(const uint Iteration,const STRUCT_Priming &Priming)
   {
    double res=-1;
    uint i=Iteration;
@@ -716,9 +875,9 @@ double RTrade::m_EMUL_CalculateDc2(const uint Iteration,const STRUCT_Priming &Pr
    return(res);
   }//END of Emulate dc by 3 bars forward    
 //+------------------------------------------------------------------+
-//| Emulated Open TR Caterpillar2                                    |
+//| Emulated Open TR Caterpillar                                     |
 //+------------------------------------------------------------------+
-int RTrade::m_EMUL_TR_Caterpillar2(const char Case,const int IterationNum,const STRUCT_Priming &Priming)
+int RTrade::m_EMUL_TR_Caterpillar(const char Case,const int IterationNum,const STRUCT_Priming &Priming,const int OHLC)
   {
 //Cases: Case0=1,Case1=4,Case2=14
    int i=IterationNum;
@@ -727,9 +886,41 @@ int RTrade::m_EMUL_TR_Caterpillar2(const char Case,const int IterationNum,const 
    double pom=0;
    double whofirst=0;
 
-   signal=Priming.Signal_Close[i];
-   pom=Priming.Pom_Close[i];
-   whofirst=Priming.First_Close[i];
+//Switch OHLC   
+   switch(OHLC)
+     {
+      case  -1: //AllClose
+         signal=Priming.Signal_Close[i];
+         pom=Priming.Pom_Close[i];
+         whofirst=Priming.First_Close[i];
+         break;
+
+      case  0: //OPEN
+         signal=Priming.Signal_Open[i];
+         pom=Priming.Pom_Open[i];
+         whofirst=Priming.First_Open[i];
+         break;
+
+      case  1: //HIGH
+         signal=Priming.Signal_High[i];
+         pom=Priming.Pom_High[i];
+         whofirst=Priming.First_High[i];
+         break;
+
+      case  2: //LOW
+         signal=Priming.Signal_Low[i];
+         pom=Priming.Pom_Low[i];
+         whofirst=Priming.First_Low[i];
+         break;
+
+      case  3: //CLOSE
+         signal=Priming.Signal_Close[i];
+         pom=Priming.Pom_Close[i];
+         whofirst=Priming.First_Close[i];
+         break;
+      default:
+         break;
+     }//END of switch OHLC
 
 //Check if Signal==0 then exit
    if(signal==0) return(-2);
@@ -753,12 +944,12 @@ int RTrade::m_EMUL_TR_Caterpillar2(const char Case,const int IterationNum,const 
 
 //If No Signal
    return(-1);
-  }//END OF Emulated Open TR Caterpillar2 
+  }//END OF Emulated Open TR Caterpillar
 //+------------------------------------------------------------------+
-//| Open Rule 2 For emulation                                        |
+//| Open Rule For emulation                                          |
 //+------------------------------------------------------------------+
-int RTrade::m_EMUL_OpenRule2(const ENUM_EMUL_OpenRule OpenRuleNum,const char Case,const int IterationNum,
-                             const double Current_OHLC_Price,const STRUCT_Priming &Priming)
+int RTrade::m_EMUL_OpenRule(const ENUM_EMUL_OpenRule OpenRuleNum,const char Case,const int IterationNum,
+                            const int OHLC,const STRUCT_Priming &Priming)
   {
 //TR_RESULT  
    int TR_RES=-1;
@@ -770,7 +961,7 @@ int RTrade::m_EMUL_OpenRule2(const ENUM_EMUL_OpenRule OpenRuleNum,const char Cas
 
    switch(OpenRuleNum)
      {
-      case  0:TR_RES=m_EMUL_TR_Caterpillar2(Case,IterationNum,Priming);
+      case  0:TR_RES=m_EMUL_TR_Caterpillar(Case,IterationNum,Priming,OHLC);
 
       break;
       default:
@@ -780,5 +971,5 @@ int RTrade::m_EMUL_OpenRule2(const ENUM_EMUL_OpenRule OpenRuleNum,const char Cas
    return(TR_RES);
 //If Ok 
    return(true);
-  }//End of EmulOpenRule 2  
+  }//End of EmulOpenRule  
 //+------------------------------------------------------------------+
