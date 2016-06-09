@@ -179,6 +179,9 @@ public:
 
    //Version with struct only
    bool              _FormPrimingData(const bool Priming1,const TIMEMARKS &TimeMarks,STRUCT_Priming &Priming);
+
+   //Version WO Indicator (returns copyed count)
+   int               _FillPriming(const bool Priming1,const TIMEMARKS &TimeMarks,MqlRates &Priming[]);
   };
 //+------------------------------------------------------------------+
 //| Constructor                                                      |
@@ -1972,6 +1975,52 @@ bool RHistory::_FormPrimingData(const bool Priming1,const TIMEMARKS &TimeMarks,S
 //If Ok
    return(true);
   }//END of FormPrimingData (structure)  
+//+------------------------------------------------------------------+
+//| Fill Priming data wo Indicator                                   |
+//+------------------------------------------------------------------+ 
+int RHistory::_FillPriming(const bool Priming1,const TIMEMARKS &TimeMarks,MqlRates &Priming[])
+  {
+//Priming 1 =True , do with p1, else with p2
+
+   datetime Priming_Start=0;
+   datetime Priming_Stop=0;
+
+//If bars not calculated in indicator, then exit
+   int bars_calc=BarsCalculated(m_handle_ind_POM);
+
+   if(bars_calc<0)
+     {
+      //  Print("Waiting for POM calculations...");
+      return(-1);
+     }
+
+//Check Priming1 or Priming2
+   if(Priming1)
+     {
+      Priming_Start=TimeMarks.P1_Start;
+      Priming_Stop=TimeMarks.P1_Stop;
+     }
+   else //Priming2
+     {
+      Priming_Start=TimeMarks.P2_Start;
+      Priming_Stop=TimeMarks.P2_Stop;
+     }
+
+//Rates
+   int copyed_rates=CopyRates(m_pair,0,Priming_Start,Priming_Stop,Priming);
+   if(copyed_rates<0)
+     {
+      m_result=-24;
+      return(false);
+     }
+   else
+     {//if ok!
+      return(copyed_rates);
+     }
+
+//Debug
+//  _ExportFeedToCSV(true,Priming,Priming1);
+  }//END of FillPriming (wo indicator)    
 //+------------------------------------------------------------------+
 //| Export Rates to CSV                                              |
 //+------------------------------------------------------------------+ 
