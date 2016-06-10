@@ -182,6 +182,9 @@ public:
 
    //Version WO Indicator (returns copyed count)
    int               _FillPriming(const bool Priming1,const TIMEMARKS &TimeMarks,MqlRates &Priming[]);
+   
+   //Calculates each OHLC price tick_volume from Compounding TickVolume
+   bool              _CalculateTickVolume(const MqlRates &Rates[],STRUCT_TICKVOL_OHLC &TickVol[]);
   };
 //+------------------------------------------------------------------+
 //| Constructor                                                      |
@@ -2278,3 +2281,75 @@ bool RHistory::_ExportFeedToCSV(const bool ReverseWrite,const STRUCT_Priming &Pr
    Alert("Ok, File Created in COMMON folder: "+path);
    return(true);
   }//END of ExportFeed to CSV
+  
+  //+------------------------------------------------------------------+
+// Calculate TICK_VOLUME inside OHLC 1 minute                        |
+//+------------------------------------------------------------------+ 
+bool RHistory::_CalculateTickVolume(const MqlRates &Rates[],STRUCT_TICKVOL_OHLC &TickVol[])
+  {
+//Get Size of Array
+   int ArrSize=ArraySize(Rates);
+
+//Resize New Array
+   ArrayResize(TickVol,ArrSize);
+
+//O+H+L+C=0 Counter
+   uint zero_ohlc_sum=0;
+
+//Temp Calculations
+   double o=0,h=0,l=0,c=0,sum=0,om=0,hm=0,lm=0,cm=0;
+
+//Fill 0 - item with =0
+   TickVol[ArrSize-1].Open_TickVol=0;
+   TickVol[ArrSize-1].High_TickVol=0;
+   TickVol[ArrSize-1].Low_TickVol=0;
+   TickVol[ArrSize-1].Close_TickVol=0;
+   TickVol[ArrSize-1].Time=Rates[ArrSize-1].time;
+
+//MAIN CIRCLE (-1 for first previous Close calculation & -1 for 0-element)
+   for(int i=ArrSize-2;i>-1;i--)
+     {
+      o=MathAbs(Rates[i].open-Rates[i+1].close);
+      h=MathAbs(Rates[i].high-Rates[i].open);
+      l=MathAbs(Rates[i].low-Rates[i].high);
+      c=MathAbs(Rates[i].close-Rates[i].low);
+
+      //Sum
+      sum=o+h+l+c;
+
+      //Exception if SUM[4]=0
+      if(sum==0)
+        {
+         //res = 0
+         TickVol[i].Open_TickVol=0;
+         TickVol[i].High_TickVol=0;
+         TickVol[i].Low_TickVol=0;
+         TickVol[i].Close_TickVol=0;
+         TickVol[i].Time=Rates[i].time;
+
+         //         Print(__FUNCTION__+" Sum of O,H,L,C==0!");
+
+         //Inc Counter
+         zero_ohlc_sum++;
+         continue;
+        }//End of sum
+
+      //Multyplication
+      om=Rates[i].tick_volume*o;
+      hm=Rates[i].tick_volume*h;
+      lm=Rates[i].tick_volume*l;
+      cm=Rates[i].tick_volume*c;
+
+      //Division
+      TickVol[i].Open_TickVol=om/sum;
+      TickVol[i].High_TickVol=hm/sum;
+      TickVol[i].Low_TickVol=lm/sum;
+      TickVol[i].Close_TickVol=cm/sum;
+
+      //Fill Time
+      TickVol[i].Time=Rates[i].time;
+     }//END OF FOR
+
+//If ok return true
+   return(true);
+  }  //END of Calc TickVol
