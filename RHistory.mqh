@@ -79,6 +79,16 @@ private:
    void              _ClearArrays();            //Clear internal arrays
    bool              _CheckMRS();               //Check Minutes Spreads Rates arrays by dates(First & Last)+Counts
    bool              _ConnectIndicator();       //Connect indicator POM3
+                                                //
+   //Calculate WhoFirst
+   char              m_WhoFirst(const MqlRates &Rates[],const int &Start,const double &Open,const double &High,
+                                const double &Low,const double &Close);
+
+   //Calculates POM & Signal in primings
+   bool              m_CalculatePOMSignal(const MqlRates &Rates[],STRUCT_FEED_OHLC &Feed[]);
+
+   //Calculates DC in primings
+   bool              m_CalculateDC(const MqlRates &Rates[],STRUCT_FEED_OHLC &Feed[]);
 
 public:
                      RHistory(const string pair,const string path_to_ind,const uchar bottlesize);
@@ -182,9 +192,12 @@ public:
 
    //Version WO Indicator (returns copyed count)
    int               _FillPriming(const bool Priming1,const TIMEMARKS &TimeMarks,MqlRates &Priming[]);
-   
+
    //Calculates each OHLC price tick_volume from Compounding TickVolume
    bool              _CalculateTickVolume(const MqlRates &Rates[],STRUCT_TICKVOL_OHLC &TickVol[]);
+
+   //Calculate OHLC Feed
+   bool              _Calculate_OHLC_Feed(const MqlRates &Rates[],STRUCT_FEED_OHLC &Feed[]);
   };
 //+------------------------------------------------------------------+
 //| Constructor                                                      |
@@ -2281,8 +2294,7 @@ bool RHistory::_ExportFeedToCSV(const bool ReverseWrite,const STRUCT_Priming &Pr
    Alert("Ok, File Created in COMMON folder: "+path);
    return(true);
   }//END of ExportFeed to CSV
-  
-  //+------------------------------------------------------------------+
+//+------------------------------------------------------------------+
 // Calculate TICK_VOLUME inside OHLC 1 minute                        |
 //+------------------------------------------------------------------+ 
 bool RHistory::_CalculateTickVolume(const MqlRates &Rates[],STRUCT_TICKVOL_OHLC &TickVol[])
@@ -2290,7 +2302,7 @@ bool RHistory::_CalculateTickVolume(const MqlRates &Rates[],STRUCT_TICKVOL_OHLC 
 //Get Size of Array
    int ArrSize=ArraySize(Rates);
 
-//Resize New Array
+//Resize TickVol Array
    ArrayResize(TickVol,ArrSize);
 
 //O+H+L+C=0 Counter
@@ -2353,3 +2365,201 @@ bool RHistory::_CalculateTickVolume(const MqlRates &Rates[],STRUCT_TICKVOL_OHLC 
 //If ok return true
    return(true);
   }  //END of Calc TickVol
+//+------------------------------------------------------------------+
+//| Calculate OHLC FEED                                              |
+//+------------------------------------------------------------------+
+bool RHistory::_Calculate_OHLC_Feed(const MqlRates &Rates[],STRUCT_FEED_OHLC &Feed[])
+  {
+//Get Size of ArrayOHLC
+   int ArrSize=ArraySize(Rates);
+
+//Resize Feed Array ONCE
+   ArrayResize(Feed,ArrSize);
+
+//Calculate Start position
+   int StartZero=ArrSize-1-m_bottle_size;
+
+//Fill first bottle_size=5 params by zero
+   for(int i=ArrSize-1;i>StartZero;i--)
+     {
+      Feed[i].Open_WhoFirst=0;
+      Feed[i].High_WhoFirst=0;
+      Feed[i].Low_WhoFirst=0;
+      Feed[i].Close_WhoFirst=0;
+     }//END of Fill Zero
+
+//Current OHLC template (changed in each O,H,L,C)
+   double open=0;
+   double high=0;
+   double low=0;
+   double close=0;
+
+//Main Circle
+   for(int i=StartZero;i>-1;i--)
+     {
+
+      //OHLC CIRCLE
+      for(int OHLC=0;OHLC<4;OHLC++)
+        {
+         switch(OHLC)
+           {
+            case  0: //Open
+               open=Rates[i].open;
+               high=open;
+               low=open;
+               close=open;
+
+               //WhoFirst:
+               Feed[i].Open_WhoFirst=m_WhoFirst(Rates,i,open,high,low,close);
+
+               //POM+Signal
+               // Feed[i].Open_POMSignal = 
+
+               //DC 
+               //Feed[i].Open_dc = 
+
+               break;
+
+            case  1: //High
+               open=Rates[i].open;
+               high=Rates[i].high;
+               low=open;
+               close=high;
+
+               //WhoFirst:
+               Feed[i].High_WhoFirst=m_WhoFirst(Rates,i,open,high,low,close);
+
+               //POM+Signal
+               // Feed[i].High_POMSignal = 
+
+               //DC 
+               //Feed[i].High_dc = 
+
+               break;
+
+            case  2: //Low
+               open=Rates[i].open;
+               high=Rates[i].high;
+               low=Rates[i].low;
+               close=low;
+
+               //WhoFirst:
+               Feed[i].Low_WhoFirst=m_WhoFirst(Rates,i,open,high,low,close);
+
+               //POM+Signal
+               // Feed[i].Low_POMSignal = 
+
+               //DC 
+               //Feed[i].Low_dc = 
+               break;
+
+            case  3: //Close
+               open=Rates[i].open;
+               high=Rates[i].high;
+               low=Rates[i].low;
+               close=Rates[i].low;
+
+               //WhoFirst:
+               Feed[i].Close_WhoFirst=m_WhoFirst(Rates,i,open,high,low,close);
+
+               //POM+Signal
+               // Feed[i].Close_POMSignal = 
+
+               //DC 
+               //Feed[i].Close_dc = 
+               break;
+
+            default:
+               break;
+           }//END OF SWITCH
+        }//END OF OHLC CIRCLE
+
+     }//END of MAIN CIRCLE
+
+//If Ok
+   return(true);
+  }//END of CALC OHLC FEED
+//+------------------------------------------------------------------+
+//| Calculate PomSignal                                              |
+//+------------------------------------------------------------------+
+bool RHistory::m_CalculatePOMSignal(const MqlRates &Rates[],STRUCT_FEED_OHLC &Feed[])
+  {
+//If Ok
+   return(true);
+  }//END of PomSignal
+//+------------------------------------------------------------------+
+//| Calculate DC                                                     |
+//+------------------------------------------------------------------+
+bool RHistory::m_CalculateDC(const MqlRates &Rates[],STRUCT_FEED_OHLC &Feed[])
+  {
+
+//If Ok
+   return(true);
+  }//END of DC
+//+------------------------------------------------------------------+
+//| WhoFirst                                                         |
+//+------------------------------------------------------------------+
+char RHistory::m_WhoFirst(const MqlRates &Rates[],const int &Start,const double &Open,const double &High,
+                          const double &Low,const double &Close)
+  {
+//Iteration num
+   int i=Start;
+
+//Default indexes High and Low
+   int HighIndex=-1;
+   int LowIndex=-1;
+
+//Default High and Low
+   double HighMax = INT_MIN;
+   double LowMin  = INT_MAX;
+
+//Arr for Calc WhoFirst
+   MqlRates arr_WF[];
+   ArrayResize(arr_WF,m_bottle_size);
+//  ArraySetAsSeries(arr_WF,true);
+
+//Copy One Last Bottle to find Min\Max
+   for(int j=0;j<m_bottle_size;j++)
+     {
+      arr_WF[j].open=Rates[i+j].open;
+      arr_WF[j].high=Rates[i+j].high;
+      arr_WF[j].low=Rates[i+j].low;
+      arr_WF[j].close=Rates[i+j].close;
+      arr_WF[j].spread=Rates[i+j].spread;
+      arr_WF[j].tick_volume=Rates[i+j].tick_volume;
+      arr_WF[j].time=Rates[i+j].time;
+     }//END of CopyArr   
+
+//Add Current O,H,L,C to last free cell 
+   arr_WF[m_bottle_size-1].open = Open;
+   arr_WF[m_bottle_size-1].high = High;
+   arr_WF[m_bottle_size-1].low=Low;
+   arr_WF[m_bottle_size-1].close=Close;
+
+//Find Max & Min
+   for(int z=0;z<m_bottle_size;z++)
+     {
+      //Max
+      if(arr_WF[z].high>HighIndex)
+        {
+         HighMax=arr_WF[z].high;
+         HighIndex=z;
+        }
+      //Min
+      if(arr_WF[z].low<LowIndex)
+        {
+         LowMin=arr_WF[z].low;
+         LowIndex=z;
+        }
+     }//END of Find Max & Min
+
+//Find WhoFirst
+//Private case H==L
+//Private case, when many H or L, and don`t know who >
+   if(HighIndex>LowIndex)  return(HighFirst);
+   if(HighIndex<LowIndex)  return(LowFirst);
+   if(HighIndex==LowIndex) return(EqualFirst);
+
+//If Err
+   return(EqualFirst);
+  }//END of WhoFirst
