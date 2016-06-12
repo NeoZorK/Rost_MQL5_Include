@@ -88,7 +88,8 @@ private:
    double            m_POM_Signal_OHLC(const double &Open,const double &High,const double &Low,const double &Close,
                                        const char &WhoFirst,char &POM_SIGNAL);
    //Calculates DC in primings
-   bool              m_DC_OHLC(const MqlRates &Rates[],STRUCT_FEED_OHLC &Feed[]);
+   double            m_DC_OHLC(const int &OHLC,const MqlRates &Rates[],const int &Start,const double &Open,
+                               const double &High,const double &Low,const double &Close,const STRUCT_TICKVOL_OHLC &TickVol[]);
 
 public:
                      RHistory(const string pair,const string path_to_ind,const uchar bottlesize);
@@ -197,7 +198,7 @@ public:
    bool              _CalculateTickVolume(const MqlRates &Rates[],STRUCT_TICKVOL_OHLC &TickVol[]);
 
    //Calculate OHLC Feed (4 prices in one minute)
-   bool              _Calculate_OHLC_Feed(const MqlRates &Rates[],STRUCT_FEED_OHLC &Feed[]);
+   bool              _Calculate_OHLC_Feed(const MqlRates &Rates[],STRUCT_FEED_OHLC &Feed[],const STRUCT_TICKVOL_OHLC &TickVol[]);
 
    //Calculate Feed for Only Close prices
    bool              _Calculate_CLOSE_Feed(const MqlRates &Rates[],STRUCT_FEED_CLOSE &Feed[]);
@@ -2371,7 +2372,7 @@ bool RHistory::_CalculateTickVolume(const MqlRates &Rates[],STRUCT_TICKVOL_OHLC 
 //+------------------------------------------------------------------+
 //| Calculate OHLC FEED                                              |
 //+------------------------------------------------------------------+
-bool RHistory::_Calculate_OHLC_Feed(const MqlRates &Rates[],STRUCT_FEED_OHLC &Feed[])
+bool RHistory::_Calculate_OHLC_Feed(const MqlRates &Rates[],STRUCT_FEED_OHLC &Feed[],const STRUCT_TICKVOL_OHLC &TickVol[])
   {
 //Get Size of ArrayOHLC
    int ArrSize=ArraySize(Rates);
@@ -2431,7 +2432,7 @@ bool RHistory::_Calculate_OHLC_Feed(const MqlRates &Rates[],STRUCT_FEED_OHLC &Fe
                Feed[i].Open_pom=m_POM_Signal_OHLC(open,high,low,close,Feed[i].Open_WhoFirst,Feed[i].Open_signal);
 
                //DC 
-               //Feed[i].Open_dc = 
+               Feed[i].Open_dc=m_DC_OHLC(OHLC,Rates,i,open,high,low,close,TickVol);
 
                break;
 
@@ -2448,7 +2449,7 @@ bool RHistory::_Calculate_OHLC_Feed(const MqlRates &Rates[],STRUCT_FEED_OHLC &Fe
                Feed[i].High_pom=m_POM_Signal_OHLC(open,high,low,close,Feed[i].High_WhoFirst,Feed[i].High_signal);
 
                //DC 
-               //Feed[i].High_dc = 
+               Feed[i].High_dc=m_DC_OHLC(OHLC,Rates,i,open,high,low,close,TickVol);
 
                break;
 
@@ -2465,7 +2466,7 @@ bool RHistory::_Calculate_OHLC_Feed(const MqlRates &Rates[],STRUCT_FEED_OHLC &Fe
                Feed[i].Low_pom=m_POM_Signal_OHLC(open,high,low,close,Feed[i].Low_WhoFirst,Feed[i].Low_signal);
 
                //DC 
-               //Feed[i].Low_dc = 
+               Feed[i].Low_dc=m_DC_OHLC(OHLC,Rates,i,open,high,low,close,TickVol);
                break;
 
             case  3: //Close
@@ -2481,7 +2482,7 @@ bool RHistory::_Calculate_OHLC_Feed(const MqlRates &Rates[],STRUCT_FEED_OHLC &Fe
                Feed[i].Close_pom=m_POM_Signal_OHLC(open,high,low,close,Feed[i].Close_WhoFirst,Feed[i].Close_signal);
 
                //DC 
-               //Feed[i].Close_dc = 
+               Feed[i].Close_dc=m_DC_OHLC(OHLC,Rates,i,open,high,low,close,TickVol);
                break;
 
             default:
@@ -2565,13 +2566,81 @@ double RHistory::m_POM_Signal_OHLC(const double &Open,const double &High,const d
    return(0);
   }//END of PomSignal for OHLC
 //+------------------------------------------------------------------+
-//| Calculate DC in last 3 minute for OHLC                           |
+//| Calculate DC in last 3 minute for OHLC (include current)         |
 //+------------------------------------------------------------------+
-bool RHistory::m_DC_OHLC(const MqlRates &Rates[],STRUCT_FEED_OHLC &Feed[])
+double RHistory::m_DC_OHLC(const int &OHLC,const MqlRates &Rates[],const int &Start,const double &Open,
+                           const double &High,const double &Low,const double &Close,const STRUCT_TICKVOL_OHLC &TickVol[])
   {
+   double res=-1;
+   uint i=Start;
+
+//Arr for Calc WhoFirst
+   MqlRates arr_WF[];
+   ArraySetAsSeries(arr_WF,true);
+   ArrayResize(arr_WF,3);
+
+//Copy 3 Last minutes to find Min\Max
+   for(int j=0;j<3;j++)
+     {
+      arr_WF[j].open=Rates[i+j].open;
+      arr_WF[j].high=Rates[i+j].high;
+      arr_WF[j].low=Rates[i+j].low;
+      arr_WF[j].close=Rates[i+j].close;
+      arr_WF[j].spread=Rates[i+j].spread;
+
+      //All previous tick_volume we get from Total Sum of Tick_Volume
+      arr_WF[j].tick_volume=Rates[i+j].tick_volume;
+
+      arr_WF[j].time=Rates[i+j].time;
+     }//END of CopyArr   
+
+//Add Current O,H,L,C to last free cell 
+   arr_WF[0].open = Open;
+   arr_WF[0].high = High;
+   arr_WF[0].low=Low;
+   arr_WF[0].close=Close;
+
+//Insert Current TickVolume
+   switch(OHLC)
+     {
+      case  0://Open
+         arr_WF[0].tick_volume=(long)TickVol[i].Open_TickVol;
+         break;
+
+      case  1://High
+         arr_WF[0].tick_volume=(long)TickVol[i].High_TickVol;
+         break;
+
+      case  2://Low
+         arr_WF[0].tick_volume=(long)TickVol[i].Low_TickVol;
+         break;
+
+      case  3://Close
+         arr_WF[0].tick_volume=(long)TickVol[i].Close_TickVol;
+         break;
+      default:
+         break;
+     }
+
+   double r0=arr_WF[0].high-arr_WF[0].low;
+
+   double r2=arr_WF[2].high-arr_WF[2].low;
+
+   long t1=arr_WF[2].tick_volume-arr_WF[1].tick_volume;
+   double t2=t1*r2;
+   if(t2==0)return(res=0); //div 0 exception
+
+   double t3=arr_WF[1].close-arr_WF[2].close;
+
+   double t4=t3/t2;
+
+   long t6=arr_WF[1].tick_volume-arr_WF[0].tick_volume;
+
+   res=t6*t4*r0;
+   res= NormalizeDouble(res,5);
 
 //If Ok
-   return(true);
+   return(res);
   }//END of DC for OHLC
 //+------------------------------------------------------------------+
 //| WhoFirst in last bottle (5 minutes) for OHLC                     |
@@ -2592,8 +2661,8 @@ char RHistory::m_WhoFirst_OHLC(const MqlRates &Rates[],const int &Start,const do
 
 //Arr for Calc WhoFirst
    MqlRates arr_WF[];
+   ArraySetAsSeries(arr_WF,true);
    ArrayResize(arr_WF,m_bottle_size);
-//  ArraySetAsSeries(arr_WF,true);
 
 //Copy One Last Bottle to find Min\Max
    for(int j=0;j<m_bottle_size;j++)
@@ -2608,10 +2677,10 @@ char RHistory::m_WhoFirst_OHLC(const MqlRates &Rates[],const int &Start,const do
      }//END of CopyArr   
 
 //Add Current O,H,L,C to last free cell 
-   arr_WF[m_bottle_size-1].open = Open;
-   arr_WF[m_bottle_size-1].high = High;
-   arr_WF[m_bottle_size-1].low=Low;
-   arr_WF[m_bottle_size-1].close=Close;
+   arr_WF[0].open = Open;
+   arr_WF[0].high = High;
+   arr_WF[0].low=Low;
+   arr_WF[0].close=Close;
 
 //Find Max & Min
    for(int z=0;z<m_bottle_size;z++)
