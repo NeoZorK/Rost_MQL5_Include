@@ -57,7 +57,7 @@ struct STRUCT_TICKVOL_OHLC
    double            Close_TickVol;
    bool              High_First;// (true or low first =false)
   };
-//---Feed Struct
+//---OHLC Feed Struct
 struct STRUCT_FEED_OHLC
   {
    datetime          Time;
@@ -79,6 +79,15 @@ struct STRUCT_FEED_OHLC
    double            Open_dc;
    double            High_dc;
    double            Low_dc;
+   double            Close_dc;
+  };
+//---CLOSE Feed Struct
+struct STRUCT_FEED_CLOSE
+  {
+   datetime          Time;
+   char              Close_WhoFirst;
+   double            Close_pom;
+   char              Close_signal;
    double            Close_dc;
   };
 //Old Priming Structs

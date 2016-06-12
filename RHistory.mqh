@@ -196,8 +196,11 @@ public:
    //Calculates each OHLC price tick_volume from Compounding TickVolume
    bool              _CalculateTickVolume(const MqlRates &Rates[],STRUCT_TICKVOL_OHLC &TickVol[]);
 
-   //Calculate OHLC Feed
+   //Calculate OHLC Feed (4 prices in one minute)
    bool              _Calculate_OHLC_Feed(const MqlRates &Rates[],STRUCT_FEED_OHLC &Feed[]);
+
+   //Calculate Feed for Only Close prices
+   bool              _Calculate_CLOSE_Feed(const MqlRates &Rates[],STRUCT_FEED_CLOSE &Feed[]);
   };
 //+------------------------------------------------------------------+
 //| Constructor                                                      |
