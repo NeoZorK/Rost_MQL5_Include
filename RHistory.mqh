@@ -81,14 +81,14 @@ private:
    bool              _ConnectIndicator();       //Connect indicator POM3
                                                 //
    //Calculate WhoFirst
-   char              m_WhoFirst(const MqlRates &Rates[],const int &Start,const double &Open,const double &High,
-                                const double &Low,const double &Close);
+   char              m_WhoFirst_OHLC(const MqlRates &Rates[],const int &Start,const double &Open,const double &High,
+                                     const double &Low,const double &Close);
 
    //Calculates POM & Signal in primings
-   double            m_POM_Signal(const double &Open,const double &High,const double &Low,const double &Close,
-                                  const char &WhoFirst,char &POM_SIGNAL);
+   double            m_POM_Signal_OHLC(const double &Open,const double &High,const double &Low,const double &Close,
+                                       const char &WhoFirst,char &POM_SIGNAL);
    //Calculates DC in primings
-   bool              m_CalculateDC(const MqlRates &Rates[],STRUCT_FEED_OHLC &Feed[]);
+   bool              m_DC_OHLC(const MqlRates &Rates[],STRUCT_FEED_OHLC &Feed[]);
 
 public:
                      RHistory(const string pair,const string path_to_ind,const uchar bottlesize);
@@ -2425,10 +2425,10 @@ bool RHistory::_Calculate_OHLC_Feed(const MqlRates &Rates[],STRUCT_FEED_OHLC &Fe
                close=open;
 
                //WhoFirst:
-               Feed[i].Open_WhoFirst=m_WhoFirst(Rates,i,open,high,low,close);
+               Feed[i].Open_WhoFirst=m_WhoFirst_OHLC(Rates,i,open,high,low,close);
 
                //POM+Signal
-               Feed[i].Open_pom=m_POM_Signal(open,high,low,close,Feed[i].Open_WhoFirst,Feed[i].Open_signal);
+               Feed[i].Open_pom=m_POM_Signal_OHLC(open,high,low,close,Feed[i].Open_WhoFirst,Feed[i].Open_signal);
 
                //DC 
                //Feed[i].Open_dc = 
@@ -2442,10 +2442,10 @@ bool RHistory::_Calculate_OHLC_Feed(const MqlRates &Rates[],STRUCT_FEED_OHLC &Fe
                close=high;
 
                //WhoFirst:
-               Feed[i].High_WhoFirst=m_WhoFirst(Rates,i,open,high,low,close);
+               Feed[i].High_WhoFirst=m_WhoFirst_OHLC(Rates,i,open,high,low,close);
 
                //POM+Signal
-               Feed[i].High_pom=m_POM_Signal(open,high,low,close,Feed[i].High_WhoFirst,Feed[i].High_signal);
+               Feed[i].High_pom=m_POM_Signal_OHLC(open,high,low,close,Feed[i].High_WhoFirst,Feed[i].High_signal);
 
                //DC 
                //Feed[i].High_dc = 
@@ -2459,10 +2459,10 @@ bool RHistory::_Calculate_OHLC_Feed(const MqlRates &Rates[],STRUCT_FEED_OHLC &Fe
                close=low;
 
                //WhoFirst:
-               Feed[i].Low_WhoFirst=m_WhoFirst(Rates,i,open,high,low,close);
+               Feed[i].Low_WhoFirst=m_WhoFirst_OHLC(Rates,i,open,high,low,close);
 
                //POM+Signal
-               Feed[i].Low_pom=m_POM_Signal(open,high,low,close,Feed[i].Low_WhoFirst,Feed[i].Low_signal);
+               Feed[i].Low_pom=m_POM_Signal_OHLC(open,high,low,close,Feed[i].Low_WhoFirst,Feed[i].Low_signal);
 
                //DC 
                //Feed[i].Low_dc = 
@@ -2475,10 +2475,10 @@ bool RHistory::_Calculate_OHLC_Feed(const MqlRates &Rates[],STRUCT_FEED_OHLC &Fe
                close=Rates[i].low;
 
                //WhoFirst:
-               Feed[i].Close_WhoFirst=m_WhoFirst(Rates,i,open,high,low,close);
+               Feed[i].Close_WhoFirst=m_WhoFirst_OHLC(Rates,i,open,high,low,close);
 
                //POM+Signal
-               Feed[i].Close_pom=m_POM_Signal(open,high,low,close,Feed[i].Close_WhoFirst,Feed[i].Close_signal);
+               Feed[i].Close_pom=m_POM_Signal_OHLC(open,high,low,close,Feed[i].Close_WhoFirst,Feed[i].Close_signal);
 
                //DC 
                //Feed[i].Close_dc = 
@@ -2495,10 +2495,10 @@ bool RHistory::_Calculate_OHLC_Feed(const MqlRates &Rates[],STRUCT_FEED_OHLC &Fe
    return(true);
   }//END of CALC OHLC FEED
 //+------------------------------------------------------------------+
-//| Calculate PomSignal by Last one minute                           |
+//| Calculate PomSignal by Last one minute for OHLC                  |
 //+------------------------------------------------------------------+
-double RHistory::m_POM_Signal(const double &Open,const double &High,const double &Low,const double &Close,
-                              const char &WhoFirst,char &POM_SIGNAL)
+double RHistory::m_POM_Signal_OHLC(const double &Open,const double &High,const double &Low,const double &Close,
+                                   const char &WhoFirst,char &POM_SIGNAL)
   {
    double a=0;
    double b=0;
@@ -2563,21 +2563,21 @@ double RHistory::m_POM_Signal(const double &Open,const double &High,const double
 
 //If no POM, private case or unknown error
    return(0);
-  }//END of PomSignal
+  }//END of PomSignal for OHLC
 //+------------------------------------------------------------------+
-//| Calculate DC                                                     |
+//| Calculate DC in last 3 minute for OHLC                           |
 //+------------------------------------------------------------------+
-bool RHistory::m_CalculateDC(const MqlRates &Rates[],STRUCT_FEED_OHLC &Feed[])
+bool RHistory::m_DC_OHLC(const MqlRates &Rates[],STRUCT_FEED_OHLC &Feed[])
   {
 
 //If Ok
    return(true);
-  }//END of DC
+  }//END of DC for OHLC
 //+------------------------------------------------------------------+
-//| WhoFirst                                                         |
+//| WhoFirst in last bottle (5 minutes) for OHLC                     |
 //+------------------------------------------------------------------+
-char RHistory::m_WhoFirst(const MqlRates &Rates[],const int &Start,const double &Open,const double &High,
-                          const double &Low,const double &Close)
+char RHistory::m_WhoFirst_OHLC(const MqlRates &Rates[],const int &Start,const double &Open,const double &High,
+                               const double &Low,const double &Close)
   {
 //Iteration num
    int i=Start;
@@ -2639,4 +2639,4 @@ char RHistory::m_WhoFirst(const MqlRates &Rates[],const int &Start,const double 
 
 //If Err
    return(EqualFirst);
-  }//END of WhoFirst
+  }//END of WhoFirst for OHLC
