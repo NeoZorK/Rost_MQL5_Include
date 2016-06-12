@@ -88,7 +88,7 @@ private:
    double            m_POM_Signal_OHLC(const double &Open,const double &High,const double &Low,const double &Close,
                                        const char &WhoFirst,char &POM_SIGNAL);
    //Calculates DC in primings
-   double            m_DC_OHLC(const int &OHLC,const MqlRates &Rates[],const int &Start,const double &Open,
+   double            m_DC_OHLC(const int OHLC,const MqlRates &Rates[],const int &Start,const double &Open,
                                const double &High,const double &Low,const double &Close,const STRUCT_TICKVOL_OHLC &TickVol[]);
 
 public:
@@ -201,7 +201,7 @@ public:
    bool              _Calculate_OHLC_Feed(const MqlRates &Rates[],STRUCT_FEED_OHLC &Feed[],const STRUCT_TICKVOL_OHLC &TickVol[]);
 
    //Calculate Feed for Only Close prices
-   bool              _Calculate_CLOSE_Feed(const MqlRates &Rates[],STRUCT_FEED_CLOSE &Feed[]);
+   bool              _Calculate_CLOSE_Feed(const MqlRates &Rates[],STRUCT_FEED_CLOSE &Feed[],const STRUCT_TICKVOL_OHLC &TickVol[]);
   };
 //+------------------------------------------------------------------+
 //| Constructor                                                      |
@@ -2568,7 +2568,7 @@ double RHistory::m_POM_Signal_OHLC(const double &Open,const double &High,const d
 //+------------------------------------------------------------------+
 //| Calculate DC in last 3 minute for OHLC (include current)         |
 //+------------------------------------------------------------------+
-double RHistory::m_DC_OHLC(const int &OHLC,const MqlRates &Rates[],const int &Start,const double &Open,
+double RHistory::m_DC_OHLC(const int OHLC,const MqlRates &Rates[],const int &Start,const double &Open,
                            const double &High,const double &Low,const double &Close,const STRUCT_TICKVOL_OHLC &TickVol[])
   {
    double res=-1;
@@ -2617,6 +2617,10 @@ double RHistory::m_DC_OHLC(const int &OHLC,const MqlRates &Rates[],const int &St
 
       case  3://Close
          arr_WF[0].tick_volume=(long)TickVol[i].Close_TickVol;
+         break;
+
+      case  4://For Close only prices Mode (sum of 4 our voumes)
+         arr_WF[0].tick_volume=Rates[i].tick_volume;
          break;
       default:
          break;
@@ -2709,3 +2713,54 @@ char RHistory::m_WhoFirst_OHLC(const MqlRates &Rates[],const int &Start,const do
 //If Err
    return(EqualFirst);
   }//END of WhoFirst for OHLC
+//+------------------------------------------------------------------+
+//| Calculate Feed on Close prices only                              |
+//+------------------------------------------------------------------+
+bool RHistory::_Calculate_CLOSE_Feed(const MqlRates &Rates[],STRUCT_FEED_CLOSE &Feed[],const STRUCT_TICKVOL_OHLC &TickVol[])
+  {
+//Get Size of ArrayOHLC
+   int ArrSize=ArraySize(Rates);
+
+//Resize Feed Array ONCE
+   ArrayResize(Feed,ArrSize);
+
+//Calculate Start position
+   int StartZero=ArrSize-1-m_bottle_size;
+
+//Fill first bottle_size=5 params by zero
+   for(int i=ArrSize-1;i>StartZero;i--)
+     {
+      Feed[i].Close_WhoFirst=0;
+      Feed[i].Close_pom=0;
+      Feed[i].Close_signal=0;
+      Feed[i].Close_dc=0;
+     }//END of Fill Zero
+
+//Current OHLC template (changed in each O,H,L,C)
+   double open=0;
+   double high=0;
+   double low=0;
+   double close=0;
+
+//Main Circle
+   for(int i=StartZero;i>-1;i--)
+     {
+      //For close prices only
+      open=Rates[i].open;
+      high=Rates[i].high;
+      low=Rates[i].low;
+      close=Rates[i].close;
+
+      //WhoFirst:
+      Feed[i].Close_WhoFirst=m_WhoFirst_OHLC(Rates,i,open,high,low,close);
+
+      //POM+Signal
+      Feed[i].Close_pom=m_POM_Signal_OHLC(open,high,low,close,Feed[i].Close_WhoFirst,Feed[i].Close_signal);
+
+      //DC (OHLC=4 - for Close prices only Mode!)
+      Feed[i].Close_dc=m_DC_OHLC(4,Rates,i,open,high,low,close,TickVol);
+
+     }//END of MAIN CIRCLE
+//If Ok
+   return(true);
+  }//End of  CLOSE FEED
