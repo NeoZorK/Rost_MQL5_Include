@@ -85,8 +85,8 @@ private:
                                 const double &Low,const double &Close);
 
    //Calculates POM & Signal in primings
-   bool              m_CalculatePOMSignal(const MqlRates &Rates[],STRUCT_FEED_OHLC &Feed[]);
-
+   double            m_POM_Signal(const double &Open,const double &High,const double &Low,const double &Close,
+                                  const char &WhoFirst,char &POM_SIGNAL);
    //Calculates DC in primings
    bool              m_CalculateDC(const MqlRates &Rates[],STRUCT_FEED_OHLC &Feed[]);
 
@@ -2386,6 +2386,18 @@ bool RHistory::_Calculate_OHLC_Feed(const MqlRates &Rates[],STRUCT_FEED_OHLC &Fe
       Feed[i].High_WhoFirst=0;
       Feed[i].Low_WhoFirst=0;
       Feed[i].Close_WhoFirst=0;
+      Feed[i].Open_pom=0;
+      Feed[i].High_pom=0;
+      Feed[i].Low_pom=0;
+      Feed[i].Close_pom=0;
+      Feed[i].Open_signal=0;
+      Feed[i].High_signal=0;
+      Feed[i].Low_signal=0;
+      Feed[i].Close_signal=0;
+      Feed[i].Open_dc=0;
+      Feed[i].High_dc=0;
+      Feed[i].Low_dc=0;
+      Feed[i].Close_dc=0;
      }//END of Fill Zero
 
 //Current OHLC template (changed in each O,H,L,C)
@@ -2413,7 +2425,7 @@ bool RHistory::_Calculate_OHLC_Feed(const MqlRates &Rates[],STRUCT_FEED_OHLC &Fe
                Feed[i].Open_WhoFirst=m_WhoFirst(Rates,i,open,high,low,close);
 
                //POM+Signal
-               // Feed[i].Open_POMSignal = 
+               Feed[i].Open_pom=m_POM_Signal(open,high,low,close,Feed[i].Open_WhoFirst,Feed[i].Open_signal);
 
                //DC 
                //Feed[i].Open_dc = 
@@ -2430,7 +2442,7 @@ bool RHistory::_Calculate_OHLC_Feed(const MqlRates &Rates[],STRUCT_FEED_OHLC &Fe
                Feed[i].High_WhoFirst=m_WhoFirst(Rates,i,open,high,low,close);
 
                //POM+Signal
-               // Feed[i].High_POMSignal = 
+               Feed[i].High_pom=m_POM_Signal(open,high,low,close,Feed[i].High_WhoFirst,Feed[i].High_signal);
 
                //DC 
                //Feed[i].High_dc = 
@@ -2447,7 +2459,7 @@ bool RHistory::_Calculate_OHLC_Feed(const MqlRates &Rates[],STRUCT_FEED_OHLC &Fe
                Feed[i].Low_WhoFirst=m_WhoFirst(Rates,i,open,high,low,close);
 
                //POM+Signal
-               // Feed[i].Low_POMSignal = 
+               Feed[i].Low_pom=m_POM_Signal(open,high,low,close,Feed[i].Low_WhoFirst,Feed[i].Low_signal);
 
                //DC 
                //Feed[i].Low_dc = 
@@ -2463,7 +2475,7 @@ bool RHistory::_Calculate_OHLC_Feed(const MqlRates &Rates[],STRUCT_FEED_OHLC &Fe
                Feed[i].Close_WhoFirst=m_WhoFirst(Rates,i,open,high,low,close);
 
                //POM+Signal
-               // Feed[i].Close_POMSignal = 
+               Feed[i].Close_pom=m_POM_Signal(open,high,low,close,Feed[i].Close_WhoFirst,Feed[i].Close_signal);
 
                //DC 
                //Feed[i].Close_dc = 
@@ -2480,12 +2492,74 @@ bool RHistory::_Calculate_OHLC_Feed(const MqlRates &Rates[],STRUCT_FEED_OHLC &Fe
    return(true);
   }//END of CALC OHLC FEED
 //+------------------------------------------------------------------+
-//| Calculate PomSignal                                              |
+//| Calculate PomSignal by Last one minute                           |
 //+------------------------------------------------------------------+
-bool RHistory::m_CalculatePOMSignal(const MqlRates &Rates[],STRUCT_FEED_OHLC &Feed[])
+double RHistory::m_POM_Signal(const double &Open,const double &High,const double &Low,const double &Close,
+                              const char &WhoFirst,char &POM_SIGNAL)
   {
-//If Ok
-   return(true);
+   double a=0;
+   double b=0;
+   double c=0;
+   uchar m=0;
+   uchar n=0;
+
+//Private cases:
+   if(WhoFirst<LowFirst || WhoFirst>HighFirst) return(0);
+   if(WhoFirst==EqualFirst) return(0);
+
+//Calc abc for HIGH first on last bottle
+   if(WhoFirst==HighFirst)
+     {
+      a=High-Open;// +
+      b=Low-High; // -
+      c=Close-Low;// +
+     }
+   else//Calc abc for LOW first on last bottle        
+   if(WhoFirst==LowFirst)
+     {
+      a=Low-Open;// -
+      b=High-Low;// +
+      c=Close-High;// -
+     }
+
+// Jumps +/-
+   if(a>0) m++; else if(a<0) n++;
+   if(b>0) m++; else if(b<0) n++;
+   if(c>0) m++; else if(c<0) n++;
+
+//Limitations
+   if(m*n<1 || m*n>2)return(0);
+   if(m*n==1 && High==Close) return(0);
+   if((m*n==2) && (High-Close+Open-Low==0)) return(0);
+
+//Current POM Signal
+   POM_SIGNAL=NOSIGNAL;
+
+//--- POM ver: 10.02.2015 
+//2:1
+   if(m==2 && n==1)
+     {
+      //IF A+ >1 then UP Trend  
+      double ga=((a+c)/2)/MathAbs(b);
+
+      //(case 4)  
+      if(MathAbs(b)>((a+c)/2)) POM_SIGNAL=SELL;
+      return(1-(1/(1+ga)));
+     }//end of 2:1
+
+//1:2  
+   if(m==1 && n==2)
+     {
+      //IF A- <1 then DOWN Trend
+      double ga=b/(MathAbs(a+c)/2);
+
+      //(case 1)  
+      if(b>(MathAbs(a+c)/2)) POM_SIGNAL=BUY;
+      return(1-(1/(1+ga)));
+     }//end of 1:2
+
+//If no POM, private case or unknown error
+   return(0);
   }//END of PomSignal
 //+------------------------------------------------------------------+
 //| Calculate DC                                                     |

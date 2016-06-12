@@ -32,6 +32,9 @@ const char Ind_Buy = 1;
 const char Ind_Sell=-1;
 const int BUY1=1005;
 const int SELL1=2006;
+const char BUY=1;
+const char SELL=-1;
+const char NOSIGNAL=0;
 const char HighFirst= 1;
 const char LowFirst = -1;
 const char EqualFirst=0; //High==Open or other Private Case
@@ -67,6 +70,11 @@ struct STRUCT_FEED_OHLC
    double            High_pom;
    double            Low_pom;
    double            Close_pom;
+
+   char              Open_signal;
+   char              High_signal;
+   char              Low_signal;
+   char              Close_signal;
 
    double            Open_dc;
    double            High_dc;
