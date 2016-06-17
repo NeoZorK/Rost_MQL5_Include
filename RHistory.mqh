@@ -170,8 +170,16 @@ public:
    //Export Rates structure to CSV file
    bool              _ExportRatesToCSV(const bool ReverseWrite);
 
-   //Export Feed  to CSV file (date,ohlc,spread,tickvol,WF,POM,DC,SIGNAL)
-   bool              _ExportFeedToCSV(const bool ReverseWrite,const STRUCT_Priming &Priming,const bool Priming1);
+   //Export Indicator Feed  to CSV file (date,ohlc,spread,tickvol,WF,POM,DC,SIGNAL)
+   bool              _ExportIndicatorFeedToCSV(const bool ReverseWrite,const STRUCT_Priming &Priming,const bool Priming1);
+
+   //Export Feed to CSV file (date,ohlc,spread,tickvol,WF,POM,DC,SIGNAL)
+   bool              _ExportFeedToCSV(const bool ReverseWrite,const MqlRates &Rates[],const STRUCT_FEED_OHLC &Feed[],
+                                      const bool Priming1);
+
+   //Export OHLC TickVolume Distribution Feed to CSV file (date,OHLC,tickvol)
+   bool              _ExportOHLCTickVolFeedToCSV(const bool ReverseWrite,const STRUCT_TICKVOL_OHLC &Feed[],
+                                                 const bool Priming1);
 
    //Export Rates to binary file
    bool              _ExportRatesToBIN(const bool ReverseWrite);
@@ -2182,9 +2190,9 @@ bool RHistory::_ExportRatesToBIN(const bool ReverseWrite)
    return(true);
   }//END of ExportRates to BIN
 //+------------------------------------------------------------------+
-//| Export Feed to CSV (date,ohlc,spread,tickvol,WF,POM,DC,SIGNAL)   |
+//| Export Indicator Feed to CSV (date,ohlc,spread,tickvol,WF,POM,DC,SIGNAL)|
 //+------------------------------------------------------------------+ 
-bool RHistory::_ExportFeedToCSV(const bool ReverseWrite,const STRUCT_Priming &Priming,const bool Priming1)
+bool RHistory::_ExportIndicatorFeedToCSV(const bool ReverseWrite,const STRUCT_Priming &Priming,const bool Priming1)
   {
 //Check if Rates already loaded to memory
    if(!m_processed)
@@ -2197,7 +2205,7 @@ bool RHistory::_ExportFeedToCSV(const bool ReverseWrite,const STRUCT_Priming &Pr
    string Server=AccountInfoString(ACCOUNT_SERVER);
 
 //Path for Export (0=Priming1 or 1=Priming2)ServerRatesEURUSD2010.01.01_2016.04.01
-   string path=(string)(int)Priming1+Server+"Feed"+m_pair+TimeToString(m_from_date,TIME_DATE)+
+   string path=(string)(int)Priming1+Server+"IndFeed"+m_pair+TimeToString(m_from_date,TIME_DATE)+
                "_"+TimeToString(m_to_date,TIME_DATE)+".csv";
 
 //If BD not NULL
@@ -2295,9 +2303,9 @@ bool RHistory::_ExportFeedToCSV(const bool ReverseWrite,const STRUCT_Priming &Pr
    FileClose(file_h1);
 
 //If ok    
-   Alert("Ok, File Created in COMMON folder: "+path);
+   Alert("Ok, IndFeed Created in COMMON folder: "+path);
    return(true);
-  }//END of ExportFeed to CSV
+  }//END of Export Indicator Feed to CSV
 //+------------------------------------------------------------------+
 // Calculate TICK_VOLUME inside OHLC 1 minute                        |
 //+------------------------------------------------------------------+ 
@@ -2764,3 +2772,175 @@ bool RHistory::_Calculate_CLOSE_Feed(const MqlRates &Rates[],STRUCT_FEED_CLOSE &
 //If Ok
    return(true);
   }//End of  CLOSE FEED
+//+------------------------------------------------------------------+
+//| Export Feed to CSV (date,ohlc,spread,tickvol,WF,POM,DC,SIGNAL)   |
+//+------------------------------------------------------------------+ 
+bool RHistory::_ExportFeedToCSV(const bool ReverseWrite,const MqlRates &Rates[],const STRUCT_FEED_OHLC &Feed[],
+                                const bool Priming1)
+  {
+//Get Server Broker Name
+   string Server=AccountInfoString(ACCOUNT_SERVER);
+
+//Path for Export (0=Priming1 or 1=Priming2)ServerRatesEURUSD2010.01.01_2016.04.01
+   string path=(string)(int)Priming1+Server+"Feed"+m_pair+TimeToString(m_from_date,TIME_DATE)+
+               "_"+TimeToString(m_to_date,TIME_DATE)+".csv";
+
+//If exist delete
+   if(FileIsExist(path,FILE_COMMON)) FileDelete(path,FILE_COMMON);
+
+//Init file for write (csv) \r\n
+   int file_h1=FileOpen(path,FILE_READ|FILE_WRITE|FILE_BIN|FILE_COMMON|FILE_CSV|FILE_ANSI);
+   if(file_h1==INVALID_HANDLE) return(false);
+
+//---Export to CSV
+//Get Size of Rates Array
+   int arrSize=ArraySize(Rates);
+
+//Writable string   
+   string s1;
+
+//Main Circle
+//If not Reverse Write
+   if(!ReverseWrite)
+     {
+      //Write oldest rate to the end of file (and NOW date to the first string)
+      for(int i=0;i<arrSize;i++)
+        {
+         s1=IntegerToString(i)+","                                     //#ID
+            +TimeToString(Rates[i].time,TIME_DATE|TIME_MINUTES|TIME_SECONDS)+","     //Time in seconds 
+            +DoubleToString(Rates[i].open,5)+","              //OPEN 
+            +DoubleToString(Rates[i].high,5)+","              //HIGH
+            +DoubleToString(Rates[i].low,5)+","               //LOW
+            +DoubleToString(Rates[i].close,5)+","             //CLOSE
+            +IntegerToString(Rates[i].tick_volume)+","        //Tick Volume
+            +IntegerToString(Rates[i].real_volume)+","        //Real Volume
+            +IntegerToString(Rates[i].spread)+","             //Spread
+            +IntegerToString(Feed[i].Open_WhoFirst,1)+","     //First Open
+            +IntegerToString(Feed[i].High_WhoFirst,1)+","     //First High  
+            +IntegerToString(Feed[i].Low_WhoFirst,1)+","      //Fist Low
+            +IntegerToString(Feed[i].Close_WhoFirst,1)+","    //First Close
+            +DoubleToString(Feed[i].Open_pom,2)+","           //Pom Open
+            +DoubleToString(Feed[i].High_pom,2)+","           //Pom High  
+            +DoubleToString(Feed[i].Low_pom,2)+","            //Pom Low
+            +DoubleToString(Feed[i].Close_pom,2)+","          //Pom Close  
+            +IntegerToString(Feed[i].Open_signal,1)+","       //Signal Open
+            +IntegerToString(Feed[i].High_signal,1)+","       //Signal High  
+            +IntegerToString(Feed[i].Low_signal,1)+","        //Signal Low
+            +IntegerToString(Feed[i].Close_signal,1)+","      //Signal Close
+            +DoubleToString(Feed[i].Open_dc,2)+","            //Dc Open
+            +DoubleToString(Feed[i].High_dc,2)+","            //Dc High  
+            +DoubleToString(Feed[i].Low_dc,2)+","             //Dc Low
+            +DoubleToString(Feed[i].Close_dc,2)+","           //Dc Close
+            +"\r\n";
+         FileWrite(file_h1,s1);
+        }//End of for
+     }//End of NOT Reverse Write
+
+   if(ReverseWrite)
+     {
+      //Write oldest date first to file and NOW date to the End of file   
+      for(int i=arrSize-1;i>-1;i--)
+        {
+         s1=IntegerToString(i)+","                                     //#ID
+            +TimeToString(Rates[i].time,TIME_DATE|TIME_MINUTES|TIME_SECONDS)+","     //Time in seconds 
+            +DoubleToString(Rates[i].open,5)+","              //OPEN 
+            +DoubleToString(Rates[i].high,5)+","              //HIGH
+            +DoubleToString(Rates[i].low,5)+","               //LOW
+            +DoubleToString(Rates[i].close,5)+","             //CLOSE
+            +IntegerToString(Rates[i].tick_volume)+","        //Tick Volume
+            +IntegerToString(Rates[i].real_volume)+","        //Real Volume
+            +IntegerToString(Rates[i].spread)+","             //Spread
+            +IntegerToString(Feed[i].Open_WhoFirst,1)+","     //First Open
+            +IntegerToString(Feed[i].High_WhoFirst,1)+","     //First High  
+            +IntegerToString(Feed[i].Low_WhoFirst,1)+","      //Fist Low
+            +IntegerToString(Feed[i].Close_WhoFirst,1)+","    //First Close
+            +DoubleToString(Feed[i].Open_pom,2)+","           //Pom Open
+            +DoubleToString(Feed[i].High_pom,2)+","           //Pom High  
+            +DoubleToString(Feed[i].Low_pom,2)+","            //Pom Low
+            +DoubleToString(Feed[i].Close_pom,2)+","          //Pom Close  
+            +IntegerToString(Feed[i].Open_signal,1)+","       //Signal Open
+            +IntegerToString(Feed[i].High_signal,1)+","       //Signal High  
+            +IntegerToString(Feed[i].Low_signal,1)+","        //Signal Low
+            +IntegerToString(Feed[i].Close_signal,1)+","      //Signal Close
+            +DoubleToString(Feed[i].Open_dc,2)+","            //Dc Open
+            +DoubleToString(Feed[i].High_dc,2)+","            //Dc High  
+            +DoubleToString(Feed[i].Low_dc,2)+","             //Dc Low
+            +DoubleToString(Feed[i].Close_dc,2)+","           //Dc Close
+            +"\r\n";
+         FileWrite(file_h1,s1);
+        }//End of for
+     }//END OF Reverse Write  
+
+//Close file
+   FileClose(file_h1);
+
+//If ok    
+   Alert("Ok, Feed Created in COMMON folder: "+path);
+   return(true);
+  }//END of Export Non Indicator Feed to CSV  
+//| Export Feed to CSV (date,ohlc,spread,tickvol,WF,POM,DC,SIGNAL)   |
+//+------------------------------------------------------------------+ 
+bool RHistory::_ExportOHLCTickVolFeedToCSV(const bool ReverseWrite,const STRUCT_TICKVOL_OHLC &Feed[],const bool Priming1)
+  {
+//Get Server Broker Name
+   string Server=AccountInfoString(ACCOUNT_SERVER);
+
+//Path for Export (0=Priming1 or 1=Priming2)ServerRatesEURUSD2010.01.01_2016.04.01
+   string path=(string)(int)Priming1+Server+"OHLCTIckVol"+m_pair+TimeToString(m_from_date,TIME_DATE)+
+               "_"+TimeToString(m_to_date,TIME_DATE)+".csv";
+
+//If exist delete
+   if(FileIsExist(path,FILE_COMMON)) FileDelete(path,FILE_COMMON);
+
+//Init file for write (csv) \r\n
+   int file_h1=FileOpen(path,FILE_READ|FILE_WRITE|FILE_BIN|FILE_COMMON|FILE_CSV|FILE_ANSI);
+   if(file_h1==INVALID_HANDLE) return(false);
+
+//---Export to CSV
+//Get Size of Rates Array
+   int arrSize=ArraySize(Feed);
+
+//Writable string   
+   string s1;
+
+//Main Circle
+//If not Reverse Write
+   if(!ReverseWrite)
+     {
+      //Write oldest rate to the end of file (and NOW date to the first string)
+      for(int i=0;i<arrSize;i++)
+        {
+         s1=IntegerToString(i)+","                                     //#ID
+            +TimeToString(Feed[i].Time,TIME_DATE|TIME_MINUTES|TIME_SECONDS)+","     //Time in seconds 
+            +DoubleToString(Feed[i].Open_TickVol,5)+","              //OPEN  TickVol
+            +DoubleToString(Feed[i].High_TickVol,5)+","              //HIGH  TickVol
+            +DoubleToString(Feed[i].Low_TickVol,5)+","               //LOW   TickVol
+            +DoubleToString(Feed[i].Close_TickVol,5)+","             //CLOSE TickVol  
+            +"\r\n";
+         FileWrite(file_h1,s1);
+        }//End of for
+     }//End of NOT Reverse Write
+
+   if(ReverseWrite)
+     {
+      //Write oldest date first to file and NOW date to the End of file   
+      for(int i=arrSize-1;i>-1;i--)
+        {
+         s1=IntegerToString(i)+","                                     //#ID
+            +TimeToString(Feed[i].Time,TIME_DATE|TIME_MINUTES|TIME_SECONDS)+","     //Time in seconds 
+            +DoubleToString(Feed[i].Open_TickVol,5)+","              //OPEN  TickVol
+            +DoubleToString(Feed[i].High_TickVol,5)+","              //HIGH  TickVol
+            +DoubleToString(Feed[i].Low_TickVol,5)+","               //LOW   TickVol
+            +DoubleToString(Feed[i].Close_TickVol,5)+","             //CLOSE TickVol  
+            +"\r\n";
+         FileWrite(file_h1,s1);
+        }//End of for
+     }//END OF Reverse Write  
+
+//Close file
+   FileClose(file_h1);
+
+//If ok    
+   Alert("Ok, OHLC TickVolume Feed Created in COMMON folder: "+path);
+   return(true);
+  }//END of Export OHLC TickVolume Non Indicator Feed to CSV 
