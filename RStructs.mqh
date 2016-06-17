@@ -166,10 +166,10 @@ enum ENUM_myPredictPeriod
 //+------------------------------------------------------------------+
 enum ENUM_EMUL_OHLC_PRICE
   {
-   IND_OHLC,      //Use OHLC prices (4) with indicator
-   IND_CLOSE,     //Use only Close prices in Open\Close positions
-   FEED_OHLC,   //Use OHLC without Indicator, our Volume
-   FEED_CLOSE,  //Use only Close prices in Open\Close positions
+   IND_OHLC,      //Ind OHLC prices(4)
+   IND_CLOSE,     //Ind Only Close prices(1)
+   FEED_OHLC,   //OHLC own Volume
+   FEED_CLOSE,  //Only Close, own Volume
   };
 //+------------------------------------------------------------------+
 //| Trade  Results                                                   |
