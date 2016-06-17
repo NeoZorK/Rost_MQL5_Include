@@ -1059,27 +1059,27 @@ bool RTrade::Emulate_Trading_AllOHLC_WO_Indicator(const bool Priming1,const MqlR
               {
                case  -1://All CLOSE 
                   Current_OHLC_Price=Rates[i].close;
-                  Calculated_Dc=Feed[i].Close_dc;
+                  Calculated_Dc=Feed[i].Close_dc*inpDeltaC_koef;
                   break;
 
                case  0://OPEN 
                   Current_OHLC_Price=Rates[i].open;
-                  Calculated_Dc=Feed[i].Open_dc;
+                  Calculated_Dc=Feed[i].Open_dc*inpDeltaC_koef;
                   break;
 
                case  1://HIGH 
                   Current_OHLC_Price=Rates[i].high;
-                  Calculated_Dc=Feed[i].High_dc;
+                  Calculated_Dc=Feed[i].High_dc*inpDeltaC_koef;
                   break;
 
                case  2://LOW 
                   Current_OHLC_Price=Rates[i].low;
-                  Calculated_Dc=Feed[i].Low_dc;
+                  Calculated_Dc=Feed[i].Low_dc*inpDeltaC_koef;
                   break;
 
                case  3://CLOSE 
                   Current_OHLC_Price=Rates[i].close;
-                  Calculated_Dc=Feed[i].Close_dc;
+                  Calculated_Dc=Feed[i].Close_dc*inpDeltaC_koef;
                   break;
                default:
                   break;
@@ -1294,7 +1294,7 @@ bool RTrade::Emulate_Trading_ALLClose_WO_Indicator(const bool Priming1,const Mql
          //Reset DC
          Calculated_Dc=0;
          Current_OHLC_Price=Rates[i].close;
-         Calculated_Dc=Feed[i].Close_dc;
+         Calculated_Dc=Feed[i].Close_dc*inpDeltaC_koef;
 
          //1. Check Open Rule (OHLC=-1 : for Close Only Prices)
          int OTR_RESULT=m_EMUL_OpenRule_CLOSE_Feed(m_open_rule_num_emul,Case,i,-1,Feed);
