@@ -72,6 +72,9 @@ private:
    ulong             m_buypos_count;
    ulong             m_sellpos_count;
 
+   //Add Volume to opened position
+   bool              m_AddVolume();
+
 public:
                      RCat(const string Pair,const double &Pom_Koef,const double &PomBuy,const double &PomSell,
                                             const ushort &Fee,const uchar &SleepPage,const ushort &MaxSpread);
@@ -205,49 +208,7 @@ bool RCat::Trade(const double &First,const double &Pom,const double &Dc,const do
 //-----ADD VOLUME-----//    
    if(Opened_Position)
      {
-      //Position Volume
-      double pos_volume=PositionGetDouble(POSITION_VOLUME);
-
-      //Check MaxVolume
-      if(pos_volume>=m_max_volume) {return(false);}
-
-      //Position Open Price
-      double pos_open_price=PositionGetDouble(POSITION_PRICE_OPEN);
-
-      //Current Price(Bid for BuyClose & Ask for SellClose)
-      double pos_current_price=PositionGetDouble(POSITION_PRICE_CURRENT);
-
-      //Position Direction
-      long pos_type=PositionGetInteger(POSITION_TYPE);
-
-      //Pair point
-      double point_size=SymbolInfoDouble(m_pair,SYMBOL_POINT);
-
-      //Add Volume BUY
-      if(pos_type==POSITION_TYPE_BUY && m_TR_RES==BUY1)
-        {
-         //If Price lower->Add Vol Buy, else Exit
-         if(pos_current_price>pos_open_price-(m_add_vol_shift_points*point_size)) return(false);
-
-         //Add BUY
-         OpenMarketOrder(m_start_volume,OP_BUY,m_stoploss,m_takeprofit,MAGIC_IB,"+V"+
-                         DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
-                         TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
-         return(true);
-        }//END OF ADD VOL BUY
-
-      //Add Volume SELL
-      if((pos_type==POSITION_TYPE_SELL) && (m_TR_RES==SELL1))
-        {
-         //If Price Higher->Add Vol Sell, else Exit
-         if(pos_current_price<pos_open_price+(m_add_vol_shift_points*point_size)) return(false);
-
-         //Add SELL
-         OpenMarketOrder(m_start_volume,OP_SELL,m_stoploss,m_takeprofit,MAGIC_IS,"+V"+
-                         DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
-                         TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
-         return(true);
-        }//END OF ADD VOL SELL
+      if(!m_AddVolume()) return(false);
      }//END OF ADD VOLUME
 
 //If No Opened Position then false
@@ -700,4 +661,63 @@ bool RCat::AutoCompounding(const ENUM_AutoLot &Enum_AutoLot)
 //If Not Change 
    return(false);
   }//End of AutoCompounding
+//+------------------------------------------------------------------+
+//| Add Volume to opened position                                    |
+//+------------------------------------------------------------------+
+bool RCat::m_AddVolume(void)
+  {
+//Position Volume
+   double pos_volume=PositionGetDouble(POSITION_VOLUME);
+
+//Check MaxVolume
+   if(pos_volume>=m_max_volume) {return(false);}
+
+//Position Open Price
+   double pos_open_price=PositionGetDouble(POSITION_PRICE_OPEN);
+
+//Current Price(Bid for BuyClose & Ask for SellClose)
+   double pos_current_price=PositionGetDouble(POSITION_PRICE_CURRENT);
+
+//Position Direction
+   long pos_type=PositionGetInteger(POSITION_TYPE);
+
+//Pair point
+   double point_size=SymbolInfoDouble(m_pair,SYMBOL_POINT);
+
+//Add Volume BUY
+   if(pos_type==POSITION_TYPE_BUY && m_TR_RES==BUY1)
+     {
+      //If Price lower->Add Vol Buy, else Exit
+      if(pos_current_price>pos_open_price-(m_add_vol_shift_points*point_size)) return(false);
+
+      //Add BUY
+      OpenMarketOrder(m_start_volume,OP_BUY,m_stoploss,m_takeprofit,MAGIC_IB,"+V"+
+                      DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
+                      TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
+      return(true);
+     }//END OF ADD VOL BUY
+
+//Add Volume SELL
+   if((pos_type==POSITION_TYPE_SELL) && (m_TR_RES==SELL1))
+     {
+      //If Price Higher->Add Vol Sell, else Exit
+      if(pos_current_price<pos_open_price+(m_add_vol_shift_points*point_size)) return(false);
+
+      //Add SELL
+      OpenMarketOrder(m_start_volume,OP_SELL,m_stoploss,m_takeprofit,MAGIC_IS,"+V"+
+                      DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
+                      TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
+      return(true);
+     }//END OF ADD VOL SELL
+//If no pos,
+   return(false);
+  }//END of AddVolume
+//+------------------------------------------------------------------+
+//| AutoCompounding                                                  |
+//+------------------------------------------------------------------+
+//+------------------------------------------------------------------+
+//| AutoCompounding                                                  |
+//+------------------------------------------------------------------+
+//+------------------------------------------------------------------+
+//| AutoCompounding                                                  |
 //+------------------------------------------------------------------+
