@@ -849,7 +849,7 @@ bool RCat::m_PomSignal(void)
      {
       m_pom=0;
       m_signal=NOSIGNAL;
-      return(false);
+      return(true);
      }
 
 //Calc abc for HIGH first
@@ -878,21 +878,21 @@ bool RCat::m_PomSignal(void)
      {
       m_pom=0;
       m_signal=NOSIGNAL;
-      return(false);
+      return(true);
      }
 //2     
    if(m*n==1 && m_Highs[0]==m_Closes[0])
      {
       m_pom=0;
       m_signal=NOSIGNAL;
-      return(false);
+      return(true);
      }
 //3     
    if((m*n==2) && (m_Highs[0]-m_Closes[0]+m_Opens[0]-m_Lows[0]==0))
      {
       m_pom=0;
       m_signal=NOSIGNAL;
-      return(false);
+      return(true);
      }
 
 //If no signal occured
@@ -942,7 +942,7 @@ bool RCat::m_PomSignal(void)
 //If no POM, private case or unknown error
    m_pom=0;
    m_signal=NOSIGNAL;
-   return(false);
+   return(true);
   }//END OF CALC POM
 //+------------------------------------------------------------------+
 //| Calculate DeltaC                                                 |
