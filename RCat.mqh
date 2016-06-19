@@ -32,12 +32,15 @@ private:
    int               m_TR_RES;
    //Current Ck Prediction
    char              m_current_ck;
-   //---Latest Indicator Values
+   //---Latest Feed Values
    double            m_first;
+   double            m_Highs[];
+   double            m_Lows[];
    double            m_pom;
    double            m_dc;
    double            m_signal;
    //Pom constants
+   uint              m_bottle_size;
    double            m_pom_koef;
    double            m_pom_buy;
    double            m_pom_sell;
@@ -75,17 +78,30 @@ private:
    //Add Volume to opened position
    bool              m_AddVolume();
 
+   //WhoFirst RealTime
+   bool              m_WhoFirst();
+
+   //Pom & Signal RealTime   
+   bool              m_PomSignal();
+
+   //DC RealTime
+   bool              m_DC();
+
 public:
                      RCat(const string Pair,const double &Pom_Koef,const double &PomBuy,const double &PomSell,
-                                            const ushort &Fee,const uchar &SleepPage,const ushort &MaxSpread);
+                                            const ushort &Fee,const uchar &SleepPage,const ushort &MaxSpread,const uint &BottleSize);
                     ~RCat();
    //Initialisation     
    bool              Init(const char &Ck_Case,const ENUM_RT_OpenRule &OpenRule,const ENUM_RT_CloseRule &CloseRule,
                           const double AddVol_Shift_Pt);
-   //Main          
-   bool              Trade(const double &First,const double &Pom,const double &Dc,const double &Signal,
-                           const double &Sl,const double &Tp,const double &StartVol,const double &MaxVol,
+   //Main Trade on Ind Feed         
+   bool              TradeInd(const double &First,const double &Pom,const double &Dc,const double &Signal,
+                              const double &Sl,const double &Tp,const double &StartVol,const double &MaxVol,
+                              const ENUM_AutoLot &AutoLot);
+   //Trade on Calculated Feed (WO Indicator)
+   bool              Trade(const double &Sl,const double &Tp,const double &StartVol,const double &MaxVol,
                            const ENUM_AutoLot &AutoLot);
+
    //Close Position
    bool              ClosePosition(const string CustomComment);
    bool              CloseAllPositions(const string CustomComment);
@@ -95,12 +111,15 @@ public:
    //Compounding (AutoLot)
    bool              AutoCompounding(const ENUM_AutoLot &Enum_AutoLot);
 
+   //Calculate RT Feed (WF,Pom,Signal,DC)
+   bool              CalculateRTFeed();
+
   };
 //+------------------------------------------------------------------+
 //| Constructor                                                      |
 //+------------------------------------------------------------------+
 RCat::RCat(const string Pair,const double &Pom_Koef,const double &PomBuy,const double &PomSell,
-           const ushort &Fee,const uchar &SleepPage,const ushort &MaxSpread)
+           const ushort &Fee,const uchar &SleepPage,const ushort &MaxSpread,const uint &BottleSize)
   {
    m_pair=Pair;
    m_pom_koef= Pom_Koef;
@@ -113,6 +132,11 @@ RCat::RCat(const string Pair,const double &Pom_Koef,const double &PomBuy,const d
    m_max_spread=MaxSpread;
    m_start_vol_koef=0;
    m_max_vol_koef=0;
+   m_bottle_size=BottleSize;
+   ArraySetAsSeries(m_Highs,true);
+   ArraySetAsSeries(m_Lows,true);
+   ArrayResize(m_Highs,m_bottle_size);
+   ArrayResize(m_Lows,m_bottle_size);
   }//END OF Constructor
 //+------------------------------------------------------------------+
 //| Destructor                                                       |
@@ -123,27 +147,25 @@ RCat::~RCat()
 //+------------------------------------------------------------------+
 //| Initialisation                                                   |
 //+------------------------------------------------------------------+
-bool RCat::Init(const char &Ck_Case,const ENUM_RT_OpenRule &OpenRule,const ENUM_RT_CloseRule &CloseRule,
-                const double AddVol_Shift_Pt)
+bool RCat::Init(const char &Ck_Case,const ENUM_RT_OpenRule &OpenRule,
+                const ENUM_RT_CloseRule &CloseRule,const double AddVol_Shift_Pt)
   {
    if(Ck_Case>4 || Ck_Case<0)
      {
       return(false);
      }
    m_current_ck=Ck_Case;
-
    m_current_open_rule=OpenRule;
    m_current_close_rule=CloseRule;
    m_add_vol_shift_points=AddVol_Shift_Pt;
-
    return(true);
   }//END OF Init
 //+------------------------------------------------------------------+
-//| Main Real Trade Function:True if Open\Close Position             |
+//| Main Ind Real Trade Function:True if Open\Close Position         |
 //+------------------------------------------------------------------+
-bool RCat::Trade(const double &First,const double &Pom,const double &Dc,const double &Signal,
-                 const double &Sl,const double &Tp,const double &StartVol,const double &MaxVol,
-                 const ENUM_AutoLot &AutoLot)
+bool RCat::TradeInd(const double &First,const double &Pom,const double &Dc,const double &Signal,
+                    const double &Sl,const double &Tp,const double &StartVol,const double &MaxVol,
+                    const ENUM_AutoLot &AutoLot)
   {
 // Fill Latest Indicator Buffers
    m_first=First;
@@ -154,7 +176,6 @@ bool RCat::Trade(const double &First,const double &Pom,const double &Dc,const do
    m_takeprofit=Tp;
    m_start_volume=StartVol;
    m_max_volume=MaxVol;
-
 //Compounding   
 //Check if enabled
    if(AutoLot!=Disabled)
@@ -182,7 +203,6 @@ bool RCat::Trade(const double &First,const double &Pom,const double &Dc,const do
 
 //  If any Open Position?
    bool Opened_Position=PositionSelect(m_pair);
-
 //-----NEW POSITION-----//
    if(!Opened_Position)
      {
@@ -204,7 +224,6 @@ bool RCat::Trade(const double &First,const double &Pom,const double &Dc,const do
             break;
         }//END OF SWITCH
      }//END OF NEW POSITION
-
 //-----ADD VOLUME-----//    
    if(Opened_Position)
      {
@@ -213,19 +232,23 @@ bool RCat::Trade(const double &First,const double &Pom,const double &Dc,const do
 
 //If No Opened Position then false
    return(false);
-  }//+++++++END OF TRADE!
+  }//+++++++END OF IND TRADE!
 //+------------------------------------------------------------------+
 //| Open Rule                                                        |
 //+------------------------------------------------------------------+
 int RCat::m_OpenRule(const ENUM_RT_OpenRule &OpenRule)
   {
    int TR_RES=-1;
-
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
    if(OpenRule<0)
      {
       return(-2);
      }
-
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
    switch(OpenRule)
      {
       case  0:TR_RES=m_POMI();
@@ -242,12 +265,16 @@ int RCat::m_OpenRule(const ENUM_RT_OpenRule &OpenRule)
 int RCat::m_CloseRule(const ENUM_RT_CloseRule &CloseRule)
   {
    int TR_RES=-1;
-
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
    if(CloseRule<0)
      {
       return(-2);
      }
-
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
    switch(CloseRule)
      {
       case  0:TR_RES=m_AutoCloseDcSpread();
@@ -265,12 +292,16 @@ int RCat::m_CloseRule(const ENUM_RT_CloseRule &CloseRule)
 int RCat::m_POMI()
   {
    int res=-1;
-
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
    if(m_signal==0)
      {
       return(-2);
      }
-
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
    if(m_first==0)
      {
       return(-2);
@@ -454,7 +485,9 @@ int RCat::OpenMarketOrder(const double &Vol,const uchar &BuyOrSell,const double 
       //Market Order
       z_mt_req.type=ORDER_TYPE_BUY;
      }//END OF BUY
-
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
    if(BuyOrSell==OP_SELL)
      {
       //If limits sets needed type
@@ -505,7 +538,9 @@ int RCat::OpenMarketOrder(const double &Vol,const uchar &BuyOrSell,const double 
 //|  Send Order                                                      |
 //+------------------------------------------------------------------+
    int res=OrderSend(z_mt_req,z_mt_rez);
-
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
    if(res)
      {
       ret=(int)z_mt_rez.retcode;
@@ -518,6 +553,9 @@ int RCat::OpenMarketOrder(const double &Vol,const uchar &BuyOrSell,const double 
          if(BuyOrSell==OP_SELL) m_sellpos_count++;
         }
      } // END of ORDER SENDED
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
    else
      {//If Order Error
       Print("res="+IntegerToString(res)+" ret:"+IntegerToString(ret)+" LastErr: "+IntegerToString(GetLastError())+z_mt_rez.comment);
@@ -537,6 +575,9 @@ bool RCat::CloseAllPositions(const string CustomComment)
    if(pos_total<1){return(false);}
 
    for(int i=0;i<pos_total;i++)
+      //+------------------------------------------------------------------+
+      //|                                                                  |
+      //+------------------------------------------------------------------+
      {
       string pair=PositionGetSymbol(i);
       if(pair=="")
@@ -577,7 +618,6 @@ bool RCat::AutoCompounding(const ENUM_AutoLot &Enum_AutoLot)
 
 //Get Maximum Availables Volume on broker
    double max_broker_vol=SymbolInfoDouble(m_pair,SYMBOL_VOLUME_MAX);
-
 //Check if first run : Calculate fixed lot koef
    if(m_start_vol_koef==0 || m_max_vol_koef==0)
      {
@@ -595,7 +635,6 @@ bool RCat::AutoCompounding(const ENUM_AutoLot &Enum_AutoLot)
 //Calculate lot
    double current_start_vol_koef=0;
    double current_max_vol_koef=0;
-
 //Select Calculation mode Dynamic or MaximalOnly
    switch(Enum_AutoLot)
      {
@@ -683,7 +722,6 @@ bool RCat::m_AddVolume(void)
 
 //Pair point
    double point_size=SymbolInfoDouble(m_pair,SYMBOL_POINT);
-
 //Add Volume BUY
    if(pos_type==POSITION_TYPE_BUY && m_TR_RES==BUY1)
      {
@@ -696,7 +734,6 @@ bool RCat::m_AddVolume(void)
                       TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
       return(true);
      }//END OF ADD VOL BUY
-
 //Add Volume SELL
    if((pos_type==POSITION_TYPE_SELL) && (m_TR_RES==SELL1))
      {
@@ -713,11 +750,48 @@ bool RCat::m_AddVolume(void)
    return(false);
   }//END of AddVolume
 //+------------------------------------------------------------------+
-//| AutoCompounding                                                  |
+//| Calculate WF,Pom,Signal,DC for real time trading                 |
 //+------------------------------------------------------------------+
+bool RCat::CalculateRTFeed(void)
+  {
+//Calculate WhoFirst
+   m_WhoFirst();
+
+//Calculate POM & Signal
+//Calculate DC
+
+//If ok
+   return(true);
+  }//END OF RT Feed
 //+------------------------------------------------------------------+
-//| AutoCompounding                                                  |
+//| Trade WO Ind                                                     |
 //+------------------------------------------------------------------+
+bool RCat::Trade(const double &Sl,const double &Tp,const double &StartVol,const double &MaxVol,const ENUM_AutoLot &AutoLot)
+  {
+
+//If Ok
+   return(true);
+  }//END of Trade WO Indicator
 //+------------------------------------------------------------------+
-//| AutoCompounding                                                  |
+//| Who will be first High or low ? 0,1,2 |No,Low,High               |
 //+------------------------------------------------------------------+
+bool RCat::m_WhoFirst(void)
+  {
+//Get Last Highs
+   if(CopyHigh(m_pair,0,0,m_bottle_size,m_Highs)<=0) return(false);
+
+//Get Last Lows
+   if(CopyLow(m_pair,0,0,m_bottle_size,m_Lows)<=0) return(false);
+
+//If two maximum then get maximum near now()
+   uint index_L=ArrayMinimum(m_Lows,0,m_bottle_size);
+   uint index_H=ArrayMaximum(m_Highs,0,m_bottle_size);
+
+//Private case H==L
+//Private case, when many H or L, and don`t know who >
+   if(index_H>index_L) { m_first = HighFirst; return(true);}
+   if(index_H<index_L) { m_first =  LowFirst;  return(true);}
+   if(index_H==index_L){ m_first= EqualFirst;  return(true);}
+
+   return(true);
+  }//End of Who First

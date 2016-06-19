@@ -108,7 +108,7 @@ public:
    //Is Emulation Initialised ?
    bool              _isInitialised() const       {return(m_initialised_emul);}
 
-   //Real Trade                   
+   //Emulation Init                   
    bool              _Init(const string pair,const string path_to_ind,const uchar bottlesize,
                            const datetime from_date,const datetime to_date,const bool debug);
 
