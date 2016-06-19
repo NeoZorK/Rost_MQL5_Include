@@ -37,6 +37,7 @@ private:
    double            m_Highs[];
    double            m_Lows[];
    double            m_Closes[];
+   long              m_TickVols[];
    double            m_first;
    double            m_pom;
    double            m_dc;
@@ -139,10 +140,12 @@ RCat::RCat(const string Pair,const double &Pom_Koef,const double &PomBuy,const d
    ArraySetAsSeries(m_Highs,true);
    ArraySetAsSeries(m_Lows,true);
    ArraySetAsSeries(m_Closes,true);
+   ArraySetAsSeries(m_TickVols,true);
    ArrayResize(m_Opens,m_bottle_size);
    ArrayResize(m_Highs,m_bottle_size);
    ArrayResize(m_Lows,m_bottle_size);
    ArrayResize(m_Closes,m_bottle_size);
+   ArrayResize(m_TickVols,m_bottle_size);
   }//END OF Constructor
 //+------------------------------------------------------------------+
 //| Destructor                                                       |
@@ -761,12 +764,22 @@ bool RCat::m_AddVolume(void)
 bool RCat::CalculateRTFeed(void)
   {
 //Calculate WhoFirst
-   m_WhoFirst();
+   if(!m_WhoFirst())
+     {
+      return(false);
+     }
 
 //Calculate POM & Signal
-   m_PomSignal();
+   if(!m_PomSignal())
+     {
+      return(false);
+     }
 
 //Calculate DC
+   if(!m_DC())
+     {
+      return(false);
+     }
 
 //If ok
    return(true);
@@ -946,3 +959,51 @@ bool RCat::m_PomSignal(void)
    m_signal=NOSIGNAL;
    return(false);
   }//END OF CALC POM
+//+------------------------------------------------------------------+
+//| Calculate DeltaC                                                 |
+//+------------------------------------------------------------------+
+bool RCat::m_DC(void)
+  {
+//Get Last Highs
+   if(CopyHigh(m_pair,0,0,m_bottle_size,m_Highs)<=0)
+     {
+      m_dc=0;
+      return(false);
+     }
+
+//Get Last Lows
+   if(CopyLow(m_pair,0,0,m_bottle_size,m_Lows)<=0)
+     {
+      m_dc=0;
+      return(false);
+     }
+
+//Get Last Closes
+   if(CopyClose(m_pair,0,0,m_bottle_size,m_Closes)<=0)
+     {
+      m_dc=0;
+      return(false);
+     }
+
+//Get Last Tick Volumes     
+   if(CopyTickVolume(m_pair,0,0,m_bottle_size,m_TickVols)<=0)
+     {
+      m_dc=0;
+      return(false);
+     }
+
+   double t2=(m_TickVols[2]-m_TickVols[1])*(m_Highs[2]-m_Lows[2]);
+
+//div 0 exception
+   if(t2==0)
+     {
+      m_dc=0;
+      return(true);
+     }
+
+   double t4=(m_Closes[1]-m_Closes[2])/t2;
+
+   m_dc=NormalizeDouble((m_TickVols[1]-m_TickVols[0])*t4*(m_Highs[0]-m_Lows[0]),5);
+
+   return(true);
+  }//END OF CALC_DC
