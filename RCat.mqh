@@ -33,9 +33,11 @@ private:
    //Current Ck Prediction
    char              m_current_ck;
    //---Latest Feed Values
-   double            m_first;
+   double            m_Opens[];
    double            m_Highs[];
    double            m_Lows[];
+   double            m_Closes[];
+   double            m_first;
    double            m_pom;
    double            m_dc;
    double            m_signal;
@@ -133,10 +135,14 @@ RCat::RCat(const string Pair,const double &Pom_Koef,const double &PomBuy,const d
    m_start_vol_koef=0;
    m_max_vol_koef=0;
    m_bottle_size=BottleSize;
+   ArraySetAsSeries(m_Opens,true);
    ArraySetAsSeries(m_Highs,true);
    ArraySetAsSeries(m_Lows,true);
+   ArraySetAsSeries(m_Closes,true);
+   ArrayResize(m_Opens,m_bottle_size);
    ArrayResize(m_Highs,m_bottle_size);
    ArrayResize(m_Lows,m_bottle_size);
+   ArrayResize(m_Closes,m_bottle_size);
   }//END OF Constructor
 //+------------------------------------------------------------------+
 //| Destructor                                                       |
@@ -758,6 +764,8 @@ bool RCat::CalculateRTFeed(void)
    m_WhoFirst();
 
 //Calculate POM & Signal
+   m_PomSignal();
+
 //Calculate DC
 
 //If ok
@@ -778,10 +786,10 @@ bool RCat::Trade(const double &Sl,const double &Tp,const double &StartVol,const 
 bool RCat::m_WhoFirst(void)
   {
 //Get Last Highs
-   if(CopyHigh(m_pair,0,0,m_bottle_size,m_Highs)<=0) return(false);
+   if(CopyHigh(m_pair,0,0,m_bottle_size,m_Highs)<=0) {m_first=EqualFirst; return(false);}
 
 //Get Last Lows
-   if(CopyLow(m_pair,0,0,m_bottle_size,m_Lows)<=0) return(false);
+   if(CopyLow(m_pair,0,0,m_bottle_size,m_Lows)<=0) {m_first=EqualFirst; return(false);}
 
 //If two maximum then get maximum near now()
    uint index_L=ArrayMinimum(m_Lows,0,m_bottle_size);
@@ -795,3 +803,146 @@ bool RCat::m_WhoFirst(void)
 
    return(true);
   }//End of Who First
+//+------------------------------------------------------------------+
+//|Calculate POM                                                     |
+//+------------------------------------------------------------------+
+bool RCat::m_PomSignal(void)
+  {
+//Get Last Opens
+   if(CopyOpen(m_pair,0,0,m_bottle_size,m_Opens)<=0)
+     {
+      m_pom=0;
+      m_signal=NOSIGNAL;
+      return(false);
+     }
+
+//Get Last Highs
+   if(CopyHigh(m_pair,0,0,m_bottle_size,m_Highs)<=0)
+     {
+      m_pom=0;
+      m_signal=NOSIGNAL;
+      return(false);
+     }
+
+//Get Last Lows
+   if(CopyLow(m_pair,0,0,m_bottle_size,m_Lows)<=0)
+     {
+      m_pom=0;
+      m_signal=NOSIGNAL;
+      return(false);
+     }
+
+//Get Last Closes
+   if(CopyClose(m_pair,0,0,m_bottle_size,m_Closes)<=0)
+     {
+      m_pom=0;
+      m_signal=NOSIGNAL;
+      return(false);
+     }
+
+   double a=0;
+   double b=0;
+   double c=0;
+   uchar m=0;
+   uchar n=0;
+
+//Private cases:
+   if(m_first<LowFirst || m_first>HighFirst || m_first==EqualFirst)
+     {
+      m_pom=0;
+      m_signal=NOSIGNAL;
+      return(false);
+     }
+
+//Calc abc for HIGH first
+   if(m_first==HighFirst)
+     {
+      a=m_Highs[0]-m_Opens[0];// +
+      b=m_Lows[0]-m_Highs[0]; // -
+      c=m_Closes[0]-m_Lows[0];// +
+     }
+   else//Calc abc for LOW first         
+   if(m_first==LowFirst)
+     {
+      a=m_Lows[0]-m_Opens[0];// -
+      b=m_Highs[0]-m_Lows[0];// +
+      c=m_Closes[0]-m_Highs[0];// -
+     }
+
+// Jumps +/-
+   if(a>0) m++; else if(a<0) n++;
+   if(b>0) m++; else if(b<0) n++;
+   if(c>0) m++; else if(c<0) n++;
+
+//3 Limitations:
+//1
+   if(m*n<1 || m*n>2)
+     {
+      m_pom=0;
+      m_signal=NOSIGNAL;
+      return(false);
+     }
+//2     
+   if(m*n==1 && m_Highs[0]==m_Closes[0])
+     {
+      m_pom=0;
+      m_signal=NOSIGNAL;
+      return(false);
+     }
+//3     
+   if((m*n==2) && (m_Highs[0]-m_Closes[0]+m_Opens[0]-m_Lows[0]==0))
+     {
+      m_pom=0;
+      m_signal=NOSIGNAL;
+      return(false);
+     }
+
+//If no signal occured
+   m_signal=NOSIGNAL;
+
+//--- POM ver: 10.02.2015 
+//2:1
+   if(m==2 && n==1)
+     {
+      //IF A+ >1 then UP Trend  
+      double ga=((a+c)/2)/MathAbs(b);
+
+      //(case 4)  
+      if(MathAbs(b)>((a+c)/2))
+        {
+         m_signal=SELL1;
+         m_pom=1-(1/(1+ga));
+         return(true);
+        }
+      else
+        {
+         m_pom=1-(1/(1+ga));
+         return(true);
+        }
+     }//end of 2:1
+
+//1:2  
+   if(m==1 && n==2)
+     {
+      //IF A- <1 then DOWN Trend
+      double ga=b/(MathAbs(a+c)/2);
+
+      //(case 1)  
+      if(b>(MathAbs(a+c)/2))
+        {
+         m_signal=BUY1;
+         m_pom=1-(1/(1+ga));
+         return(true);
+        }
+      else
+        {
+         m_pom=1-(1/(1+ga));
+         return(true);
+        }
+     }//end of 1:2
+
+//If no POM, private case or unknown error
+   m_pom=0;
+   m_signal=NOSIGNAL;
+   return(false);
+  }//END OF CALC POM
