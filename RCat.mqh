@@ -248,16 +248,14 @@ bool RCat::TradeInd(const double &First,const double &Pom,const double &Dc,const
 int RCat::m_OpenRule(const ENUM_RT_OpenRule &OpenRule)
   {
    int TR_RES=-1;
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
+
+//If no Rule
    if(OpenRule<0)
      {
       return(-2);
      }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
+
+//Check OpenRule
    switch(OpenRule)
      {
       case  0:TR_RES=m_POMI();
@@ -274,16 +272,14 @@ int RCat::m_OpenRule(const ENUM_RT_OpenRule &OpenRule)
 int RCat::m_CloseRule(const ENUM_RT_CloseRule &CloseRule)
   {
    int TR_RES=-1;
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
+
+//If no Close Rule
    if(CloseRule<0)
      {
       return(-2);
      }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
+
+//Check CloseRule
    switch(CloseRule)
      {
       case  0:TR_RES=m_AutoCloseDcSpread();
@@ -301,16 +297,14 @@ int RCat::m_CloseRule(const ENUM_RT_CloseRule &CloseRule)
 int RCat::m_POMI()
   {
    int res=-1;
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
+
+//If no signal
    if(m_signal==0)
      {
       return(-2);
      }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
+
+//if no who first
    if(m_first==0)
      {
       return(-2);
@@ -785,15 +779,6 @@ bool RCat::CalculateRTFeed(void)
    return(true);
   }//END OF RT Feed
 //+------------------------------------------------------------------+
-//| Trade WO Ind                                                     |
-//+------------------------------------------------------------------+
-bool RCat::Trade(const double &Sl,const double &Tp,const double &StartVol,const double &MaxVol,const ENUM_AutoLot &AutoLot)
-  {
-
-//If Ok
-   return(true);
-  }//END of Trade WO Indicator
-//+------------------------------------------------------------------+
 //| Who will be first High or low ? 0,1,2 |No,Low,High               |
 //+------------------------------------------------------------------+
 bool RCat::m_WhoFirst(void)
@@ -1007,3 +992,70 @@ bool RCat::m_DC(void)
 
    return(true);
   }//END OF CALC_DC
+//+------------------------------------------------------------------+
+//| Trade Without indicator                                          |
+//+------------------------------------------------------------------+
+bool RCat::Trade(const double &Sl,const double &Tp,const double &StartVol,const double &MaxVol,
+                 const ENUM_AutoLot &AutoLot)
+  {
+   m_stoploss=Sl;
+   m_takeprofit=Tp;
+   m_start_volume=StartVol;
+   m_max_volume=MaxVol;
+//Compounding   
+//Check if enabled
+   if(AutoLot!=Disabled)
+     {
+      bool compound_result=AutoCompounding(AutoLot);
+      //if true - lots changed, false - not changed
+     }//End of Compounding
+
+///---MAIN CALCULATION---///
+   m_TR_RES=-1;
+
+// OpenRule
+   m_TR_RES=m_OpenRule(m_current_open_rule);
+
+// CloseRule -> if close, exit
+   if(m_CloseRule(m_current_close_rule)) return(true);
+
+// Check Spread
+   if(m_max_spread <(int)SymbolInfoInteger(m_pair,SYMBOL_SPREAD)) return(false);
+
+// NoSignal, Err -> Exit
+   if(m_TR_RES <0) return(false);
+
+//QuantMode here?
+
+//  If any Open Position?
+   bool Opened_Position=PositionSelect(m_pair);
+//-----NEW POSITION-----//
+   if(!Opened_Position)
+     {
+      switch(m_TR_RES)
+        {
+         //BUY
+         case  1005: OpenMarketOrder(m_start_volume,OP_BUY,m_stoploss,m_takeprofit,MAGIC_IB,
+                                     DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
+                                     TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
+            return(true); break;
+
+            //SELL
+         case  2006: OpenMarketOrder(m_start_volume,OP_SELL,m_stoploss,m_takeprofit,MAGIC_IS,
+                                     DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
+                                     TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
+            return(true); break;
+
+         default:
+            break;
+        }//END OF SWITCH
+     }//END OF NEW POSITION
+//-----ADD VOLUME-----//    
+   if(Opened_Position)
+     {
+      if(!m_AddVolume()) return(false);
+     }//END OF ADD VOLUME
+
+//If No Opened Position then false
+   return(false);
+  }//END OF TRADE WITHOUT INDiCATOR
