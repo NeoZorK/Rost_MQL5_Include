@@ -908,7 +908,7 @@ bool RCat::m_PomSignal(void)
       //(case 4)  
       if(MathAbs(b)>((a+c)/2))
         {
-         m_signal=SELL1;
+         m_signal=Ind_Sell;
          m_pom=1-(1/(1+ga));
          return(true);
         }
@@ -928,7 +928,7 @@ bool RCat::m_PomSignal(void)
       //(case 1)  
       if(b>(MathAbs(a+c)/2))
         {
-         m_signal=BUY1;
+         m_signal=Ind_Buy;
          m_pom=1-(1/(1+ga));
          return(true);
         }
