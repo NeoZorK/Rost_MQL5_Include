@@ -5,7 +5,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, Shcherbyna Rostyslav"
 #property link      ""
-#property version   "1.41"
+#property version   "1.6"
 
 #include <Tools\DateTime.mqh>
 
@@ -14,6 +14,8 @@ Include all structures and global constants
 */
 /*
 +++++CHANGE LOG+++++
+1.6  20.06.2016--Add Custom Feed WO Indicator to Emulation and Trading
+1.5  30.05.2016--Clear Old Code , better perfomance (33 sec from 2010 to 2016.04 Daily)
 1.41 28.05.2016--Minor version with ability to Export OHLC to CSV & BIN
 1.4 20.05.2016--Stable with AutoCompounding
 1.3 19.05.2016--Stable, without Copy Arrays

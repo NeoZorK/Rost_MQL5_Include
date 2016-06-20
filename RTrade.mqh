@@ -14,6 +14,8 @@
 //+------------------------------------------------------------------+
 /*
 +++++CHANGE LOG+++++
+1.6  20.06.2016--Add Custom Feed WO Indicator to Emulation and Trading
+1.5  30.05.2016--Clear Old Code , better perfomance (33 sec from 2010 to 2016.04 Daily)
 1.41 28.05.2016--Minor version with ability to Export OHLC to CSV & BIN
 1.4 20.05.2016--Stable with AutoCompounding
 1.3 19.05.2016--Stable, without Copy Arrays
@@ -81,7 +83,6 @@ private:
                                                      const int OHLC);
    //TR Caterpillar WO Indicator Close Only
    int               m_EMUL_TR_Caterpillar_CLOSE_Feed(const char Case,const int IterationNum,const STRUCT_FEED_CLOSE &FeedCLOSE[]);
-                                                     
 
    bool              m_EMUL_CloseRule(const ENUM_EMUL_CloseRule CloseRuleNum,const double CurrentProfit,const double CurrentDC,
                                       const uint CurrentSpread);
@@ -1389,10 +1390,9 @@ int RTrade::m_EMUL_TR_Caterpillar_CLOSE_Feed(const char Case,const int Iteration
    double pom=0;
    double whofirst=0;
 
-         signal=FeedCLOSE[i].Close_signal;
-         pom=FeedCLOSE[i].Close_pom;
-         whofirst=FeedCLOSE[i].Close_WhoFirst;
-  
+   signal=FeedCLOSE[i].Close_signal;
+   pom=FeedCLOSE[i].Close_pom;
+   whofirst=FeedCLOSE[i].Close_WhoFirst;
 
 //Check if Signal==0 then exit
    if(signal==0) return(-2);
