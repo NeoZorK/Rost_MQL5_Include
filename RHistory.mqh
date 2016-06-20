@@ -5,7 +5,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, Shcherbyna Rostyslav"
 #property link      ""
-#property version   "1.41"
+#property version   "1.6"
 
 #include <Tools\DateTime.mqh>
 #include <RInclude\RStructs.mqh>
@@ -22,6 +22,8 @@ Can determine last & first day minute, last week minute, last month minute, last
 */
 /*
 +++++CHANGE LOG+++++
+1.6  20.06.2016--Add Custom Feed WO Indicator to Emulation and Trading
+1.5  30.05.2016--Clear Old Code , better perfomance (33 sec from 2010 to 2016.04 Daily)
 1.41 28.05.2016--Minor version with ability to Export OHLC to CSV & BIN
 1.4 20.05.2016--Stable with AutoCompounding
 1.3 19.05.2016--Stable, without Copy Arrays
@@ -79,6 +81,17 @@ private:
    void              _ClearArrays();            //Clear internal arrays
    bool              _CheckMRS();               //Check Minutes Spreads Rates arrays by dates(First & Last)+Counts
    bool              _ConnectIndicator();       //Connect indicator POM3
+                                                //
+   //Calculate WhoFirst
+   char              m_WhoFirst_OHLC(const MqlRates &Rates[],const int &Start,const double &Open,const double &High,
+                                     const double &Low,const double &Close);
+
+   //Calculates POM & Signal in primings
+   double            m_POM_Signal_OHLC(const double &Open,const double &High,const double &Low,const double &Close,
+                                       const char &WhoFirst,char &POM_SIGNAL);
+   //Calculates DC in primings
+   double            m_DC_OHLC(const int OHLC,const MqlRates &Rates[],const int &Start,const double &Open,
+                               const double &High,const double &Low,const double &Close,const STRUCT_TICKVOL_OHLC &TickVol[]);
 
 public:
                      RHistory(const string pair,const string path_to_ind,const uchar bottlesize);
@@ -159,8 +172,20 @@ public:
    //Export Rates structure to CSV file
    bool              _ExportRatesToCSV(const bool ReverseWrite);
 
-   //Export Feed  to CSV file (date,ohlc,spread,tickvol,WF,POM,DC,SIGNAL)
-   bool              _ExportFeedToCSV(const bool ReverseWrite,const STRUCT_Priming &Priming,const bool Priming1);
+   //Export Indicator Feed  to CSV file (date,ohlc,spread,tickvol,WF,POM,DC,SIGNAL)
+   bool              _ExportIndicatorFeedToCSV(const bool ReverseWrite,const STRUCT_Priming &Priming,const bool Priming1);
+
+   //Export OHLC Feed to CSV file (date,ohlc,spread,tickvol,WF,POM,DC,SIGNAL)
+   bool              _ExportOHLCFeedToCSV(const bool ReverseWrite,const MqlRates &Rates[],const STRUCT_FEED_OHLC &Feed[],
+                                          const bool Priming1);
+
+   //Export Close Feed to CSV file (date,ohlc,spread,tickvol,WF,POM,DC,SIGNAL)
+   bool              _ExportCloseFeedToCSV(const bool ReverseWrite,const MqlRates &Rates[],const STRUCT_FEED_CLOSE &Feed[],
+                                           const bool Priming1);
+
+   //Export OHLC TickVolume Distribution Feed to CSV file (date,OHLC,tickvol)
+   bool              _ExportOHLCTickVolFeedToCSV(const bool ReverseWrite,const STRUCT_TICKVOL_OHLC &Feed[],
+                                                 const bool Priming1);
 
    //Export Rates to binary file
    bool              _ExportRatesToBIN(const bool ReverseWrite);
@@ -179,6 +204,18 @@ public:
 
    //Version with struct only
    bool              _FormPrimingData(const bool Priming1,const TIMEMARKS &TimeMarks,STRUCT_Priming &Priming);
+
+   //Version WO Indicator (returns copyed count)
+   int               _FillPriming(const bool Priming1,const TIMEMARKS &TimeMarks,MqlRates &Priming[]);
+
+   //Calculates each OHLC price tick_volume from Compounding TickVolume
+   bool              _CalculateTickVolume(const MqlRates &Rates[],STRUCT_TICKVOL_OHLC &TickVol[]);
+
+   //Calculate OHLC Feed (4 prices in one minute)
+   bool              _Calculate_OHLC_Feed(const MqlRates &Rates[],STRUCT_FEED_OHLC &Feed[],const STRUCT_TICKVOL_OHLC &TickVol[]);
+
+   //Calculate Feed for Only Close prices
+   bool              _Calculate_CLOSE_Feed(const MqlRates &Rates[],STRUCT_FEED_CLOSE &Feed[],const STRUCT_TICKVOL_OHLC &TickVol[]);
   };
 //+------------------------------------------------------------------+
 //| Constructor                                                      |
@@ -1959,7 +1996,7 @@ bool RHistory::_FormPrimingData(const bool Priming1,const TIMEMARKS &TimeMarks,S
      }
 
 //Debug
-   _ExportFeedToCSV(true,Priming,Priming1);
+//  _ExportFeedToCSV(true,Priming,Priming1);
 
 //Check if arrays have identical elements count
    if(((copyed_rates+copyed_singal_c+copyed_spread+copyed_pom_c+copyed_first_c+copyed_dc_c)/6)!=copyed_rates)
@@ -1972,6 +2009,52 @@ bool RHistory::_FormPrimingData(const bool Priming1,const TIMEMARKS &TimeMarks,S
 //If Ok
    return(true);
   }//END of FormPrimingData (structure)  
+//+------------------------------------------------------------------+
+//| Fill Priming data wo Indicator                                   |
+//+------------------------------------------------------------------+ 
+int RHistory::_FillPriming(const bool Priming1,const TIMEMARKS &TimeMarks,MqlRates &Priming[])
+  {
+//Priming 1 =True , do with p1, else with p2
+
+   datetime Priming_Start=0;
+   datetime Priming_Stop=0;
+
+//If bars not calculated in indicator, then exit
+   int bars_calc=BarsCalculated(m_handle_ind_POM);
+
+   if(bars_calc<0)
+     {
+      //  Print("Waiting for POM calculations...");
+      return(-1);
+     }
+
+//Check Priming1 or Priming2
+   if(Priming1)
+     {
+      Priming_Start=TimeMarks.P1_Start;
+      Priming_Stop=TimeMarks.P1_Stop;
+     }
+   else //Priming2
+     {
+      Priming_Start=TimeMarks.P2_Start;
+      Priming_Stop=TimeMarks.P2_Stop;
+     }
+
+//Rates
+   int copyed_rates=CopyRates(m_pair,0,Priming_Start,Priming_Stop,Priming);
+   if(copyed_rates<0)
+     {
+      m_result=-24;
+      return(false);
+     }
+   else
+     {//if ok!
+      return(copyed_rates);
+     }
+
+//Debug
+//  _ExportFeedToCSV(true,Priming,Priming1);
+  }//END of FillPriming (wo indicator)    
 //+------------------------------------------------------------------+
 //| Export Rates to CSV                                              |
 //+------------------------------------------------------------------+ 
@@ -2113,9 +2196,9 @@ bool RHistory::_ExportRatesToBIN(const bool ReverseWrite)
    return(true);
   }//END of ExportRates to BIN
 //+------------------------------------------------------------------+
-//| Export Feed to CSV (date,ohlc,spread,tickvol,WF,POM,DC,SIGNAL)   |
+//| Export Indicator Feed to CSV (date,ohlc,spread,tickvol,WF,POM,DC,SIGNAL)|
 //+------------------------------------------------------------------+ 
-bool RHistory::_ExportFeedToCSV(const bool ReverseWrite,const STRUCT_Priming &Priming,const bool Priming1)
+bool RHistory::_ExportIndicatorFeedToCSV(const bool ReverseWrite,const STRUCT_Priming &Priming,const bool Priming1)
   {
 //Check if Rates already loaded to memory
    if(!m_processed)
@@ -2128,7 +2211,7 @@ bool RHistory::_ExportFeedToCSV(const bool ReverseWrite,const STRUCT_Priming &Pr
    string Server=AccountInfoString(ACCOUNT_SERVER);
 
 //Path for Export (0=Priming1 or 1=Priming2)ServerRatesEURUSD2010.01.01_2016.04.01
-   string path=(string)(int)Priming1+Server+"Feed"+m_pair+TimeToString(m_from_date,TIME_DATE)+
+   string path=(string)(int)Priming1+Server+"IndFeed"+m_pair+TimeToString(m_from_date,TIME_DATE)+
                "_"+TimeToString(m_to_date,TIME_DATE)+".csv";
 
 //If BD not NULL
@@ -2226,6 +2309,720 @@ bool RHistory::_ExportFeedToCSV(const bool ReverseWrite,const STRUCT_Priming &Pr
    FileClose(file_h1);
 
 //If ok    
-   Alert("Ok, File Created in COMMON folder: "+path);
+   Alert("Ok, IndFeed Created in COMMON folder: "+path);
    return(true);
-  }//END of ExportFeed to CSV
+  }//END of Export Indicator Feed to CSV
+//+------------------------------------------------------------------+
+// Calculate TICK_VOLUME inside OHLC 1 minute                        |
+//+------------------------------------------------------------------+ 
+bool RHistory::_CalculateTickVolume(const MqlRates &Rates[],STRUCT_TICKVOL_OHLC &TickVol[])
+  {
+//Get Size of Array
+   int ArrSize=ArraySize(Rates);
+
+//Resize TickVol Array
+   ArrayResize(TickVol,ArrSize);
+
+//O+H+L+C=0 Counter
+   uint zero_ohlc_sum=0;
+
+//Temp Calculations
+   double o=0,h=0,l=0,c=0,sum=0,om=0,hm=0,lm=0,cm=0;
+
+//Fill 0 - item with =0
+   TickVol[ArrSize-1].Open_TickVol=0;
+   TickVol[ArrSize-1].High_TickVol=0;
+   TickVol[ArrSize-1].Low_TickVol=0;
+   TickVol[ArrSize-1].Close_TickVol=0;
+   TickVol[ArrSize-1].Time=Rates[ArrSize-1].time;
+
+//MAIN CIRCLE (-1 for first previous Close calculation & -1 for 0-element)
+   for(int i=ArrSize-2;i>-1;i--)
+     {
+      o=MathAbs(Rates[i].open-Rates[i+1].close);
+      h=MathAbs(Rates[i].high-Rates[i].open);
+      l=MathAbs(Rates[i].low-Rates[i].high);
+      c=MathAbs(Rates[i].close-Rates[i].low);
+
+      //Sum
+      sum=o+h+l+c;
+
+      //Exception if SUM[4]=0
+      if(sum==0)
+        {
+         //res = 0
+         TickVol[i].Open_TickVol=0;
+         TickVol[i].High_TickVol=0;
+         TickVol[i].Low_TickVol=0;
+         TickVol[i].Close_TickVol=0;
+         TickVol[i].Time=Rates[i].time;
+
+         //         Print(__FUNCTION__+" Sum of O,H,L,C==0!");
+
+         //Inc Counter
+         zero_ohlc_sum++;
+         continue;
+        }//End of sum
+
+      //Multyplication
+      om=Rates[i].tick_volume*o;
+      hm=Rates[i].tick_volume*h;
+      lm=Rates[i].tick_volume*l;
+      cm=Rates[i].tick_volume*c;
+
+      //Division
+      TickVol[i].Open_TickVol=om/sum;
+      TickVol[i].High_TickVol=hm/sum;
+      TickVol[i].Low_TickVol=lm/sum;
+      TickVol[i].Close_TickVol=cm/sum;
+
+      //Fill Time
+      TickVol[i].Time=Rates[i].time;
+     }//END OF FOR
+
+//If ok return true
+   return(true);
+  }  //END of Calc TickVol
+//+------------------------------------------------------------------+
+//| Calculate OHLC FEED                                              |
+//+------------------------------------------------------------------+
+bool RHistory::_Calculate_OHLC_Feed(const MqlRates &Rates[],STRUCT_FEED_OHLC &Feed[],const STRUCT_TICKVOL_OHLC &TickVol[])
+  {
+//Get Size of ArrayOHLC
+   int ArrSize=ArraySize(Rates);
+
+//Resize Feed Array ONCE
+   ArrayResize(Feed,ArrSize);
+
+//Calculate Start position
+   int StartZero=ArrSize-1-m_bottle_size;
+
+//Fill first bottle_size=5 params by zero
+   for(int i=ArrSize-1;i>StartZero;i--)
+     {
+      Feed[i].Open_WhoFirst=0;
+      Feed[i].High_WhoFirst=0;
+      Feed[i].Low_WhoFirst=0;
+      Feed[i].Close_WhoFirst=0;
+      Feed[i].Open_pom=0;
+      Feed[i].High_pom=0;
+      Feed[i].Low_pom=0;
+      Feed[i].Close_pom=0;
+      Feed[i].Open_signal=0;
+      Feed[i].High_signal=0;
+      Feed[i].Low_signal=0;
+      Feed[i].Close_signal=0;
+      Feed[i].Open_dc=0;
+      Feed[i].High_dc=0;
+      Feed[i].Low_dc=0;
+      Feed[i].Close_dc=0;
+     }//END of Fill Zero
+
+//Current OHLC template (changed in each O,H,L,C)
+   double open=0;
+   double high=0;
+   double low=0;
+   double close=0;
+
+//Main Circle
+   for(int i=StartZero;i>-1;i--)
+     {
+
+      //OHLC CIRCLE
+      for(int OHLC=0;OHLC<4;OHLC++)
+        {
+         switch(OHLC)
+           {
+            case  0: //Open
+               open=Rates[i].open;
+               high=open;
+               low=open;
+               close=open;
+
+               //WhoFirst:
+               Feed[i].Open_WhoFirst=m_WhoFirst_OHLC(Rates,i,open,high,low,close);
+
+               //POM+Signal
+               Feed[i].Open_pom=m_POM_Signal_OHLC(open,high,low,close,Feed[i].Open_WhoFirst,Feed[i].Open_signal);
+
+               //DC 
+               Feed[i].Open_dc=m_DC_OHLC(OHLC,Rates,i,open,high,low,close,TickVol);
+
+               break;
+
+            case  1: //High
+               open=Rates[i].open;
+               high=Rates[i].high;
+               low=open;
+               close=high;
+
+               //WhoFirst:
+               Feed[i].High_WhoFirst=m_WhoFirst_OHLC(Rates,i,open,high,low,close);
+
+               //POM+Signal
+               Feed[i].High_pom=m_POM_Signal_OHLC(open,high,low,close,Feed[i].High_WhoFirst,Feed[i].High_signal);
+
+               //DC 
+               Feed[i].High_dc=m_DC_OHLC(OHLC,Rates,i,open,high,low,close,TickVol);
+
+               break;
+
+            case  2: //Low
+               open=Rates[i].open;
+               high=Rates[i].high;
+               low=Rates[i].low;
+               close=low;
+
+               //WhoFirst:
+               Feed[i].Low_WhoFirst=m_WhoFirst_OHLC(Rates,i,open,high,low,close);
+
+               //POM+Signal
+               Feed[i].Low_pom=m_POM_Signal_OHLC(open,high,low,close,Feed[i].Low_WhoFirst,Feed[i].Low_signal);
+
+               //DC 
+               Feed[i].Low_dc=m_DC_OHLC(OHLC,Rates,i,open,high,low,close,TickVol);
+               break;
+
+            case  3: //Close
+               open=Rates[i].open;
+               high=Rates[i].high;
+               low=Rates[i].low;
+               close=Rates[i].low;
+
+               //WhoFirst:
+               Feed[i].Close_WhoFirst=m_WhoFirst_OHLC(Rates,i,open,high,low,close);
+
+               //POM+Signal
+               Feed[i].Close_pom=m_POM_Signal_OHLC(open,high,low,close,Feed[i].Close_WhoFirst,Feed[i].Close_signal);
+
+               //DC 
+               Feed[i].Close_dc=m_DC_OHLC(OHLC,Rates,i,open,high,low,close,TickVol);
+               break;
+
+            default:
+               break;
+           }//END OF SWITCH
+        }//END OF OHLC CIRCLE
+
+     }//END of MAIN CIRCLE
+
+//If Ok
+   return(true);
+  }//END of CALC OHLC FEED
+//+------------------------------------------------------------------+
+//| Calculate PomSignal by Last one minute for OHLC                  |
+//+------------------------------------------------------------------+
+double RHistory::m_POM_Signal_OHLC(const double &Open,const double &High,const double &Low,const double &Close,
+                                   const char &WhoFirst,char &POM_SIGNAL)
+  {
+   double a=0;
+   double b=0;
+   double c=0;
+   uchar m=0;
+   uchar n=0;
+
+//Private cases:
+   if(WhoFirst<LowFirst || WhoFirst>HighFirst) return(0);
+   if(WhoFirst==EqualFirst) return(0);
+
+//Calc abc for HIGH first on last bottle
+   if(WhoFirst==HighFirst)
+     {
+      a=High-Open;// +
+      b=Low-High; // -
+      c=Close-Low;// +
+     }
+   else//Calc abc for LOW first on last bottle        
+   if(WhoFirst==LowFirst)
+     {
+      a=Low-Open;// -
+      b=High-Low;// +
+      c=Close-High;// -
+     }
+
+// Jumps +/-
+   if(a>0) m++; else if(a<0) n++;
+   if(b>0) m++; else if(b<0) n++;
+   if(c>0) m++; else if(c<0) n++;
+
+//Limitations
+   if(m*n<1 || m*n>2)return(0);
+   if(m*n==1 && High==Close) return(0);
+   if((m*n==2) && (High-Close+Open-Low==0)) return(0);
+
+//Current POM Signal
+   POM_SIGNAL=NOSIGNAL;
+
+//--- POM ver: 10.02.2015 
+//2:1
+   if(m==2 && n==1)
+     {
+      //IF A+ >1 then UP Trend  
+      double ga=((a+c)/2)/MathAbs(b);
+
+      //(case 4)  
+      if(MathAbs(b)>((a+c)/2)) POM_SIGNAL=SELL;
+      return(1-(1/(1+ga)));
+     }//end of 2:1
+
+//1:2  
+   if(m==1 && n==2)
+     {
+      //IF A- <1 then DOWN Trend
+      double ga=b/(MathAbs(a+c)/2);
+
+      //(case 1)  
+      if(b>(MathAbs(a+c)/2)) POM_SIGNAL=BUY;
+      return(1-(1/(1+ga)));
+     }//end of 1:2
+
+//If no POM, private case or unknown error
+   return(0);
+  }//END of PomSignal for OHLC
+//+------------------------------------------------------------------+
+//| Calculate DC in last 3 minute for OHLC (include current)         |
+//+------------------------------------------------------------------+
+double RHistory::m_DC_OHLC(const int OHLC,const MqlRates &Rates[],const int &Start,const double &Open,
+                           const double &High,const double &Low,const double &Close,const STRUCT_TICKVOL_OHLC &TickVol[])
+  {
+   double res=-1;
+   uint i=Start;
+
+//Arr for Calc WhoFirst
+   MqlRates arr_WF[];
+   ArraySetAsSeries(arr_WF,true);
+   ArrayResize(arr_WF,3);
+
+//Copy 3 Last minutes to find Min\Max
+   for(int j=0;j<3;j++)
+     {
+      arr_WF[j].open=Rates[i+j].open;
+      arr_WF[j].high=Rates[i+j].high;
+      arr_WF[j].low=Rates[i+j].low;
+      arr_WF[j].close=Rates[i+j].close;
+      arr_WF[j].spread=Rates[i+j].spread;
+
+      //All previous tick_volume we get from Total Sum of Tick_Volume
+      arr_WF[j].tick_volume=Rates[i+j].tick_volume;
+
+      arr_WF[j].time=Rates[i+j].time;
+     }//END of CopyArr   
+
+//Add Current O,H,L,C to last free cell 
+   arr_WF[0].open = Open;
+   arr_WF[0].high = High;
+   arr_WF[0].low=Low;
+   arr_WF[0].close=Close;
+
+//Insert Current TickVolume
+   switch(OHLC)
+     {
+      case  0://Open
+         arr_WF[0].tick_volume=(long)TickVol[i].Open_TickVol;
+         break;
+
+      case  1://High
+         arr_WF[0].tick_volume=(long)TickVol[i].High_TickVol;
+         break;
+
+      case  2://Low
+         arr_WF[0].tick_volume=(long)TickVol[i].Low_TickVol;
+         break;
+
+      case  3://Close
+         arr_WF[0].tick_volume=(long)TickVol[i].Close_TickVol;
+         break;
+
+      case  4://For Close only prices Mode (sum of 4 our voumes)
+         arr_WF[0].tick_volume=Rates[i].tick_volume;
+         break;
+      default:
+         break;
+     }
+
+   double r0=arr_WF[0].high-arr_WF[0].low;
+
+   double r2=arr_WF[2].high-arr_WF[2].low;
+
+   long t1=arr_WF[2].tick_volume-arr_WF[1].tick_volume;
+   double t2=t1*r2;
+   if(t2==0)return(res=0); //div 0 exception
+
+   double t3=arr_WF[1].close-arr_WF[2].close;
+
+   double t4=t3/t2;
+
+   long t6=arr_WF[1].tick_volume-arr_WF[0].tick_volume;
+
+   res=t6*t4*r0;
+   res= NormalizeDouble(res,5);
+
+//If Ok
+   return(res);
+  }//END of DC for OHLC
+//+------------------------------------------------------------------+
+//| WhoFirst in last bottle (5 minutes) for OHLC                     |
+//+------------------------------------------------------------------+
+char RHistory::m_WhoFirst_OHLC(const MqlRates &Rates[],const int &Start,const double &Open,const double &High,
+                               const double &Low,const double &Close)
+  {
+//Iteration num
+   int i=Start;
+
+//Default indexes High and Low
+   int HighIndex=-1;
+   int LowIndex=-1;
+
+//Default High and Low
+   double HighMax = INT_MIN;
+   double LowMin  = INT_MAX;
+
+//Arr for Calc WhoFirst
+   MqlRates arr_WF[];
+   ArraySetAsSeries(arr_WF,true);
+   ArrayResize(arr_WF,m_bottle_size);
+
+//Copy One Last Bottle to find Min\Max
+   for(int j=0;j<m_bottle_size;j++)
+     {
+      arr_WF[j].open=Rates[i+j].open;
+      arr_WF[j].high=Rates[i+j].high;
+      arr_WF[j].low=Rates[i+j].low;
+      arr_WF[j].close=Rates[i+j].close;
+      arr_WF[j].spread=Rates[i+j].spread;
+      arr_WF[j].tick_volume=Rates[i+j].tick_volume;
+      arr_WF[j].time=Rates[i+j].time;
+     }//END of CopyArr   
+
+//Add Current O,H,L,C to last free cell 
+   arr_WF[0].open = Open;
+   arr_WF[0].high = High;
+   arr_WF[0].low=Low;
+   arr_WF[0].close=Close;
+
+//Find Max & Min
+   for(int z=0;z<m_bottle_size;z++)
+     {
+      //Max
+      if(arr_WF[z].high>HighIndex)
+        {
+         HighMax=arr_WF[z].high;
+         HighIndex=z;
+        }
+      //Min
+      if(arr_WF[z].low<LowIndex)
+        {
+         LowMin=arr_WF[z].low;
+         LowIndex=z;
+        }
+     }//END of Find Max & Min
+
+//Find WhoFirst
+//Private case H==L
+//Private case, when many H or L, and don`t know who >
+   if(HighIndex>LowIndex)  return(HighFirst);
+   if(HighIndex<LowIndex)  return(LowFirst);
+   if(HighIndex==LowIndex) return(EqualFirst);
+
+//If Err
+   return(EqualFirst);
+  }//END of WhoFirst for OHLC
+//+------------------------------------------------------------------+
+//| Calculate Feed on Close prices only                              |
+//+------------------------------------------------------------------+
+bool RHistory::_Calculate_CLOSE_Feed(const MqlRates &Rates[],STRUCT_FEED_CLOSE &Feed[],const STRUCT_TICKVOL_OHLC &TickVol[])
+  {
+//Get Size of ArrayOHLC
+   int ArrSize=ArraySize(Rates);
+
+//Resize Feed Array ONCE
+   ArrayResize(Feed,ArrSize);
+
+//Calculate Start position
+   int StartZero=ArrSize-1-m_bottle_size;
+
+//Fill first bottle_size=5 params by zero
+   for(int i=ArrSize-1;i>StartZero;i--)
+     {
+      Feed[i].Close_WhoFirst=0;
+      Feed[i].Close_pom=0;
+      Feed[i].Close_signal=0;
+      Feed[i].Close_dc=0;
+     }//END of Fill Zero
+
+//Current OHLC template (changed in each O,H,L,C)
+   double open=0;
+   double high=0;
+   double low=0;
+   double close=0;
+
+//Main Circle
+   for(int i=StartZero;i>-1;i--)
+     {
+      //For close prices only
+      open=Rates[i].open;
+      high=Rates[i].high;
+      low=Rates[i].low;
+      close=Rates[i].close;
+
+      //WhoFirst:
+      Feed[i].Close_WhoFirst=m_WhoFirst_OHLC(Rates,i,open,high,low,close);
+
+      //POM+Signal
+      Feed[i].Close_pom=m_POM_Signal_OHLC(open,high,low,close,Feed[i].Close_WhoFirst,Feed[i].Close_signal);
+
+      //DC (OHLC=4 - for Close prices only Mode!)
+      Feed[i].Close_dc=m_DC_OHLC(4,Rates,i,open,high,low,close,TickVol);
+
+     }//END of MAIN CIRCLE
+//If Ok
+   return(true);
+  }//End of  CLOSE FEED
+//+------------------------------------------------------------------+
+//| Export OHLC Feed to CSV (date,ohlc,spread,tickvol,WF,POM,DC,SIGNAL)   |
+//+------------------------------------------------------------------+ 
+bool RHistory::_ExportOHLCFeedToCSV(const bool ReverseWrite,const MqlRates &Rates[],const STRUCT_FEED_OHLC &Feed[],
+                                    const bool Priming1)
+  {
+//Get Server Broker Name
+   string Server=AccountInfoString(ACCOUNT_SERVER);
+
+//Path for Export (0=Priming1 or 1=Priming2)ServerRatesEURUSD2010.01.01_2016.04.01
+   string path=(string)(int)Priming1+Server+"OHLCFeed"+m_pair+TimeToString(m_from_date,TIME_DATE)+
+               "_"+TimeToString(m_to_date,TIME_DATE)+".csv";
+
+//If exist delete
+   if(FileIsExist(path,FILE_COMMON)) FileDelete(path,FILE_COMMON);
+
+//Init file for write (csv) \r\n
+   int file_h1=FileOpen(path,FILE_READ|FILE_WRITE|FILE_BIN|FILE_COMMON|FILE_CSV|FILE_ANSI);
+   if(file_h1==INVALID_HANDLE) return(false);
+
+//---Export to CSV
+//Get Size of Rates Array
+   int arrSize=ArraySize(Rates);
+
+//Writable string   
+   string s1;
+
+//Main Circle
+//If not Reverse Write
+   if(!ReverseWrite)
+     {
+      //Write oldest rate to the end of file (and NOW date to the first string)
+      for(int i=0;i<arrSize;i++)
+        {
+         s1=IntegerToString(i)+","                                     //#ID
+            +TimeToString(Rates[i].time,TIME_DATE|TIME_MINUTES|TIME_SECONDS)+","     //Time in seconds 
+            +DoubleToString(Rates[i].open,5)+","              //OPEN 
+            +DoubleToString(Rates[i].high,5)+","              //HIGH
+            +DoubleToString(Rates[i].low,5)+","               //LOW
+            +DoubleToString(Rates[i].close,5)+","             //CLOSE
+            +IntegerToString(Rates[i].tick_volume)+","        //Tick Volume
+            +IntegerToString(Rates[i].real_volume)+","        //Real Volume
+            +IntegerToString(Rates[i].spread)+","             //Spread
+            +IntegerToString(Feed[i].Open_WhoFirst,1)+","     //First Open
+            +IntegerToString(Feed[i].High_WhoFirst,1)+","     //First High  
+            +IntegerToString(Feed[i].Low_WhoFirst,1)+","      //Fist Low
+            +IntegerToString(Feed[i].Close_WhoFirst,1)+","    //First Close
+            +DoubleToString(Feed[i].Open_pom,2)+","           //Pom Open
+            +DoubleToString(Feed[i].High_pom,2)+","           //Pom High  
+            +DoubleToString(Feed[i].Low_pom,2)+","            //Pom Low
+            +DoubleToString(Feed[i].Close_pom,2)+","          //Pom Close  
+            +IntegerToString(Feed[i].Open_signal,1)+","       //Signal Open
+            +IntegerToString(Feed[i].High_signal,1)+","       //Signal High  
+            +IntegerToString(Feed[i].Low_signal,1)+","        //Signal Low
+            +IntegerToString(Feed[i].Close_signal,1)+","      //Signal Close
+            +DoubleToString(Feed[i].Open_dc,2)+","            //Dc Open
+            +DoubleToString(Feed[i].High_dc,2)+","            //Dc High  
+            +DoubleToString(Feed[i].Low_dc,2)+","             //Dc Low
+            +DoubleToString(Feed[i].Close_dc,2)+","           //Dc Close
+            +"\r\n";
+         FileWrite(file_h1,s1);
+        }//End of for
+     }//End of NOT Reverse Write
+
+   if(ReverseWrite)
+     {
+      //Write oldest date first to file and NOW date to the End of file   
+      for(int i=arrSize-1;i>-1;i--)
+        {
+         s1=IntegerToString(i)+","                                     //#ID
+            +TimeToString(Rates[i].time,TIME_DATE|TIME_MINUTES|TIME_SECONDS)+","     //Time in seconds 
+            +DoubleToString(Rates[i].open,5)+","              //OPEN 
+            +DoubleToString(Rates[i].high,5)+","              //HIGH
+            +DoubleToString(Rates[i].low,5)+","               //LOW
+            +DoubleToString(Rates[i].close,5)+","             //CLOSE
+            +IntegerToString(Rates[i].tick_volume)+","        //Tick Volume
+            +IntegerToString(Rates[i].real_volume)+","        //Real Volume
+            +IntegerToString(Rates[i].spread)+","             //Spread
+            +IntegerToString(Feed[i].Open_WhoFirst,1)+","     //First Open
+            +IntegerToString(Feed[i].High_WhoFirst,1)+","     //First High  
+            +IntegerToString(Feed[i].Low_WhoFirst,1)+","      //Fist Low
+            +IntegerToString(Feed[i].Close_WhoFirst,1)+","    //First Close
+            +DoubleToString(Feed[i].Open_pom,2)+","           //Pom Open
+            +DoubleToString(Feed[i].High_pom,2)+","           //Pom High  
+            +DoubleToString(Feed[i].Low_pom,2)+","            //Pom Low
+            +DoubleToString(Feed[i].Close_pom,2)+","          //Pom Close  
+            +IntegerToString(Feed[i].Open_signal,1)+","       //Signal Open
+            +IntegerToString(Feed[i].High_signal,1)+","       //Signal High  
+            +IntegerToString(Feed[i].Low_signal,1)+","        //Signal Low
+            +IntegerToString(Feed[i].Close_signal,1)+","      //Signal Close
+            +DoubleToString(Feed[i].Open_dc,2)+","            //Dc Open
+            +DoubleToString(Feed[i].High_dc,2)+","            //Dc High  
+            +DoubleToString(Feed[i].Low_dc,2)+","             //Dc Low
+            +DoubleToString(Feed[i].Close_dc,2)+","           //Dc Close
+            +"\r\n";
+         FileWrite(file_h1,s1);
+        }//End of for
+     }//END OF Reverse Write  
+
+//Close file
+   FileClose(file_h1);
+
+//If ok    
+   Alert("Ok, Feed Created in COMMON folder: "+path);
+   return(true);
+  }//END of Export Non Indicator OHLC Feed to CSV  
+//| Export Feed to CSV (date,ohlc,spread,tickvol,WF,POM,DC,SIGNAL)   |
+//+------------------------------------------------------------------+ 
+bool RHistory::_ExportOHLCTickVolFeedToCSV(const bool ReverseWrite,const STRUCT_TICKVOL_OHLC &Feed[],const bool Priming1)
+  {
+//Get Server Broker Name
+   string Server=AccountInfoString(ACCOUNT_SERVER);
+
+//Path for Export (0=Priming1 or 1=Priming2)ServerRatesEURUSD2010.01.01_2016.04.01
+   string path=(string)(int)Priming1+Server+"OHLCTIckVol"+m_pair+TimeToString(m_from_date,TIME_DATE)+
+               "_"+TimeToString(m_to_date,TIME_DATE)+".csv";
+
+//If exist delete
+   if(FileIsExist(path,FILE_COMMON)) FileDelete(path,FILE_COMMON);
+
+//Init file for write (csv) \r\n
+   int file_h1=FileOpen(path,FILE_READ|FILE_WRITE|FILE_BIN|FILE_COMMON|FILE_CSV|FILE_ANSI);
+   if(file_h1==INVALID_HANDLE) return(false);
+
+//---Export to CSV
+//Get Size of Rates Array
+   int arrSize=ArraySize(Feed);
+
+//Writable string   
+   string s1;
+
+//Main Circle
+//If not Reverse Write
+   if(!ReverseWrite)
+     {
+      //Write oldest rate to the end of file (and NOW date to the first string)
+      for(int i=0;i<arrSize;i++)
+        {
+         s1=IntegerToString(i)+","                                     //#ID
+            +TimeToString(Feed[i].Time,TIME_DATE|TIME_MINUTES|TIME_SECONDS)+","     //Time in seconds 
+            +DoubleToString(Feed[i].Open_TickVol,5)+","              //OPEN  TickVol
+            +DoubleToString(Feed[i].High_TickVol,5)+","              //HIGH  TickVol
+            +DoubleToString(Feed[i].Low_TickVol,5)+","               //LOW   TickVol
+            +DoubleToString(Feed[i].Close_TickVol,5)+","             //CLOSE TickVol  
+            +"\r\n";
+         FileWrite(file_h1,s1);
+        }//End of for
+     }//End of NOT Reverse Write
+
+   if(ReverseWrite)
+     {
+      //Write oldest date first to file and NOW date to the End of file   
+      for(int i=arrSize-1;i>-1;i--)
+        {
+         s1=IntegerToString(i)+","                                     //#ID
+            +TimeToString(Feed[i].Time,TIME_DATE|TIME_MINUTES|TIME_SECONDS)+","     //Time in seconds 
+            +DoubleToString(Feed[i].Open_TickVol,5)+","              //OPEN  TickVol
+            +DoubleToString(Feed[i].High_TickVol,5)+","              //HIGH  TickVol
+            +DoubleToString(Feed[i].Low_TickVol,5)+","               //LOW   TickVol
+            +DoubleToString(Feed[i].Close_TickVol,5)+","             //CLOSE TickVol  
+            +"\r\n";
+         FileWrite(file_h1,s1);
+        }//End of for
+     }//END OF Reverse Write  
+
+//Close file
+   FileClose(file_h1);
+
+//If ok    
+   Alert("Ok, OHLC TickVolume Feed Created in COMMON folder: "+path);
+   return(true);
+  }//END of Export OHLC TickVolume Non Indicator Feed to CSV 
+//+------------------------------------------------------------------+
+//| Export Close Feed to CSV (date,ohlc,spread,tickvol,WF,POM,DC,SIGNAL)   |
+//+------------------------------------------------------------------+ 
+bool RHistory::_ExportCloseFeedToCSV(const bool ReverseWrite,const MqlRates &Rates[],const STRUCT_FEED_CLOSE &Feed[],
+                                     const bool Priming1)
+  {
+//Get Server Broker Name
+   string Server=AccountInfoString(ACCOUNT_SERVER);
+
+//Path for Export (0=Priming1 or 1=Priming2)ServerRatesEURUSD2010.01.01_2016.04.01
+   string path=(string)(int)Priming1+Server+"CloseFeed"+m_pair+TimeToString(m_from_date,TIME_DATE)+
+               "_"+TimeToString(m_to_date,TIME_DATE)+".csv";
+
+//If exist delete
+   if(FileIsExist(path,FILE_COMMON)) FileDelete(path,FILE_COMMON);
+
+//Init file for write (csv) \r\n
+   int file_h1=FileOpen(path,FILE_READ|FILE_WRITE|FILE_BIN|FILE_COMMON|FILE_CSV|FILE_ANSI);
+   if(file_h1==INVALID_HANDLE) return(false);
+
+//---Export to CSV
+//Get Size of Rates Array
+   int arrSize=ArraySize(Rates);
+
+//Writable string   
+   string s1;
+
+//Main Circle
+//If not Reverse Write
+   if(!ReverseWrite)
+     {
+      //Write oldest rate to the end of file (and NOW date to the first string)
+      for(int i=0;i<arrSize;i++)
+        {
+         s1=IntegerToString(i)+","                                     //#ID
+            +TimeToString(Rates[i].time,TIME_DATE|TIME_MINUTES|TIME_SECONDS)+","     //Time in seconds 
+            +DoubleToString(Rates[i].open,5)+","              //OPEN 
+            +DoubleToString(Rates[i].high,5)+","              //HIGH
+            +DoubleToString(Rates[i].low,5)+","               //LOW
+            +DoubleToString(Rates[i].close,5)+","             //CLOSE
+            +IntegerToString(Feed[i].Close_WhoFirst,5)+","    //Close WhoFirst
+            +IntegerToString(Feed[i].Close_signal,5)+","      //Close Signal
+            +DoubleToString(Feed[i].Close_pom,5)+","          //Close Pom
+            +DoubleToString(Feed[i].Close_dc,5)+","           //Close Dc
+            +"\r\n";
+         FileWrite(file_h1,s1);
+        }//End of for
+     }//End of NOT Reverse Write
+
+   if(ReverseWrite)
+     {
+      //Write oldest date first to file and NOW date to the End of file   
+      for(int i=arrSize-1;i>-1;i--)
+        {
+         s1=IntegerToString(i)+","                                     //#ID
+            +TimeToString(Rates[i].time,TIME_DATE|TIME_MINUTES|TIME_SECONDS)+","     //Time in seconds 
+            +DoubleToString(Rates[i].open,5)+","              //OPEN 
+            +DoubleToString(Rates[i].high,5)+","              //HIGH
+            +DoubleToString(Rates[i].low,5)+","               //LOW
+            +DoubleToString(Rates[i].close,5)+","             //CLOSE
+            +IntegerToString(Feed[i].Close_WhoFirst,5)+","    //Close WhoFirst
+            +IntegerToString(Feed[i].Close_signal,5)+","      //Close Signal
+            +DoubleToString(Feed[i].Close_pom,5)+","          //Close Pom
+            +DoubleToString(Feed[i].Close_dc,5)+","           //Close Dc
+            +"\r\n";
+         FileWrite(file_h1,s1);
+        }//End of for
+     }//END OF Reverse Write  
+
+//Close file
+   FileClose(file_h1);
+
+//If ok    
+   Alert("Ok, Close Feed Created in COMMON folder: "+path);
+   return(true);
+  }//END of Export Non Indicator Close Feed to CSV  
