@@ -5,7 +5,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, Shcherbyna Rostyslav"
 #property link      ""
-#property version   "1.41"
+#property version   "1.6"
 
 #include <Tools\DateTime.mqh>
 
@@ -14,6 +14,8 @@ Include all structures and global constants
 */
 /*
 +++++CHANGE LOG+++++
+1.6  20.06.2016--Add Custom Feed WO Indicator to Emulation and Trading
+1.5  30.05.2016--Clear Old Code , better perfomance (33 sec from 2010 to 2016.04 Daily)
 1.41 28.05.2016--Minor version with ability to Export OHLC to CSV & BIN
 1.4 20.05.2016--Stable with AutoCompounding
 1.3 19.05.2016--Stable, without Copy Arrays
@@ -32,6 +34,9 @@ const char Ind_Buy = 1;
 const char Ind_Sell=-1;
 const int BUY1=1005;
 const int SELL1=2006;
+const char BUY=1;
+const char SELL=-1;
+const char NOSIGNAL=0;
 const char HighFirst= 1;
 const char LowFirst = -1;
 const char EqualFirst=0; //High==Open or other Private Case
@@ -45,6 +50,49 @@ const char CkBuySell14=2;
 const char CkSingularityBuy=3;
 const char CkSingularitySell=4;
 //---Primings structs
+struct STRUCT_TICKVOL_OHLC
+  {
+   datetime          Time;
+   double            Open_TickVol;
+   double            High_TickVol;
+   double            Low_TickVol;
+   double            Close_TickVol;
+   bool              High_First;// (true or low first =false)
+  };
+//---OHLC Feed Struct
+struct STRUCT_FEED_OHLC
+  {
+   datetime          Time;
+   char              Open_WhoFirst;
+   char              High_WhoFirst;
+   char              Low_WhoFirst;
+   char              Close_WhoFirst;
+
+   double            Open_pom;
+   double            High_pom;
+   double            Low_pom;
+   double            Close_pom;
+
+   char              Open_signal;
+   char              High_signal;
+   char              Low_signal;
+   char              Close_signal;
+
+   double            Open_dc;
+   double            High_dc;
+   double            Low_dc;
+   double            Close_dc;
+  };
+//---CLOSE Feed Struct
+struct STRUCT_FEED_CLOSE
+  {
+   datetime          Time;
+   char              Close_WhoFirst;
+   double            Close_pom;
+   char              Close_signal;
+   double            Close_dc;
+  };
+//Old Priming Structs
 struct STRUCT_Priming
   {
    MqlRates          Rates[];
@@ -120,10 +168,10 @@ enum ENUM_myPredictPeriod
 //+------------------------------------------------------------------+
 enum ENUM_EMUL_OHLC_PRICE
   {
-   ALL_OHLC,      //Use OHLC prices (4)
-   ALL_Close,     //Use only Close prices in Open\Close positions
-   OHLC_onOpenOnly,   //Use OHLC on Open, and CloseValues on Close positions
-   OHLC_onCloseOnly,  //Use OHLC on Close, and CloseValues on Open positions
+   IND_OHLC,      //Ind OHLC prices(4)
+   IND_CLOSE,     //Ind Only Close prices(1)
+   FEED_OHLC,   //OHLC own Volume
+   FEED_CLOSE,  //Only Close, own Volume
   };
 //+------------------------------------------------------------------+
 //| Trade  Results                                                   |
