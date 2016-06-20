@@ -5,7 +5,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, Shcherbyna Rostyslav"
 #property link      ""
-#property version   "1.41"
+#property version   "1.6"
 
 #include <Tools\DateTime.mqh>
 #include <RInclude\RTrade.mqh>
@@ -14,6 +14,8 @@
 //+------------------------------------------------------------------+
 /*
 +++++CHANGE LOG+++++
+1.6  20.06.2016--Add Custom Feed WO Indicator to Emulation and Trading
+1.5  30.05.2016--Clear Old Code , better perfomance (33 sec from 2010 to 2016.04 Daily)
 1.41 28.05.2016--Minor version with ability to Export OHLC to CSV & BIN
 1.4 20.05.2016--Stable with AutoCompounding
 1.3 19.05.2016--Stable, without Copy Arrays
@@ -32,12 +34,18 @@ private:
    int               m_TR_RES;
    //Current Ck Prediction
    char              m_current_ck;
-   //---Latest Indicator Values
+   //---Latest Feed Values
+   double            m_Opens[];
+   double            m_Highs[];
+   double            m_Lows[];
+   double            m_Closes[];
+   long              m_TickVols[];
    double            m_first;
    double            m_pom;
    double            m_dc;
    double            m_signal;
    //Pom constants
+   uint              m_bottle_size;
    double            m_pom_koef;
    double            m_pom_buy;
    double            m_pom_sell;
@@ -72,17 +80,33 @@ private:
    ulong             m_buypos_count;
    ulong             m_sellpos_count;
 
+   //Add Volume to opened position
+   bool              m_AddVolume();
+
+   //WhoFirst RealTime
+   bool              m_WhoFirst();
+
+   //Pom & Signal RealTime   
+   bool              m_PomSignal();
+
+   //DC RealTime
+   bool              m_DC();
+
 public:
                      RCat(const string Pair,const double &Pom_Koef,const double &PomBuy,const double &PomSell,
-                                            const ushort &Fee,const uchar &SleepPage,const ushort &MaxSpread);
+                                            const ushort &Fee,const uchar &SleepPage,const ushort &MaxSpread,const uint &BottleSize);
                     ~RCat();
    //Initialisation     
    bool              Init(const char &Ck_Case,const ENUM_RT_OpenRule &OpenRule,const ENUM_RT_CloseRule &CloseRule,
                           const double AddVol_Shift_Pt);
-   //Main          
-   bool              Trade(const double &First,const double &Pom,const double &Dc,const double &Signal,
-                           const double &Sl,const double &Tp,const double &StartVol,const double &MaxVol,
+   //Main Trade on Ind Feed         
+   bool              TradeInd(const double &First,const double &Pom,const double &Dc,const double &Signal,
+                              const double &Sl,const double &Tp,const double &StartVol,const double &MaxVol,
+                              const ENUM_AutoLot &AutoLot);
+   //Trade on Calculated Feed (WO Indicator)
+   bool              Trade(const double &Sl,const double &Tp,const double &StartVol,const double &MaxVol,
                            const ENUM_AutoLot &AutoLot);
+
    //Close Position
    bool              ClosePosition(const string CustomComment);
    bool              CloseAllPositions(const string CustomComment);
@@ -92,12 +116,15 @@ public:
    //Compounding (AutoLot)
    bool              AutoCompounding(const ENUM_AutoLot &Enum_AutoLot);
 
+   //Calculate RT Feed (WF,Pom,Signal,DC)
+   bool              CalculateRTFeed();
+
   };
 //+------------------------------------------------------------------+
 //| Constructor                                                      |
 //+------------------------------------------------------------------+
 RCat::RCat(const string Pair,const double &Pom_Koef,const double &PomBuy,const double &PomSell,
-           const ushort &Fee,const uchar &SleepPage,const ushort &MaxSpread)
+           const ushort &Fee,const uchar &SleepPage,const ushort &MaxSpread,const uint &BottleSize)
   {
    m_pair=Pair;
    m_pom_koef= Pom_Koef;
@@ -110,6 +137,17 @@ RCat::RCat(const string Pair,const double &Pom_Koef,const double &PomBuy,const d
    m_max_spread=MaxSpread;
    m_start_vol_koef=0;
    m_max_vol_koef=0;
+   m_bottle_size=BottleSize;
+   ArraySetAsSeries(m_Opens,true);
+   ArraySetAsSeries(m_Highs,true);
+   ArraySetAsSeries(m_Lows,true);
+   ArraySetAsSeries(m_Closes,true);
+   ArraySetAsSeries(m_TickVols,true);
+   ArrayResize(m_Opens,m_bottle_size);
+   ArrayResize(m_Highs,m_bottle_size);
+   ArrayResize(m_Lows,m_bottle_size);
+   ArrayResize(m_Closes,m_bottle_size);
+   ArrayResize(m_TickVols,m_bottle_size);
   }//END OF Constructor
 //+------------------------------------------------------------------+
 //| Destructor                                                       |
@@ -120,27 +158,25 @@ RCat::~RCat()
 //+------------------------------------------------------------------+
 //| Initialisation                                                   |
 //+------------------------------------------------------------------+
-bool RCat::Init(const char &Ck_Case,const ENUM_RT_OpenRule &OpenRule,const ENUM_RT_CloseRule &CloseRule,
-                const double AddVol_Shift_Pt)
+bool RCat::Init(const char &Ck_Case,const ENUM_RT_OpenRule &OpenRule,
+                const ENUM_RT_CloseRule &CloseRule,const double AddVol_Shift_Pt)
   {
    if(Ck_Case>4 || Ck_Case<0)
      {
       return(false);
      }
    m_current_ck=Ck_Case;
-
    m_current_open_rule=OpenRule;
    m_current_close_rule=CloseRule;
    m_add_vol_shift_points=AddVol_Shift_Pt;
-
    return(true);
   }//END OF Init
 //+------------------------------------------------------------------+
-//| Main Real Trade Function:True if Open\Close Position             |
+//| Main Ind Real Trade Function:True if Open\Close Position         |
 //+------------------------------------------------------------------+
-bool RCat::Trade(const double &First,const double &Pom,const double &Dc,const double &Signal,
-                 const double &Sl,const double &Tp,const double &StartVol,const double &MaxVol,
-                 const ENUM_AutoLot &AutoLot)
+bool RCat::TradeInd(const double &First,const double &Pom,const double &Dc,const double &Signal,
+                    const double &Sl,const double &Tp,const double &StartVol,const double &MaxVol,
+                    const ENUM_AutoLot &AutoLot)
   {
 // Fill Latest Indicator Buffers
    m_first=First;
@@ -151,7 +187,6 @@ bool RCat::Trade(const double &First,const double &Pom,const double &Dc,const do
    m_takeprofit=Tp;
    m_start_volume=StartVol;
    m_max_volume=MaxVol;
-
 //Compounding   
 //Check if enabled
    if(AutoLot!=Disabled)
@@ -179,7 +214,6 @@ bool RCat::Trade(const double &First,const double &Pom,const double &Dc,const do
 
 //  If any Open Position?
    bool Opened_Position=PositionSelect(m_pair);
-
 //-----NEW POSITION-----//
    if(!Opened_Position)
      {
@@ -201,58 +235,15 @@ bool RCat::Trade(const double &First,const double &Pom,const double &Dc,const do
             break;
         }//END OF SWITCH
      }//END OF NEW POSITION
-
 //-----ADD VOLUME-----//    
    if(Opened_Position)
      {
-      //Position Volume
-      double pos_volume=PositionGetDouble(POSITION_VOLUME);
-
-      //Check MaxVolume
-      if(pos_volume>=m_max_volume) {return(false);}
-
-      //Position Open Price
-      double pos_open_price=PositionGetDouble(POSITION_PRICE_OPEN);
-
-      //Current Price(Bid for BuyClose & Ask for SellClose)
-      double pos_current_price=PositionGetDouble(POSITION_PRICE_CURRENT);
-
-      //Position Direction
-      long pos_type=PositionGetInteger(POSITION_TYPE);
-
-      //Pair point
-      double point_size=SymbolInfoDouble(m_pair,SYMBOL_POINT);
-
-      //Add Volume BUY
-      if(pos_type==POSITION_TYPE_BUY && m_TR_RES==BUY1)
-        {
-         //If Price lower->Add Vol Buy, else Exit
-         if(pos_current_price>pos_open_price-(m_add_vol_shift_points*point_size)) return(false);
-
-         //Add BUY
-         OpenMarketOrder(m_start_volume,OP_BUY,m_stoploss,m_takeprofit,MAGIC_IB,"+V"+
-                         DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
-                         TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
-         return(true);
-        }//END OF ADD VOL BUY
-
-      //Add Volume SELL
-      if((pos_type==POSITION_TYPE_SELL) && (m_TR_RES==SELL1))
-        {
-         //If Price Higher->Add Vol Sell, else Exit
-         if(pos_current_price<pos_open_price+(m_add_vol_shift_points*point_size)) return(false);
-
-         //Add SELL
-         OpenMarketOrder(m_start_volume,OP_SELL,m_stoploss,m_takeprofit,MAGIC_IS,"+V"+
-                         DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
-                         TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
-         return(true);
-        }//END OF ADD VOL SELL
+      if(!m_AddVolume()) return(false);
      }//END OF ADD VOLUME
 
 //If No Opened Position then false
    return(false);
-  }//+++++++END OF TRADE!
+  }//+++++++END OF IND TRADE!
 //+------------------------------------------------------------------+
 //| Open Rule                                                        |
 //+------------------------------------------------------------------+
@@ -260,11 +251,13 @@ int RCat::m_OpenRule(const ENUM_RT_OpenRule &OpenRule)
   {
    int TR_RES=-1;
 
+//If no Rule
    if(OpenRule<0)
      {
       return(-2);
      }
 
+//Check OpenRule
    switch(OpenRule)
      {
       case  0:TR_RES=m_POMI();
@@ -282,11 +275,13 @@ int RCat::m_CloseRule(const ENUM_RT_CloseRule &CloseRule)
   {
    int TR_RES=-1;
 
+//If no Close Rule
    if(CloseRule<0)
      {
       return(-2);
      }
 
+//Check CloseRule
    switch(CloseRule)
      {
       case  0:TR_RES=m_AutoCloseDcSpread();
@@ -305,11 +300,13 @@ int RCat::m_POMI()
   {
    int res=-1;
 
+//If no signal
    if(m_signal==0)
      {
       return(-2);
      }
 
+//if no who first
    if(m_first==0)
      {
       return(-2);
@@ -493,7 +490,9 @@ int RCat::OpenMarketOrder(const double &Vol,const uchar &BuyOrSell,const double 
       //Market Order
       z_mt_req.type=ORDER_TYPE_BUY;
      }//END OF BUY
-
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
    if(BuyOrSell==OP_SELL)
      {
       //If limits sets needed type
@@ -544,7 +543,9 @@ int RCat::OpenMarketOrder(const double &Vol,const uchar &BuyOrSell,const double 
 //|  Send Order                                                      |
 //+------------------------------------------------------------------+
    int res=OrderSend(z_mt_req,z_mt_rez);
-
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
    if(res)
      {
       ret=(int)z_mt_rez.retcode;
@@ -557,6 +558,9 @@ int RCat::OpenMarketOrder(const double &Vol,const uchar &BuyOrSell,const double 
          if(BuyOrSell==OP_SELL) m_sellpos_count++;
         }
      } // END of ORDER SENDED
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
    else
      {//If Order Error
       Print("res="+IntegerToString(res)+" ret:"+IntegerToString(ret)+" LastErr: "+IntegerToString(GetLastError())+z_mt_rez.comment);
@@ -576,6 +580,9 @@ bool RCat::CloseAllPositions(const string CustomComment)
    if(pos_total<1){return(false);}
 
    for(int i=0;i<pos_total;i++)
+      //+------------------------------------------------------------------+
+      //|                                                                  |
+      //+------------------------------------------------------------------+
      {
       string pair=PositionGetSymbol(i);
       if(pair=="")
@@ -616,7 +623,6 @@ bool RCat::AutoCompounding(const ENUM_AutoLot &Enum_AutoLot)
 
 //Get Maximum Availables Volume on broker
    double max_broker_vol=SymbolInfoDouble(m_pair,SYMBOL_VOLUME_MAX);
-
 //Check if first run : Calculate fixed lot koef
    if(m_start_vol_koef==0 || m_max_vol_koef==0)
      {
@@ -634,7 +640,6 @@ bool RCat::AutoCompounding(const ENUM_AutoLot &Enum_AutoLot)
 //Calculate lot
    double current_start_vol_koef=0;
    double current_max_vol_koef=0;
-
 //Select Calculation mode Dynamic or MaximalOnly
    switch(Enum_AutoLot)
      {
@@ -701,3 +706,358 @@ bool RCat::AutoCompounding(const ENUM_AutoLot &Enum_AutoLot)
    return(false);
   }//End of AutoCompounding
 //+------------------------------------------------------------------+
+//| Add Volume to opened position                                    |
+//+------------------------------------------------------------------+
+bool RCat::m_AddVolume(void)
+  {
+//Position Volume
+   double pos_volume=PositionGetDouble(POSITION_VOLUME);
+
+//Check MaxVolume
+   if(pos_volume>=m_max_volume) {return(false);}
+
+//Position Open Price
+   double pos_open_price=PositionGetDouble(POSITION_PRICE_OPEN);
+
+//Current Price(Bid for BuyClose & Ask for SellClose)
+   double pos_current_price=PositionGetDouble(POSITION_PRICE_CURRENT);
+
+//Position Direction
+   long pos_type=PositionGetInteger(POSITION_TYPE);
+
+//Pair point
+   double point_size=SymbolInfoDouble(m_pair,SYMBOL_POINT);
+//Add Volume BUY
+   if(pos_type==POSITION_TYPE_BUY && m_TR_RES==BUY1)
+     {
+      //If Price lower->Add Vol Buy, else Exit
+      if(pos_current_price>pos_open_price-(m_add_vol_shift_points*point_size)) return(false);
+
+      //Add BUY
+      OpenMarketOrder(m_start_volume,OP_BUY,m_stoploss,m_takeprofit,MAGIC_IB,"+V"+
+                      DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
+                      TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
+      return(true);
+     }//END OF ADD VOL BUY
+//Add Volume SELL
+   if((pos_type==POSITION_TYPE_SELL) && (m_TR_RES==SELL1))
+     {
+      //If Price Higher->Add Vol Sell, else Exit
+      if(pos_current_price<pos_open_price+(m_add_vol_shift_points*point_size)) return(false);
+
+      //Add SELL
+      OpenMarketOrder(m_start_volume,OP_SELL,m_stoploss,m_takeprofit,MAGIC_IS,"+V"+
+                      DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
+                      TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
+      return(true);
+     }//END OF ADD VOL SELL
+//If no pos,
+   return(false);
+  }//END of AddVolume
+//+------------------------------------------------------------------+
+//| Calculate WF,Pom,Signal,DC for real time trading                 |
+//+------------------------------------------------------------------+
+bool RCat::CalculateRTFeed(void)
+  {
+//Calculate WhoFirst
+   if(!m_WhoFirst())
+     {
+      return(false);
+     }
+
+//Calculate POM & Signal
+   if(!m_PomSignal())
+     {
+      return(false);
+     }
+
+//Calculate DC
+   if(!m_DC())
+     {
+      return(false);
+     }
+
+//If ok
+   return(true);
+  }//END OF RT Feed
+//+------------------------------------------------------------------+
+//| Who will be first High or low ? 0,1,2 |No,Low,High               |
+//+------------------------------------------------------------------+
+bool RCat::m_WhoFirst(void)
+  {
+//Get Last Highs
+   if(CopyHigh(m_pair,0,0,m_bottle_size,m_Highs)<=0) {m_first=EqualFirst; return(false);}
+
+//Get Last Lows
+   if(CopyLow(m_pair,0,0,m_bottle_size,m_Lows)<=0) {m_first=EqualFirst; return(false);}
+
+//If two maximum then get maximum near now()
+   uint index_L=ArrayMinimum(m_Lows,0,m_bottle_size);
+   uint index_H=ArrayMaximum(m_Highs,0,m_bottle_size);
+
+//Private case H==L
+//Private case, when many H or L, and don`t know who >
+   if(index_H>index_L) { m_first = HighFirst; return(true);}
+   if(index_H<index_L) { m_first =  LowFirst;  return(true);}
+   if(index_H==index_L){ m_first= EqualFirst;  return(true);}
+
+   return(true);
+  }//End of Who First
+//+------------------------------------------------------------------+
+//|Calculate POM                                                     |
+//+------------------------------------------------------------------+
+bool RCat::m_PomSignal(void)
+  {
+//Get Last Opens
+   if(CopyOpen(m_pair,0,0,m_bottle_size,m_Opens)<=0)
+     {
+      m_pom=0;
+      m_signal=NOSIGNAL;
+      return(false);
+     }
+
+//Get Last Highs
+   if(CopyHigh(m_pair,0,0,m_bottle_size,m_Highs)<=0)
+     {
+      m_pom=0;
+      m_signal=NOSIGNAL;
+      return(false);
+     }
+
+//Get Last Lows
+   if(CopyLow(m_pair,0,0,m_bottle_size,m_Lows)<=0)
+     {
+      m_pom=0;
+      m_signal=NOSIGNAL;
+      return(false);
+     }
+
+//Get Last Closes
+   if(CopyClose(m_pair,0,0,m_bottle_size,m_Closes)<=0)
+     {
+      m_pom=0;
+      m_signal=NOSIGNAL;
+      return(false);
+     }
+
+   double a=0;
+   double b=0;
+   double c=0;
+   uchar m=0;
+   uchar n=0;
+
+//Private cases:
+   if(m_first<LowFirst || m_first>HighFirst || m_first==EqualFirst)
+     {
+      m_pom=0;
+      m_signal=NOSIGNAL;
+      return(true);
+     }
+
+//Calc abc for HIGH first
+   if(m_first==HighFirst)
+     {
+      a=m_Highs[0]-m_Opens[0];// +
+      b=m_Lows[0]-m_Highs[0]; // -
+      c=m_Closes[0]-m_Lows[0];// +
+     }
+   else//Calc abc for LOW first         
+   if(m_first==LowFirst)
+     {
+      a=m_Lows[0]-m_Opens[0];// -
+      b=m_Highs[0]-m_Lows[0];// +
+      c=m_Closes[0]-m_Highs[0];// -
+     }
+
+// Jumps +/-
+   if(a>0) m++; else if(a<0) n++;
+   if(b>0) m++; else if(b<0) n++;
+   if(c>0) m++; else if(c<0) n++;
+
+//3 Limitations:
+//1
+   if(m*n<1 || m*n>2)
+     {
+      m_pom=0;
+      m_signal=NOSIGNAL;
+      return(true);
+     }
+//2     
+   if(m*n==1 && m_Highs[0]==m_Closes[0])
+     {
+      m_pom=0;
+      m_signal=NOSIGNAL;
+      return(true);
+     }
+//3     
+   if((m*n==2) && (m_Highs[0]-m_Closes[0]+m_Opens[0]-m_Lows[0]==0))
+     {
+      m_pom=0;
+      m_signal=NOSIGNAL;
+      return(true);
+     }
+
+//If no signal occured
+   m_signal=NOSIGNAL;
+
+//--- POM ver: 10.02.2015 
+//2:1
+   if(m==2 && n==1)
+     {
+      //IF A+ >1 then UP Trend  
+      double ga=((a+c)/2)/MathAbs(b);
+
+      //(case 4)  
+      if(MathAbs(b)>((a+c)/2))
+        {
+         m_signal=Ind_Sell;
+         m_pom=1-(1/(1+ga));
+         return(true);
+        }
+      else
+        {
+         m_pom=1-(1/(1+ga));
+         return(true);
+        }
+     }//end of 2:1
+
+//1:2  
+   if(m==1 && n==2)
+     {
+      //IF A- <1 then DOWN Trend
+      double ga=b/(MathAbs(a+c)/2);
+
+      //(case 1)  
+      if(b>(MathAbs(a+c)/2))
+        {
+         m_signal=Ind_Buy;
+         m_pom=1-(1/(1+ga));
+         return(true);
+        }
+      else
+        {
+         m_pom=1-(1/(1+ga));
+         return(true);
+        }
+     }//end of 1:2
+
+//If no POM, private case or unknown error
+   m_pom=0;
+   m_signal=NOSIGNAL;
+   return(true);
+  }//END OF CALC POM
+//+------------------------------------------------------------------+
+//| Calculate DeltaC                                                 |
+//+------------------------------------------------------------------+
+bool RCat::m_DC(void)
+  {
+//Get Last Highs
+   if(CopyHigh(m_pair,0,0,m_bottle_size,m_Highs)<=0)
+     {
+      m_dc=0;
+      return(false);
+     }
+
+//Get Last Lows
+   if(CopyLow(m_pair,0,0,m_bottle_size,m_Lows)<=0)
+     {
+      m_dc=0;
+      return(false);
+     }
+
+//Get Last Closes
+   if(CopyClose(m_pair,0,0,m_bottle_size,m_Closes)<=0)
+     {
+      m_dc=0;
+      return(false);
+     }
+
+//Get Last Tick Volumes     
+   if(CopyTickVolume(m_pair,0,0,m_bottle_size,m_TickVols)<=0)
+     {
+      m_dc=0;
+      return(false);
+     }
+
+   double t2=(m_TickVols[2]-m_TickVols[1])*(m_Highs[2]-m_Lows[2]);
+
+//div 0 exception
+   if(t2==0)
+     {
+      m_dc=0;
+      return(true);
+     }
+
+   double t4=(m_Closes[1]-m_Closes[2])/t2;
+
+   m_dc=NormalizeDouble((m_TickVols[1]-m_TickVols[0])*t4*(m_Highs[0]-m_Lows[0]),5);
+
+   return(true);
+  }//END OF CALC_DC
+//+------------------------------------------------------------------+
+//| Trade Without indicator                                          |
+//+------------------------------------------------------------------+
+bool RCat::Trade(const double &Sl,const double &Tp,const double &StartVol,const double &MaxVol,
+                 const ENUM_AutoLot &AutoLot)
+  {
+   m_stoploss=Sl;
+   m_takeprofit=Tp;
+   m_start_volume=StartVol;
+   m_max_volume=MaxVol;
+//Compounding   
+//Check if enabled
+   if(AutoLot!=Disabled)
+     {
+      bool compound_result=AutoCompounding(AutoLot);
+      //if true - lots changed, false - not changed
+     }//End of Compounding
+
+///---MAIN CALCULATION---///
+   m_TR_RES=-1;
+
+// OpenRule
+   m_TR_RES=m_OpenRule(m_current_open_rule);
+
+// CloseRule -> if close, exit
+   if(m_CloseRule(m_current_close_rule)) return(true);
+
+// Check Spread
+   if(m_max_spread <(int)SymbolInfoInteger(m_pair,SYMBOL_SPREAD)) return(false);
+
+// NoSignal, Err -> Exit
+   if(m_TR_RES <0) return(false);
+
+//QuantMode here?
+
+//  If any Open Position?
+   bool Opened_Position=PositionSelect(m_pair);
+//-----NEW POSITION-----//
+   if(!Opened_Position)
+     {
+      switch(m_TR_RES)
+        {
+         //BUY
+         case  1005: OpenMarketOrder(m_start_volume,OP_BUY,m_stoploss,m_takeprofit,MAGIC_IB,
+                                     DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
+                                     TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
+            return(true); break;
+
+            //SELL
+         case  2006: OpenMarketOrder(m_start_volume,OP_SELL,m_stoploss,m_takeprofit,MAGIC_IS,
+                                     DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
+                                     TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
+            return(true); break;
+
+         default:
+            break;
+        }//END OF SWITCH
+     }//END OF NEW POSITION
+//-----ADD VOLUME-----//    
+   if(Opened_Position)
+     {
+      if(!m_AddVolume()) return(false);
+     }//END OF ADD VOLUME
+
+//If No Opened Position then false
+   return(false);
+  }//END OF TRADE WITHOUT INDiCATOR
