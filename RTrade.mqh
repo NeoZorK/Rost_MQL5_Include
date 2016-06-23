@@ -70,6 +70,8 @@ private:
    STRUCT_Priming    m_P2;
 
    //Methods
+   //Print 3 cases q before each prediction
+   void              m_PrintLast_Q(const bool Priming1);
    //TR Close Positions
    bool              m_EMUL_AutoCloseDCSpread(const double PositionProfit,const double Dc,const uint Spread,
                                               const double Commission);
@@ -701,6 +703,9 @@ bool RTrade::Emulate_Trading_AllClose(const bool Priming1,const STRUCT_Priming &
 
      }//END OF ALL CASES
 
+//Print Q
+   m_PrintLast_Q(Priming1);
+
 //If Ok
    return(true);
   }//END OF Emulate Trading All Close 
@@ -859,6 +864,9 @@ bool RTrade::Emulate_Trading_AllOHLC(const bool Priming1,const STRUCT_Priming &C
            }//End of Switch FILLING Priming1 Omega Structures
         }//End of Priming 2 Switch
      }//END OF ALL CASES
+
+//Print Q
+   m_PrintLast_Q(Priming1);
 
 //If Ok
    return(true);
@@ -1138,6 +1146,9 @@ bool RTrade::Emulate_Trading_AllOHLC_WO_Indicator(const bool Priming1,const MqlR
         }//End of Priming 2 Switch
      }//END OF ALL CASES
 
+//Print Q
+   m_PrintLast_Q(Priming1);
+
 //If Ok
    return(true);
   }//END OF Emulate Trading All OHLC WO Indicator, using Feed
@@ -1348,6 +1359,9 @@ bool RTrade::Emulate_Trading_ALLClose_WO_Indicator(const bool Priming1,const Mql
         }//End of Priming 2 Switch
      }//END OF ALL CASES
 
+//Print Q
+   m_PrintLast_Q(Priming1);
+
 //If Ok
    return(true);
   }//END OF EMUL ALL CLOSE WO INDICATOR
@@ -1417,3 +1431,29 @@ int RTrade::m_EMUL_TR_Caterpillar_CLOSE_Feed(const char Case,const int Iteration
 //If No Signal
    return(-1);
   }//END OF TR Caterpillar WO Indicator CLOSE Only prices
+//+------------------------------------------------------------------+
+//|  Print 3 Q before Ck prediction                                  |
+//+------------------------------------------------------------------+
+void RTrade::m_PrintLast_Q(const bool Priming1)
+  {
+//Get Total Size
+   int ArrSize=ArraySize(m_arr_sim_q)-1;
+
+   if(Priming1)
+     {
+      Print("P1 Q1="+IntegerToString(m_arr_sim_q[ArrSize].P1_Q1_Simul),
+            "|  Q4="+IntegerToString(m_arr_sim_q[ArrSize].P1_Q4_Simul),
+            "|  Q14="+IntegerToString(m_arr_sim_q[ArrSize].P1_Q14_Simul)
+            );
+     }
+   else
+     {
+      //After Priming2 (-1) because we Resize arr(+1)
+      Print("P2  Q1="+IntegerToString(m_arr_sim_q[ArrSize-1].P2_Q1_Simul),
+            "|   Q4="+IntegerToString(m_arr_sim_q[ArrSize-1].P2_Q4_Simul),
+            "|   Q14="+IntegerToString(m_arr_sim_q[ArrSize-1].P2_Q14_Simul)
+            );
+     }
+
+  }//END OF Print Last Q
+//+------------------------------------------------------------------+
