@@ -65,6 +65,15 @@ private:
    double            m_max_vol_koef;
    double            m_add_vol_shift_points;
 
+   //Total Monthes Count
+   double            m_TotalMonthsCount;
+
+   //Total Profit in %
+   double            m_TotalProfitPercent;
+
+   //Avg Monthly Profit % 
+   double            m_AvgMonthlyProfitPercent;
+
    ENUM_RT_OpenRule  m_current_open_rule;
    ENUM_RT_CloseRule m_current_close_rule;
    //Open TR 
@@ -96,6 +105,7 @@ public:
                      RCat(const string Pair,const double &Pom_Koef,const double &PomBuy,const double &PomSell,
                                             const ushort &Fee,const uchar &SleepPage,const ushort &MaxSpread,const uint &BottleSize);
                     ~RCat();
+
    //Initialisation     
    bool              Init(const char &Ck_Case,const ENUM_RT_OpenRule &OpenRule,const ENUM_RT_CloseRule &CloseRule,
                           const double AddVol_Shift_Pt);
@@ -118,6 +128,9 @@ public:
 
    //Calculate RT Feed (WF,Pom,Signal,DC)
    bool              CalculateRTFeed();
+
+   //Calculate Total Info onDeInit
+   bool              Calculate_TotalInfo(const datetime &StartDate,const double StartBalance);
 
   };
 //+------------------------------------------------------------------+
@@ -1061,3 +1074,42 @@ bool RCat::Trade(const double &Sl,const double &Tp,const double &StartVol,const 
 //If No Opened Position then false
    return(false);
   }//END OF TRADE WITHOUT INDiCATOR
+//+------------------------------------------------------------------+
+//| Calculate MonthCount,Avg & Total Profit in %                     |
+//+------------------------------------------------------------------+
+bool RCat::Calculate_TotalInfo(const datetime &StartDate,const double StartBalance)
+  {
+//Stop Date
+   datetime   StopDate=TimeCurrent();
+
+//Get Current Balance
+   double _FinalProfit=AccountInfoDouble(ACCOUNT_BALANCE)-StartBalance;
+
+//Calculate Month Number
+   double MonthsCount=((double)StopDate-(double)StartDate)/86400/30;
+
+   if(MonthsCount<=0)
+     {
+      Print(__FUNCTION__+"Total:Months Count =!"+DoubleToString(MonthsCount)+" , Exit");
+      return(false);
+     }
+
+//Save Months Count
+   m_TotalMonthsCount=MonthsCount;
+
+//Calculate TotalPercentProfit
+   m_TotalProfitPercent=_FinalProfit*100/StartBalance;
+
+//Calculate Avg : Monthly Profit  
+   m_AvgMonthlyProfitPercent=_FinalProfit/m_TotalMonthsCount/(StartBalance/100);
+
+//Printing:
+   Print("Total Months: "+DoubleToString(m_TotalMonthsCount)+
+         " Total%: "+DoubleToString(m_TotalProfitPercent)+"%"+
+         " Avg Monthly Profit % = "+DoubleToString(m_AvgMonthlyProfitPercent)+"%"
+         );
+
+//If Ok
+   return(true);
+  }//END OF  Calculate MonthCount,Avg & Total Profit in %    
+//+------------------------------------------------------------------+
