@@ -37,6 +37,14 @@ class RTrade
 private:
    string            m_pair;
    double            m_pair_point;
+   //Ck Summary
+   uint              m_Ck_NoSignal_Count;
+   uint              m_Ck_Buys_Count;
+   uint              m_Ck_Sells_Count;
+   uint              m_Ck_BuysSells_Count;
+   uint              m_Ck_BuySingularities_Count;
+   uint              m_Ck_SellSingularities_Count;
+   ulong             m_Ck_Total_Count;
    //Emulation
    // Each 2 primings = +1  
    uint              m_simulated_primings_total;
@@ -70,8 +78,10 @@ private:
    STRUCT_Priming    m_P2;
 
    //Methods
+
    //Print 3 cases q before each prediction
    void              m_PrintLast_Q(const bool Priming1);
+
    //TR Close Positions
    bool              m_EMUL_AutoCloseDCSpread(const double PositionProfit,const double Dc,const uint Spread,
                                               const double Commission);
@@ -144,6 +154,8 @@ public:
    string            CkResultToString(const char Ck);
    //Get Ck Predictions by Index
    char              CkPredictionByIndex(const uint CkIndex);
+   //Print All Ck Predictions
+   void              PrintAll_Ck(void);
   };
 //+------------------------------------------------------------------+
 //| Init                                                             |
@@ -1456,4 +1468,53 @@ void RTrade::m_PrintLast_Q(const bool Priming1)
      }
 
   }//END OF Print Last Q
+//+------------------------------------------------------------------+
+//| Print All Ck Predictions                                         |
+//+------------------------------------------------------------------+
+void RTrade::PrintAll_Ck(void)
+  {
+//Get Size of all Cks arr
+   int ArrSize=ArraySize(m_arr_ck_predictions);
+
+//Check if Cks exist
+   if(ArrSize<0)
+     {
+      Print(__FUNCTION__+"Ck predictions count = "+IntegerToString(ArrSize)+", Exit");
+      return;
+     }
+
+//Clear 
+   m_Ck_NoSignal_Count=0;
+   m_Ck_Buys_Count=0;
+   m_Ck_Sells_Count=0;
+   m_Ck_BuysSells_Count=0;
+   m_Ck_BuySingularities_Count=0;
+   m_Ck_SellSingularities_Count=0;
+
+//Sum all Cks by category
+   for(int i=0;i<ArrSize;i++)
+     {
+      if(m_arr_ck_predictions[i]==CkBuySell14)        {m_Ck_BuysSells_Count++; continue;}
+      if(m_arr_ck_predictions[i]==CkBuy1)             {m_Ck_Buys_Count++; continue;}
+      if(m_arr_ck_predictions[i]==CkSell4)            {m_Ck_Sells_Count++; continue;}
+      if(m_arr_ck_predictions[i]==CkSingularityBuy)   {m_Ck_BuySingularities_Count++; continue;}
+      if(m_arr_ck_predictions[i]==CkSingularitySell)  {m_Ck_SellSingularities_Count++; continue;}
+      if(m_arr_ck_predictions[i]==CkNoSignal)         {m_Ck_NoSignal_Count++; continue;}
+     }
+
+//Total Cks
+   m_Ck_Total_Count=m_Ck_BuysSells_Count+m_Ck_BuysSells_Count+m_Ck_Sells_Count+
+                    m_Ck_NoSignal_Count+m_Ck_BuySingularities_Count+m_Ck_SellSingularities_Count;
+
+//Print All Cks
+   Print("Total Cks: "+IntegerToString(m_Ck_Total_Count)+
+         " Ck14= "+IntegerToString(m_Ck_BuysSells_Count)+
+         " Ck1= "+IntegerToString(m_Ck_Buys_Count)+
+         " Ck4= "+IntegerToString(m_Ck_Sells_Count)+
+         " CkSBuy= "+IntegerToString(m_Ck_BuySingularities_Count)+
+         " CkSSell= "+IntegerToString(m_Ck_SellSingularities_Count)+
+         " CkNo= "+IntegerToString(m_Ck_NoSignal_Count)
+         );
+
+  }//END Of Print All Ck Predictions 
 //+------------------------------------------------------------------+
