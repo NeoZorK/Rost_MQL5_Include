@@ -274,8 +274,8 @@ int RCat::m_OpenRule(const ENUM_RT_OpenRule &OpenRule)
    switch(OpenRule)
      {
       case  0:TR_RES=m_POMI();
-
       break;
+
       default:
          break;
      }
@@ -330,7 +330,6 @@ int RCat::m_POMI()
      {
       if((m_signal==Ind_Sell) && (m_pom>=m_pom_sell) && (m_pom<m_pom_sell+m_pom_koef))
         {
-         //  Print("SELL PRISHEL");
          return(SELL1);
         }
      }//END of BUY
@@ -1111,5 +1110,4 @@ bool RCat::Calculate_TotalInfo(const datetime &StartDate,const double StartBalan
 
 //If Ok
    return(true);
-  }//END OF  Calculate MonthCount,Avg & Total Profit in %    
-//+------------------------------------------------------------------+
+  }//END OF  Calculate MonthCount,Avg & Total Profit in %  

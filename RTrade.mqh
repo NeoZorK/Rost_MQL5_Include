@@ -108,6 +108,9 @@ private:
                                                 const int OHLC,const STRUCT_FEED_CLOSE &FeedClose[]);
    //Calculate Ck Prediction 0,1,2 : 1,4,14
    char              m_BUILD_CK_TR18_0330_Virt(const bool USDFirst);
+   //Only Ck 14
+   char              m_BUILD_CK_TR14();
+
    //Check for Close Position (:true->continue)
    bool              m_CheckClose(const double Price,bool &BUY_OPENED,bool &SELL_OPENED,double &PositionProfit,
                                   double &BUY_OPENED_PRICE,double &SELL_OPENED_PRICE,const double Dc,const int Spread);
@@ -336,18 +339,20 @@ char RTrade::TR_PredictCk(const ENUM_TRCK TRCk_Name,const bool USDFirst)
    switch(TRCk_Name)
      {//False - EURUSD
       case  CK_TR18_0330_Virt:
-        {
-         //Get Ck Prediction
          TR_RES=m_BUILD_CK_TR18_0330_Virt(USDFirst);
-
-         //Save to arr prediction
-         m_arr_ck_predictions[ArraySize(m_arr_ck_predictions)-1]=TR_RES;
          break;
-        } //END OF CK_TR18_0330_Virt
+
+      case CK_TR14:
+         TR_RES=m_BUILD_CK_TR14();
+         break;
 
       default:
          break;
      }
+
+//Save to arr prediction
+   m_arr_ck_predictions[ArraySize(m_arr_ck_predictions)-1]=TR_RES;
+
 //If Ok
    return(TR_RES);
   }//End of Choose TR for Ck
@@ -1516,5 +1521,12 @@ void RTrade::PrintAll_Ck(void)
          " CkNo= "+IntegerToString(m_Ck_NoSignal_Count)
          );
 
-  }//END Of Print All Ck Predictions 
+  }//END Of Print All Ck Predictions
+//+------------------------------------------------------------------+
+//| Only CK14                                                        |
+//+------------------------------------------------------------------+
+char RTrade::m_BUILD_CK_TR14(void)
+  {
+   return(CkBuySell14);
+  }
 //+------------------------------------------------------------------+
