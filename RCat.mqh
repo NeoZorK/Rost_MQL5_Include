@@ -635,6 +635,7 @@ bool RCat::AutoCompounding(const ENUM_AutoLot &Enum_AutoLot)
 
 //Get Maximum Availables Volume on broker
    double max_broker_vol=SymbolInfoDouble(m_pair,SYMBOL_VOLUME_MAX);
+
 //Check if first run : Calculate fixed lot koef
    if(m_start_vol_koef==0 || m_max_vol_koef==0)
      {
@@ -652,6 +653,7 @@ bool RCat::AutoCompounding(const ENUM_AutoLot &Enum_AutoLot)
 //Calculate lot
    double current_start_vol_koef=0;
    double current_max_vol_koef=0;
+
 //Select Calculation mode Dynamic or MaximalOnly
    switch(Enum_AutoLot)
      {
@@ -662,22 +664,21 @@ bool RCat::AutoCompounding(const ENUM_AutoLot &Enum_AutoLot)
          //Calculate Current Max volume koeficient
          current_max_vol_koef=NormalizeDouble(balance/m_max_volume,2);
 
+         //Compare Maximum broker volume with our calculated
+         if(m_start_volume>max_broker_vol || m_max_volume>max_broker_vol)
+           {
+            //return to saved volume
+            m_start_volume=saved_start_vol;
+            m_max_volume=saved_max_vol;
+            return(false);
+           }//End of compare
+
          //Check if balance changed
          if(current_start_vol_koef!=m_start_vol_koef)
            {
             //if changed set current lot to new
             m_start_volume=NormalizeDouble(balance/m_start_vol_koef,2);
             m_max_volume=NormalizeDouble(balance/m_max_vol_koef,2);
-
-            //Compare Maximum broker volume with our calculated
-            if(m_start_volume>max_broker_vol || m_max_volume>max_broker_vol)
-              {
-               //return to saved volume
-               m_start_volume=saved_start_vol;
-               m_max_volume=saved_max_vol;
-               return(false);
-              }//End of compare
-
             return(true);
            }
          break;
