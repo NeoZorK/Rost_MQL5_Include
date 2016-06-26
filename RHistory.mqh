@@ -2704,13 +2704,13 @@ char RHistory::m_WhoFirst_OHLC(const MqlRates &Rates[],const int &Start,const do
    for(int z=0;z<m_bottle_size;z++)
      {
       //Max
-      if(arr_WF[z].high>HighIndex)
+      if(arr_WF[z].high>HighMax)
         {
          HighMax=arr_WF[z].high;
          HighIndex=z;
         }
       //Min
-      if(arr_WF[z].low<LowIndex)
+      if(arr_WF[z].low<LowMin)
         {
          LowMin=arr_WF[z].low;
          LowIndex=z;
