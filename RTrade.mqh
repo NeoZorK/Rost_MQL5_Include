@@ -1508,7 +1508,7 @@ void RTrade::PrintAll_Ck(void)
      }
 
 //Total Cks
-   m_Ck_Total_Count=m_Ck_BuysSells_Count+m_Ck_BuysSells_Count+m_Ck_Sells_Count+
+   m_Ck_Total_Count=m_Ck_BuysSells_Count+m_Ck_Buys_Count+m_Ck_Sells_Count+
                     m_Ck_NoSignal_Count+m_Ck_BuySingularities_Count+m_Ck_SellSingularities_Count;
 
 //Print All Cks
