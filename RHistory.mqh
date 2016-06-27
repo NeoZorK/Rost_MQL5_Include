@@ -2521,6 +2521,9 @@ double RHistory::m_POM_Signal_OHLC(const double &Open,const double &High,const d
    uchar m=0;
    uchar n=0;
 
+//Current POM Signal
+   POM_SIGNAL=NOSIGNAL;
+
 //Private cases:
    if(WhoFirst<LowFirst || WhoFirst>HighFirst) return(0);
    if(WhoFirst==EqualFirst) return(0);
@@ -2550,9 +2553,6 @@ double RHistory::m_POM_Signal_OHLC(const double &Open,const double &High,const d
    if(m*n==1 && High==Close) return(0);
    if((m*n==2) && (High-Close+Open-Low==0)) return(0);
 
-//Current POM Signal
-   POM_SIGNAL=NOSIGNAL;
-
 //--- POM ver: 10.02.2015 
 //2:1
    if(m==2 && n==1)
@@ -2561,8 +2561,13 @@ double RHistory::m_POM_Signal_OHLC(const double &Open,const double &High,const d
       double ga=((a+c)/2)/MathAbs(b);
 
       //(case 4)  
-      if(MathAbs(b)>((a+c)/2)) POM_SIGNAL=SELL;
-      return(1-(1/(1+ga)));
+      if(MathAbs(b)>((a+c)/2))
+        {
+         POM_SIGNAL=SELL;
+        }
+      double pom=1-(1/(1+ga));
+
+      return(pom);
      }//end of 2:1
 
 //1:2  
@@ -2572,8 +2577,13 @@ double RHistory::m_POM_Signal_OHLC(const double &Open,const double &High,const d
       double ga=b/(MathAbs(a+c)/2);
 
       //(case 1)  
-      if(b>(MathAbs(a+c)/2)) POM_SIGNAL=BUY;
-      return(1-(1/(1+ga)));
+      if(b>(MathAbs(a+c)/2))
+        {
+         POM_SIGNAL=BUY;
+        }
+      double pom=1-(1/(1+ga));
+
+      return(pom);
      }//end of 1:2
 
 //If no POM, private case or unknown error
