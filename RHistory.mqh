@@ -82,7 +82,7 @@ private:
    bool              _CheckMRS();               //Check Minutes Spreads Rates arrays by dates(First & Last)+Counts
    bool              _ConnectIndicator();       //Connect indicator POM3
                                                 //
-   //Calculate WhoFirst
+   //Calculate WhoFirst Universal for Close and OHLC
    char              m_WhoFirst_OHLC(const MqlRates &Rates[],const int &Start,const double &Open,const double &High,
                                      const double &Low,const double &Close);
 
@@ -2661,7 +2661,7 @@ double RHistory::m_DC_OHLC(const int OHLC,const MqlRates &Rates[],const int &Sta
    return(res);
   }//END of DC for OHLC
 //+------------------------------------------------------------------+
-//| WhoFirst in last bottle (5 minutes) for OHLC                     |
+//| WhoFirst in last bottle (5 minutes) for OHLC&Close               |
 //+------------------------------------------------------------------+
 char RHistory::m_WhoFirst_OHLC(const MqlRates &Rates[],const int &Start,const double &Open,const double &High,
                                const double &Low,const double &Close)
@@ -2720,13 +2720,14 @@ char RHistory::m_WhoFirst_OHLC(const MqlRates &Rates[],const int &Start,const do
 //Find WhoFirst
 //Private case H==L
 //Private case, when many H or L, and don`t know who >
+//Where > Index where early!
    if(HighIndex>LowIndex)  return(HighFirst);
    if(HighIndex<LowIndex)  return(LowFirst);
    if(HighIndex==LowIndex) return(EqualFirst);
 
 //If Err
    return(EqualFirst);
-  }//END of WhoFirst for OHLC
+  }//END of WhoFirst for OHLC&ClOSE
 //+------------------------------------------------------------------+
 //| Calculate Feed on Close prices only                              |
 //+------------------------------------------------------------------+
