@@ -86,6 +86,9 @@ private:
    char              m_WhoFirst_OHLC(const MqlRates &Rates[],const int &Start,const double &Open,const double &High,
                                      const double &Low,const double &Close);
 
+   //Calculate WhoFirst for placement in OHLC emulation (true=HighFirst)                               
+   bool              m_MT5_HighFirst_OHLC(const MqlRates &Rates);
+
    //Calculates POM & Signal in primings
    double            m_POM_Signal_OHLC(const double &Open,const double &High,const double &Low,const double &Close,
                                        const char &WhoFirst,char &POM_SIGNAL);
@@ -2427,82 +2430,72 @@ bool RHistory::_Calculate_OHLC_Feed(const MqlRates &Rates[],STRUCT_FEED_OHLC &Fe
 //Main Circle
    for(int i=StartZero;i>-1;i--)
      {
-
       //OHLC CIRCLE
-      for(int OHLC=0;OHLC<4;OHLC++)
+      //+++++++Open
+      open=Rates[i].open;
+      high=open;
+      low=open;
+      close=open;
+
+      //WhoFirst:
+      Feed[i].Open_WhoFirst=m_WhoFirst_OHLC(Rates,i,open,high,low,close);
+
+      //POM+Signal
+      Feed[i].Open_pom=m_POM_Signal_OHLC(open,high,low,close,Feed[i].Open_WhoFirst,Feed[i].Open_signal);
+
+      //DC 
+      Feed[i].Open_dc=m_DC_OHLC(0,Rates,i,open,high,low,close,TickVol);
+
+      //Check WhoFirst High or Low inside 1 OHLC minute by MT5 algorithm
+      if(m_MT5_HighFirst_OHLC(Rates[i])==true)
         {
-         switch(OHLC)
-           {
-            case  0: //Open
-               open=Rates[i].open;
-               high=open;
-               low=open;
-               close=open;
+         //+++++++High
+         open=Rates[i].open;
+         high=Rates[i].high;
+         low=open;
+         close=high;
 
-               //WhoFirst:
-               Feed[i].Open_WhoFirst=m_WhoFirst_OHLC(Rates,i,open,high,low,close);
+         //WhoFirst:
+         Feed[i].High_WhoFirst=m_WhoFirst_OHLC(Rates,i,open,high,low,close);
 
-               //POM+Signal
-               Feed[i].Open_pom=m_POM_Signal_OHLC(open,high,low,close,Feed[i].Open_WhoFirst,Feed[i].Open_signal);
+         //POM+Signal
+         Feed[i].High_pom=m_POM_Signal_OHLC(open,high,low,close,Feed[i].High_WhoFirst,Feed[i].High_signal);
 
-               //DC 
-               Feed[i].Open_dc=m_DC_OHLC(OHLC,Rates,i,open,high,low,close,TickVol);
+         //DC 
+         Feed[i].High_dc=m_DC_OHLC(1,Rates,i,open,high,low,close,TickVol);
+        }//END OF HIGH
+      else
+        {
+         //+++++++Low
+         open=Rates[i].open;
+         high=Rates[i].high;
+         low=Rates[i].low;
+         close=low;
 
-               break;
+         //WhoFirst:
+         Feed[i].Low_WhoFirst=m_WhoFirst_OHLC(Rates,i,open,high,low,close);
 
-            case  1: //High
-               open=Rates[i].open;
-               high=Rates[i].high;
-               low=open;
-               close=high;
+         //POM+Signal
+         Feed[i].Low_pom=m_POM_Signal_OHLC(open,high,low,close,Feed[i].Low_WhoFirst,Feed[i].Low_signal);
 
-               //WhoFirst:
-               Feed[i].High_WhoFirst=m_WhoFirst_OHLC(Rates,i,open,high,low,close);
+         //DC 
+         Feed[i].Low_dc=m_DC_OHLC(2,Rates,i,open,high,low,close,TickVol);
+        }//END OF LOW
 
-               //POM+Signal
-               Feed[i].High_pom=m_POM_Signal_OHLC(open,high,low,close,Feed[i].High_WhoFirst,Feed[i].High_signal);
+      //+++++++Close
+      open=Rates[i].open;
+      high=Rates[i].high;
+      low=Rates[i].low;
+      close=Rates[i].low;
 
-               //DC 
-               Feed[i].High_dc=m_DC_OHLC(OHLC,Rates,i,open,high,low,close,TickVol);
+      //WhoFirst:
+      Feed[i].Close_WhoFirst=m_WhoFirst_OHLC(Rates,i,open,high,low,close);
 
-               break;
+      //POM+Signal
+      Feed[i].Close_pom=m_POM_Signal_OHLC(open,high,low,close,Feed[i].Close_WhoFirst,Feed[i].Close_signal);
 
-            case  2: //Low
-               open=Rates[i].open;
-               high=Rates[i].high;
-               low=Rates[i].low;
-               close=low;
-
-               //WhoFirst:
-               Feed[i].Low_WhoFirst=m_WhoFirst_OHLC(Rates,i,open,high,low,close);
-
-               //POM+Signal
-               Feed[i].Low_pom=m_POM_Signal_OHLC(open,high,low,close,Feed[i].Low_WhoFirst,Feed[i].Low_signal);
-
-               //DC 
-               Feed[i].Low_dc=m_DC_OHLC(OHLC,Rates,i,open,high,low,close,TickVol);
-               break;
-
-            case  3: //Close
-               open=Rates[i].open;
-               high=Rates[i].high;
-               low=Rates[i].low;
-               close=Rates[i].low;
-
-               //WhoFirst:
-               Feed[i].Close_WhoFirst=m_WhoFirst_OHLC(Rates,i,open,high,low,close);
-
-               //POM+Signal
-               Feed[i].Close_pom=m_POM_Signal_OHLC(open,high,low,close,Feed[i].Close_WhoFirst,Feed[i].Close_signal);
-
-               //DC 
-               Feed[i].Close_dc=m_DC_OHLC(OHLC,Rates,i,open,high,low,close,TickVol);
-               break;
-
-            default:
-               break;
-           }//END OF SWITCH
-        }//END OF OHLC CIRCLE
+      //DC 
+      Feed[i].Close_dc=m_DC_OHLC(3,Rates,i,open,high,low,close,TickVol);
 
      }//END of MAIN CIRCLE
 
@@ -3037,3 +3030,47 @@ bool RHistory::_ExportCloseFeedToCSV(const bool ReverseWrite,const MqlRates &Rat
    Alert("Ok, Close Feed Created in COMMON folder: "+path);
    return(true);
   }//END of Export Non Indicator Close Feed to CSV  
+//+------------------------------------------------------------------+
+//| WhoFirst by MT5 OHLC Emulation algorithm (true - High First)     |
+//+------------------------------------------------------------------+
+bool RHistory::m_MT5_HighFirst_OHLC(const MqlRates &Rates)
+  {
+//Private Cases:
+//Check Zero Tick
+   if(Rates.open==Rates.close==Rates.high==Rates.low) return(true);
+
+//Check dogi
+   if(Rates.open==Rates.close)
+     {
+      //Calculate ABS for High and Low
+      double absH = MathAbs(Rates.open-Rates.high);
+      double absL = MathAbs(Rates.open-Rates.low);
+
+      //Check Dogi O=H=C
+      if(Rates.open==Rates.high==Rates.close)
+        {
+         if(absL > absH) return(false);
+         if(absL < absH)  return(true);
+        }//END OF O=H=C
+
+      //Check Dogi O=L=C
+      if(Rates.open==Rates.low==Rates.close)
+        {
+         if(absL > absH) return(false);
+         if(absL < absH)  return(true);
+        }//END OF O=H=C
+
+      //Check dogi absH > absL
+      if(absH > absL) return(true);
+      if(absH < absL) return(false);
+     }//END OF O=C
+
+//Regular cases:
+   if(Rates.close > Rates.open) return(false);
+   if(Rates.close < Rates.open) return(true);
+
+
+//If Unknown situation return HighFirst  
+   return(true);
+  }//END OF WhoFirst by MT5
+//+------------------------------------------------------------------+
