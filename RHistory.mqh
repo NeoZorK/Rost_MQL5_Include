@@ -2486,7 +2486,7 @@ bool RHistory::_Calculate_OHLC_Feed(const MqlRates &Rates[],STRUCT_FEED_OHLC &Fe
       open=Rates[i].open;
       high=Rates[i].high;
       low=Rates[i].low;
-      close=Rates[i].low;
+      close=Rates[i].close;
 
       //WhoFirst:
       Feed[i].Close_WhoFirst=m_WhoFirst_OHLC(Rates,i,open,high,low,close);
