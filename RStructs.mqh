@@ -144,6 +144,16 @@ struct SIMUL_Q
    int               P2_Q4_Simul;
    int               P2_Q14_Simul;
   };
+//---Structure for simulated NPs
+struct SIMUL_NP
+  {
+   double            P1_NP1;
+   double            P1_NP4;
+   double            P1_NP14;
+   double            P2_NP1;
+   double            P2_NP4;
+   double            P2_NP14;
+  };
 //+------------------------------------------------------------------+
 //| Compounding (Dynamic or Maximal Only)                            |
 //+------------------------------------------------------------------+
