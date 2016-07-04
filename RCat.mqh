@@ -5,7 +5,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, Shcherbyna Rostyslav"
 #property link      ""
-#property version   "1.6"
+#property version   "1.7"
 
 #include <Tools\DateTime.mqh>
 #include <RInclude\RTrade.mqh>
@@ -14,6 +14,7 @@
 //+------------------------------------------------------------------+
 /*
 +++++CHANGE LOG+++++
+1.7  04.07.2016--Add QNP Export
 1.6  20.06.2016--Add Custom Feed WO Indicator to Emulation and Trading
 1.5  30.05.2016--Clear Old Code , better perfomance (33 sec from 2010 to 2016.04 Daily)
 1.41 28.05.2016--Minor version with ability to Export OHLC to CSV & BIN
@@ -65,6 +66,15 @@ private:
    double            m_max_vol_koef;
    double            m_add_vol_shift_points;
 
+   //Total Monthes Count
+   double            m_TotalMonthsCount;
+
+   //Total Profit in %
+   double            m_TotalProfitPercent;
+
+   //Avg Monthly Profit % 
+   double            m_AvgMonthlyProfitPercent;
+
    ENUM_RT_OpenRule  m_current_open_rule;
    ENUM_RT_CloseRule m_current_close_rule;
    //Open TR 
@@ -96,6 +106,7 @@ public:
                      RCat(const string Pair,const double &Pom_Koef,const double &PomBuy,const double &PomSell,
                                             const ushort &Fee,const uchar &SleepPage,const ushort &MaxSpread,const uint &BottleSize);
                     ~RCat();
+
    //Initialisation     
    bool              Init(const char &Ck_Case,const ENUM_RT_OpenRule &OpenRule,const ENUM_RT_CloseRule &CloseRule,
                           const double AddVol_Shift_Pt);
@@ -118,6 +129,9 @@ public:
 
    //Calculate RT Feed (WF,Pom,Signal,DC)
    bool              CalculateRTFeed();
+
+   //Calculate Total Info onDeInit
+   bool              Calculate_TotalInfo(const datetime &StartDate,const double StartBalance);
 
   };
 //+------------------------------------------------------------------+
@@ -261,8 +275,8 @@ int RCat::m_OpenRule(const ENUM_RT_OpenRule &OpenRule)
    switch(OpenRule)
      {
       case  0:TR_RES=m_POMI();
-
       break;
+
       default:
          break;
      }
@@ -317,7 +331,6 @@ int RCat::m_POMI()
      {
       if((m_signal==Ind_Sell) && (m_pom>=m_pom_sell) && (m_pom<m_pom_sell+m_pom_koef))
         {
-         //  Print("SELL PRISHEL");
          return(SELL1);
         }
      }//END of BUY
@@ -623,6 +636,7 @@ bool RCat::AutoCompounding(const ENUM_AutoLot &Enum_AutoLot)
 
 //Get Maximum Availables Volume on broker
    double max_broker_vol=SymbolInfoDouble(m_pair,SYMBOL_VOLUME_MAX);
+
 //Check if first run : Calculate fixed lot koef
    if(m_start_vol_koef==0 || m_max_vol_koef==0)
      {
@@ -640,6 +654,7 @@ bool RCat::AutoCompounding(const ENUM_AutoLot &Enum_AutoLot)
 //Calculate lot
    double current_start_vol_koef=0;
    double current_max_vol_koef=0;
+
 //Select Calculation mode Dynamic or MaximalOnly
    switch(Enum_AutoLot)
      {
@@ -650,22 +665,21 @@ bool RCat::AutoCompounding(const ENUM_AutoLot &Enum_AutoLot)
          //Calculate Current Max volume koeficient
          current_max_vol_koef=NormalizeDouble(balance/m_max_volume,2);
 
+         //Compare Maximum broker volume with our calculated
+         if(m_start_volume>max_broker_vol || m_max_volume>max_broker_vol)
+           {
+            //return to saved volume
+            m_start_volume=saved_start_vol;
+            m_max_volume=saved_max_vol;
+            return(false);
+           }//End of compare
+
          //Check if balance changed
          if(current_start_vol_koef!=m_start_vol_koef)
            {
             //if changed set current lot to new
             m_start_volume=NormalizeDouble(balance/m_start_vol_koef,2);
             m_max_volume=NormalizeDouble(balance/m_max_vol_koef,2);
-
-            //Compare Maximum broker volume with our calculated
-            if(m_start_volume>max_broker_vol || m_max_volume>max_broker_vol)
-              {
-               //return to saved volume
-               m_start_volume=saved_start_vol;
-               m_max_volume=saved_max_vol;
-               return(false);
-              }//End of compare
-
             return(true);
            }
          break;
@@ -1061,3 +1075,41 @@ bool RCat::Trade(const double &Sl,const double &Tp,const double &StartVol,const 
 //If No Opened Position then false
    return(false);
   }//END OF TRADE WITHOUT INDiCATOR
+//+------------------------------------------------------------------+
+//| Calculate MonthCount,Avg & Total Profit in %                     |
+//+------------------------------------------------------------------+
+bool RCat::Calculate_TotalInfo(const datetime &StartDate,const double StartBalance)
+  {
+//Stop Date
+   datetime   StopDate=TimeCurrent();
+
+//Get Current Balance
+   double _FinalProfit=AccountInfoDouble(ACCOUNT_BALANCE)-StartBalance;
+
+//Calculate Month Number
+   double MonthsCount=((double)StopDate-(double)StartDate)/86400/30;
+
+   if(MonthsCount<=0)
+     {
+      Print(__FUNCTION__+"Total:Months Count =!"+DoubleToString(MonthsCount)+" , Exit");
+      return(false);
+     }
+
+//Save Months Count
+   m_TotalMonthsCount=MonthsCount;
+
+//Calculate TotalPercentProfit
+   m_TotalProfitPercent=_FinalProfit*100/StartBalance;
+
+//Calculate Avg : Monthly Profit  
+   m_AvgMonthlyProfitPercent=_FinalProfit/m_TotalMonthsCount/(StartBalance/100);
+
+//Printing:
+   Print("Total Months: "+DoubleToString(m_TotalMonthsCount)+
+         " Total%: "+DoubleToString(m_TotalProfitPercent)+"%"+
+         " Avg Monthly Profit % = "+DoubleToString(m_AvgMonthlyProfitPercent)+"%"
+         );
+
+//If Ok
+   return(true);
+  }//END OF  Calculate MonthCount,Avg & Total Profit in %  
