@@ -5,7 +5,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, Shcherbyna Rostyslav"
 #property link      ""
-#property version   "1.41"
+#property version   "1.7"
 
 #include <Tools\DateTime.mqh>
 #include <RInclude\RStructs.mqh>
@@ -14,6 +14,7 @@
 //+------------------------------------------------------------------+
 /*
 +++++CHANGE LOG+++++
+1.7  04.07.2016--Add QNP Export
 1.6  20.06.2016--Add Custom Feed WO Indicator to Emulation and Trading
 1.5  30.05.2016--Clear Old Code , better perfomance (33 sec from 2010 to 2016.04 Daily)
 1.41 28.05.2016--Minor version with ability to Export OHLC to CSV & BIN
@@ -37,13 +38,22 @@ class RTrade
 private:
    string            m_pair;
    double            m_pair_point;
+   //Ck Summary
+   uint              m_Ck_NoSignal_Count;
+   uint              m_Ck_Buys_Count;
+   uint              m_Ck_Sells_Count;
+   uint              m_Ck_BuysSells_Count;
+   uint              m_Ck_BuySingularities_Count;
+   uint              m_Ck_SellSingularities_Count;
+   ulong             m_Ck_Total_Count;
    //Emulation
    // Each 2 primings = +1  
    uint              m_simulated_primings_total;
    //Ck Predictions
    char              m_arr_ck_predictions[];
-   //Array of Simulated Q  
+   //Array of Simulated Q & NP 
    SIMUL_Q           m_arr_sim_q[];
+   SIMUL_NP          m_arr_sim_np[];
 
    bool              m_initialised_emul;
    ENUM_EMUL_CloseRule m_close_rule_num_emul;
@@ -55,7 +65,10 @@ private:
    uint              m_bottle_size_emul;
    uint              m_one_bottle_size_emul;
    uint              m_all_bottle_size_emul;
+   //Our TakeProfit
    double            m_comission_emul;
+   //Broker Emulated Comission for 1.00 Lot
+   double            m_OneLotFee_emul;
 
    //Other   
    bool              m_debug;
@@ -70,6 +83,10 @@ private:
    STRUCT_Priming    m_P2;
 
    //Methods
+
+   //Print 3 cases q before each prediction
+   void              m_PrintLast_Q(const bool Priming1);
+
    //TR Close Positions
    bool              m_EMUL_AutoCloseDCSpread(const double PositionProfit,const double Dc,const uint Spread,
                                               const double Commission);
@@ -96,15 +113,18 @@ private:
                                                 const int OHLC,const STRUCT_FEED_CLOSE &FeedClose[]);
    //Calculate Ck Prediction 0,1,2 : 1,4,14
    char              m_BUILD_CK_TR18_0330_Virt(const bool USDFirst);
+   //Only Ck 14
+   char              m_BUILD_CK_TR14();
+
    //Check for Close Position (:true->continue)
-   bool              m_CheckClose(const double Price,bool &BUY_OPENED,bool &SELL_OPENED,double &PositionProfit,
+   bool              m_CheckClose(const double Price,bool &BUY_OPENED,bool &SELL_OPENED,double &PositionProfit,double &CaseNP,
                                   double &BUY_OPENED_PRICE,double &SELL_OPENED_PRICE,const double Dc,const int Spread);
    //Check for Open Position (:true->continue)
    bool              m_CheckOpen(const double Price,const int OTR_RESULT,bool &BUY_OPENED,bool &SELL_OPENED,
                                  double &BUY_OPENED_PRICE,double &SELL_OPENED_PRICE,int &BUY_Signal_Count,
-                                 int &SELL_Signal_Count);
+                                 int &SELL_Signal_Count,const uint &Spread);
 public:
-                     RTrade();
+                     RTrade(const double OneLotFee);
                     ~RTrade();
    //Is Emulation Initialised ?
    bool              _isInitialised() const       {return(m_initialised_emul);}
@@ -142,11 +162,16 @@ public:
    string            CkResultToString(const char Ck);
    //Get Ck Predictions by Index
    char              CkPredictionByIndex(const uint CkIndex);
+   //Print All Ck Predictions
+   void              PrintAll_Ck(void);
+   //Export Q&NP to CSV
+   void              ExportQNP_CSV(const TIMEMARKS &arr_tm[],const ENUM_myPredictPeriod _PredictPeriod,
+                                   const ENUM_EMUL_OHLC_PRICE &_OHLCPRICE_emul);
   };
 //+------------------------------------------------------------------+
 //| Init                                                             |
 //+------------------------------------------------------------------+
-RTrade::RTrade()
+RTrade::RTrade(const double OneLotFee)
   {
    MassiveSetAsSeries(m_P1);
    MassiveSetAsSeries(m_P2);
@@ -155,11 +180,15 @@ RTrade::RTrade()
    m_CurrentPriming=0;
    m_debug=false;
 
+//Emulated one lot Fee (1.00 Lot) (RoundTrip = Fee*2)
+   m_OneLotFee_emul=OneLotFee;
+
 //Each 2 simulated primings = 2
    m_simulated_primings_total=0;
 
 //Add +1 Cell to Dynamic Array of Primings Omega
    ArrayResize(m_arr_sim_q,ArraySize(m_arr_sim_q)+1);
+   ArrayResize(m_arr_sim_np,ArraySize(m_arr_sim_np)+1);
   }//END OF CONSTRUCTOR
 //+------------------------------------------------------------------+
 //| Deinit                                                           |
@@ -212,7 +241,11 @@ bool  RTrade::m_EMUL_AutoCloseDCSpread(const double PositionProfit,const double 
   {// CLose if NetProfit >= |dC|+spread+commision
    bool res=false;
 
-//Check for close
+//Check for close with spread and comission (works better for calc Q)
+//  if(PositionProfit>=MathAbs(Dc*10)+Spread+Commission)
+
+//No need check Spread & Comission Because Position Profit already Include all Fees and Spread (Open & Close)
+//   if(PositionProfit>=MathAbs(Dc*10))
    if(PositionProfit>=MathAbs(Dc*10)+Spread+Commission)
      {
       //Close Position
@@ -322,18 +355,20 @@ char RTrade::TR_PredictCk(const ENUM_TRCK TRCk_Name,const bool USDFirst)
    switch(TRCk_Name)
      {//False - EURUSD
       case  CK_TR18_0330_Virt:
-        {
-         //Get Ck Prediction
          TR_RES=m_BUILD_CK_TR18_0330_Virt(USDFirst);
-
-         //Save to arr prediction
-         m_arr_ck_predictions[ArraySize(m_arr_ck_predictions)-1]=TR_RES;
          break;
-        } //END OF CK_TR18_0330_Virt
+
+      case CK_TR14:
+         TR_RES=m_BUILD_CK_TR14();
+         break;
 
       default:
          break;
      }
+
+//Save to arr prediction
+   m_arr_ck_predictions[ArraySize(m_arr_ck_predictions)-1]=TR_RES;
+
 //If Ok
    return(TR_RES);
   }//End of Choose TR for Ck
@@ -496,23 +531,29 @@ char RTrade::CkPredictionByIndex(const uint CkIndex)
 //+------------------------------------------------------------------+
 //| Check for Close                                                  |
 //+------------------------------------------------------------------+
-bool RTrade::m_CheckClose(const double Price,bool &BUY_OPENED,bool &SELL_OPENED,double &PositionProfit,
+bool RTrade::m_CheckClose(const double Price,bool &BUY_OPENED,bool &SELL_OPENED,double &PositionProfit,double &CaseNP,
                           double &BUY_OPENED_PRICE,double &SELL_OPENED_PRICE,const double Dc,const int Spread)
   {
    if(BUY_OPENED || SELL_OPENED)
      {
       //3.1 Calculate Position Profit for buy
       if(BUY_OPENED)PositionProfit=(Price-BUY_OPENED_PRICE)/m_pair_point;
+      //if(BUY_OPENED)PositionProfit=((Price-(Spread/m_pair_point))-BUY_OPENED_PRICE)+(m_OneLotFee_emul*2);
 
       //3.2 Calculate Position Profit for sell
       if(SELL_OPENED) PositionProfit=(SELL_OPENED_PRICE-Price)/m_pair_point;
+      //if(SELL_OPENED) PositionProfit=(SELL_OPENED_PRICE -(Price+(Spread/m_pair_point)))+(m_OneLotFee_emul*2);
 
-      //3.3 Check Close Rule (DONT WORK)
+      //3.3 Check Close Rule 
       bool CTR_RESULT=m_EMUL_CloseRule(m_close_rule_num_emul,PositionProfit,Dc,Spread);
 
       //3.4 If need to Close position
       if(CTR_RESULT)
         {
+         //Save NetProfit
+         CaseNP+=PositionProfit;
+
+         //Clear position(buy or sell)
          BUY_OPENED=false;
          SELL_OPENED=false;
          BUY_OPENED_PRICE=0;
@@ -528,8 +569,8 @@ bool RTrade::m_CheckClose(const double Price,bool &BUY_OPENED,bool &SELL_OPENED,
 //+------------------------------------------------------------------+
 //| Check for Open                                                   |
 //+------------------------------------------------------------------+
-bool RTrade::m_CheckOpen(const double Price,const int OTR_RESULT,bool &BUY_OPENED,bool &SELL_OPENED,
-                         double &BUY_OPENED_PRICE,double &SELL_OPENED_PRICE,int &BUY_Signal_Count,int &SELL_Signal_Count)
+bool RTrade::m_CheckOpen(const double Price,const int OTR_RESULT,bool &BUY_OPENED,bool &SELL_OPENED,double &BUY_OPENED_PRICE,
+                         double &SELL_OPENED_PRICE,int &BUY_Signal_Count,int &SELL_Signal_Count,const uint &Spread)
   {
 //5. Check if NOSIGNAL then exit
    if(OTR_RESULT<=0) return(true);
@@ -545,7 +586,7 @@ bool RTrade::m_CheckOpen(const double Price,const int OTR_RESULT,bool &BUY_OPENE
       // Check If already opened Position exist, 
       if(BUY_OPENED)  return(true);
 
-      BUY_OPENED_PRICE=Price;
+      BUY_OPENED_PRICE=Price;//+(Spread/m_pair_point);
       BUY_Signal_Count++;
       BUY_OPENED=true;
       //  Print("BUY "+TimeToString(m_arr_Rates_P1[i].time)+" "+DoubleToString(Calculated_Dc));
@@ -558,7 +599,7 @@ bool RTrade::m_CheckOpen(const double Price,const int OTR_RESULT,bool &BUY_OPENE
       // Check If already opened Position exist, 
       if(SELL_OPENED)  return(true);
 
-      SELL_OPENED_PRICE=Price;
+      SELL_OPENED_PRICE=Price;//-(Spread/m_pair_point);
       SELL_Signal_Count++;
       SELL_OPENED=true;
       //  Print("SELL "+TimeToString(m_arr_Rates_P1[i].time)+" "+DoubleToString(Calculated_Dc));
@@ -635,7 +676,10 @@ bool RTrade::Emulate_Trading_AllClose(const bool Priming1,const STRUCT_Priming &
       double SELL_OPENED_PRICE=0;
       bool SELL_OPENED=false;
       double Calculated_Dc=0;
+      //Profit of only one position
       double PositionProfit=0;
+      //Accumulated Posittion Profit inside one Case
+      double CaseNetProfit=0;
 
       //From first day 00:00 to 23:50 last day in Priming1
       for(int i=ArrSize-1;i>-1;i--)
@@ -651,17 +695,20 @@ bool RTrade::Emulate_Trading_AllClose(const bool Priming1,const STRUCT_Priming &
          Calculated_Dc= m_EMUL_CalculateDc(i,CurP)*inpDeltaC_koef;
 
          //3. Check if pos opened, try to close,if closed continue   
-         if(m_CheckClose(CurP.Rates[i].close,BUY_OPENED,SELL_OPENED,PositionProfit,BUY_OPENED_PRICE,SELL_OPENED_PRICE,
-            Calculated_Dc,CurP.Spread[i])) continue;
+         if(m_CheckClose(CurP.Rates[i].close,BUY_OPENED,SELL_OPENED,PositionProfit,CaseNetProfit,
+            BUY_OPENED_PRICE,SELL_OPENED_PRICE,Calculated_Dc,CurP.Spread[i])) continue;
 
          //4. Check Spread (if > max then next iteration)
          if(CheckSpread(m_max_spread_emul,CurP.Spread[i])) continue;
 
-         //5. +++OPEN POSITION+++ (:true -> next iteration)
+         //5. +++OPEN POSITION+++ (:true -> next iteration) (Always 1.00 Lot)
          if(m_CheckOpen(CurP.Rates[i].close,OTR_RESULT,BUY_OPENED,SELL_OPENED,BUY_OPENED_PRICE,
-            SELL_OPENED_PRICE,BUY_Signal_Count,SELL_Signal_Count)) continue;
+            SELL_OPENED_PRICE,BUY_Signal_Count,SELL_Signal_Count,CurP.Spread[i])) continue;
 
         }//END OF CASE
+
+      //If Position still opened when period ends, then save her Profit to TotalCaseNetProfit
+      CaseNetProfit+=PositionProfit;
 
       //Fill Omega Structures for Priming1:
       if(m_CurrentPriming)
@@ -669,9 +716,18 @@ bool RTrade::Emulate_Trading_AllClose(const bool Priming1,const STRUCT_Priming &
          //Priming 1
          switch(Case)
            {
-            case  0: m_arr_sim_q[m_simulated_primings_total].P1_Q1_Simul=BUY_Signal_Count;  break;
-            case  1: m_arr_sim_q[m_simulated_primings_total].P1_Q4_Simul=SELL_Signal_Count;  break;
-            case  2: m_arr_sim_q[m_simulated_primings_total].P1_Q14_Simul=BUY_Signal_Count+SELL_Signal_Count;break;
+            case  0:
+               m_arr_sim_q[m_simulated_primings_total].P1_Q1_Simul=BUY_Signal_Count;
+               m_arr_sim_np[m_simulated_primings_total].P1_NP1=CaseNetProfit;
+               break;
+            case  1:
+               m_arr_sim_q[m_simulated_primings_total].P1_Q4_Simul=SELL_Signal_Count;
+               m_arr_sim_np[m_simulated_primings_total].P1_NP4=CaseNetProfit;
+               break;
+            case  2:
+               m_arr_sim_q[m_simulated_primings_total].P1_Q14_Simul=BUY_Signal_Count+SELL_Signal_Count;
+               m_arr_sim_np[m_simulated_primings_total].P1_NP14=CaseNetProfit;
+               break;
 
             default:
                break;
@@ -682,16 +738,25 @@ bool RTrade::Emulate_Trading_AllClose(const bool Priming1,const STRUCT_Priming &
          //Priming 2
          switch(Case)
            {
-            case  0: m_arr_sim_q[m_simulated_primings_total].P2_Q1_Simul=BUY_Signal_Count;  break;
-            case  1: m_arr_sim_q[m_simulated_primings_total].P2_Q4_Simul=SELL_Signal_Count;  break;
-            case  2: m_arr_sim_q[m_simulated_primings_total].P2_Q14_Simul=BUY_Signal_Count+SELL_Signal_Count;
+            case  0:
+               m_arr_sim_q[m_simulated_primings_total].P2_Q1_Simul=BUY_Signal_Count;
+               m_arr_sim_np[m_simulated_primings_total].P2_NP1=CaseNetProfit;
+               break;
+            case  1:
+               m_arr_sim_q[m_simulated_primings_total].P2_Q4_Simul=SELL_Signal_Count;
+               m_arr_sim_np[m_simulated_primings_total].P2_NP4=CaseNetProfit;
+               break;
+            case  2:
+               m_arr_sim_q[m_simulated_primings_total].P2_Q14_Simul=BUY_Signal_Count+SELL_Signal_Count;
+               m_arr_sim_np[m_simulated_primings_total].P2_NP14=CaseNetProfit;
 
-            //Only after Second Priming Case2 : Add +1 Cell to Dynamic Array of Primings Omegas
-            ArrayResize(m_arr_sim_q,ArraySize(m_arr_sim_q)+1);
+               //Only after Second Priming Case2 : Add +1 Cell to Dynamic Array of Primings Omegas
+               ArrayResize(m_arr_sim_q,ArraySize(m_arr_sim_q)+1);
+               ArrayResize(m_arr_sim_np,ArraySize(m_arr_sim_np)+1);
 
-            //Always increase by 1 this counter, otherwise program writes to [0]
-            m_simulated_primings_total++;
-            break;
+               //Always increase by 1 this counter, otherwise program writes to [0]
+               m_simulated_primings_total++;
+               break;
 
             default:
                break;
@@ -699,7 +764,13 @@ bool RTrade::Emulate_Trading_AllClose(const bool Priming1,const STRUCT_Priming &
 
         }//End of Priming 2 Switch
 
+      //Clear Total NPs of Current Case
+      CaseNetProfit=0;
+
      }//END OF ALL CASES
+
+//Print Q
+   m_PrintLast_Q(Priming1);
 
 //If Ok
    return(true);
@@ -748,7 +819,10 @@ bool RTrade::Emulate_Trading_AllOHLC(const bool Priming1,const STRUCT_Priming &C
       bool SELL_OPENED=false;
       double Calculated_Dc=0;
       double Calculated_DcOld=0;
+      //Profit of only one position
       double PositionProfit=0;
+      //Accumulated Posittion Profit inside one Case
+      double CaseNetProfit=0;
       double Current_OHLC_Price=0;
 
       //From first day 00:00 to 23:50 last day in Priming1
@@ -812,17 +886,20 @@ bool RTrade::Emulate_Trading_AllOHLC(const bool Priming1,const STRUCT_Priming &C
             //  Print("OHLC: "+IntegerToString(OHLC)+",dc: "+DoubleToString(Calculated_Dc));
 
             //3. Check if pos opened, try to close,if closed continue   
-            if(m_CheckClose(Current_OHLC_Price,BUY_OPENED,SELL_OPENED,PositionProfit,BUY_OPENED_PRICE,SELL_OPENED_PRICE,
-               Calculated_Dc,CurP.Spread[i])) continue;
+            if(m_CheckClose(Current_OHLC_Price,BUY_OPENED,SELL_OPENED,PositionProfit,CaseNetProfit,
+               BUY_OPENED_PRICE,SELL_OPENED_PRICE,Calculated_Dc,CurP.Spread[i])) continue;
 
             //4. Check Spread (if > max then next iteration)
             if(CheckSpread(m_max_spread_emul,CurP.Spread[i])) continue;
 
-            //5. +++OPEN POSITION+++ (:true -> next iteration)
+            //5. +++OPEN POSITION+++ (:true -> next iteration)(Always 1.00 Lot)
             if(m_CheckOpen(Current_OHLC_Price,OTR_RESULT,BUY_OPENED,SELL_OPENED,BUY_OPENED_PRICE,
-               SELL_OPENED_PRICE,BUY_Signal_Count,SELL_Signal_Count)) continue;
+               SELL_OPENED_PRICE,BUY_Signal_Count,SELL_Signal_Count,CurP.Spread[i])) continue;
            }//END OF OHLC SWITCH
         }//END OF CASE
+
+      //If Position still opened when period ends, then save her Profit to TotalCaseNetProfit
+      CaseNetProfit+=PositionProfit;
 
       //Fill Omega Structures for Priming1:
       if(m_CurrentPriming)
@@ -830,9 +907,18 @@ bool RTrade::Emulate_Trading_AllOHLC(const bool Priming1,const STRUCT_Priming &C
          //Priming 1
          switch(Case)
            {
-            case  0: m_arr_sim_q[m_simulated_primings_total].P1_Q1_Simul=BUY_Signal_Count;  break;
-            case  1: m_arr_sim_q[m_simulated_primings_total].P1_Q4_Simul=SELL_Signal_Count;  break;
-            case  2: m_arr_sim_q[m_simulated_primings_total].P1_Q14_Simul=BUY_Signal_Count+SELL_Signal_Count;break;
+            case  0:
+               m_arr_sim_q[m_simulated_primings_total].P1_Q1_Simul=BUY_Signal_Count;
+               m_arr_sim_np[m_simulated_primings_total].P1_NP1=CaseNetProfit;
+               break;
+            case  1:
+               m_arr_sim_q[m_simulated_primings_total].P1_Q4_Simul=SELL_Signal_Count;
+               m_arr_sim_np[m_simulated_primings_total].P1_NP4=CaseNetProfit;
+               break;
+            case  2:
+               m_arr_sim_q[m_simulated_primings_total].P1_Q14_Simul=BUY_Signal_Count+SELL_Signal_Count;
+               m_arr_sim_np[m_simulated_primings_total].P1_NP14=CaseNetProfit;
+               break;
 
             default:
                break;
@@ -843,22 +929,39 @@ bool RTrade::Emulate_Trading_AllOHLC(const bool Priming1,const STRUCT_Priming &C
          //Priming 2
          switch(Case)
            {
-            case  0: m_arr_sim_q[m_simulated_primings_total].P2_Q1_Simul=BUY_Signal_Count;  break;
-            case  1: m_arr_sim_q[m_simulated_primings_total].P2_Q4_Simul=SELL_Signal_Count;  break;
-            case  2: m_arr_sim_q[m_simulated_primings_total].P2_Q14_Simul=BUY_Signal_Count+SELL_Signal_Count;
+            case  0:
+               m_arr_sim_q[m_simulated_primings_total].P2_Q1_Simul=BUY_Signal_Count;
+               m_arr_sim_np[m_simulated_primings_total].P2_NP1=CaseNetProfit;
+               break;
+            case  1:
+               m_arr_sim_q[m_simulated_primings_total].P2_Q4_Simul=SELL_Signal_Count;
+               m_arr_sim_np[m_simulated_primings_total].P2_NP4=CaseNetProfit;
+               break;
+            case  2:
+               m_arr_sim_q[m_simulated_primings_total].P2_Q14_Simul=BUY_Signal_Count+SELL_Signal_Count;
+               m_arr_sim_np[m_simulated_primings_total].P2_NP14=CaseNetProfit;
 
-            //Only after Second Priming Case2 : Add +1 Cell to Dynamic Array of Primings Omegas
-            ArrayResize(m_arr_sim_q,ArraySize(m_arr_sim_q)+1);
+               //Only after Second Priming Case2 : Add +1 Cell to Dynamic Array of Primings Omegas
+               ArrayResize(m_arr_sim_q,ArraySize(m_arr_sim_q)+1);
+               ArrayResize(m_arr_sim_np,ArraySize(m_arr_sim_np)+1);
 
-            //Always increase by 1 this counter, otherwise program writes to [0]
-            m_simulated_primings_total++;
-            break;
+               //Always increase by 1 this counter, otherwise program writes to [0]
+               m_simulated_primings_total++;
+               break;
 
             default:
                break;
            }//End of Switch FILLING Priming1 Omega Structures
+
         }//End of Priming 2 Switch
+
+      //Clear Total NPs of Current Case
+      CaseNetProfit=0;
+
      }//END OF ALL CASES
+
+//Print Q
+   m_PrintLast_Q(Priming1);
 
 //If Ok
    return(true);
@@ -1034,7 +1137,10 @@ bool RTrade::Emulate_Trading_AllOHLC_WO_Indicator(const bool Priming1,const MqlR
       bool SELL_OPENED=false;
       double Calculated_Dc=0;
       double Calculated_DcOld=0;
+      //Profit of only one position
       double PositionProfit=0;
+      //Accumulated Posittion Profit inside one Case
+      double CaseNetProfit=0;
       double Current_OHLC_Price=0;
 
       //From first day 00:00 to 23:50 last day in Priming1
@@ -1090,17 +1196,20 @@ bool RTrade::Emulate_Trading_AllOHLC_WO_Indicator(const bool Priming1,const MqlR
             int OTR_RESULT=m_EMUL_OpenRule_OHLC_Feed(m_open_rule_num_emul,Case,i,OHLC,Feed);
 
             //2. Check if pos opened, try to close,if closed continue   
-            if(m_CheckClose(Current_OHLC_Price,BUY_OPENED,SELL_OPENED,PositionProfit,BUY_OPENED_PRICE,SELL_OPENED_PRICE,
-               Calculated_Dc,Rates[i].spread)) continue;
+            if(m_CheckClose(Current_OHLC_Price,BUY_OPENED,SELL_OPENED,PositionProfit,CaseNetProfit,
+               BUY_OPENED_PRICE,SELL_OPENED_PRICE,Calculated_Dc,Rates[i].spread)) continue;
 
             //3. Check Spread (if > max then next iteration)
             if(CheckSpread(m_max_spread_emul,Rates[i].spread)) continue;
 
-            //4. +++OPEN POSITION+++ (:true -> next iteration)
+            //4. +++OPEN POSITION+++ (:true -> next iteration)(Always 1.00 Lot)
             if(m_CheckOpen(Current_OHLC_Price,OTR_RESULT,BUY_OPENED,SELL_OPENED,BUY_OPENED_PRICE,
-               SELL_OPENED_PRICE,BUY_Signal_Count,SELL_Signal_Count)) continue;
+               SELL_OPENED_PRICE,BUY_Signal_Count,SELL_Signal_Count,Rates[i].spread)) continue;
            }//END OF OHLC SWITCH
         }//END OF CASE
+
+      //If Position still opened when period ends, then save her Profit to TotalCaseNetProfit
+      CaseNetProfit+=PositionProfit;
 
       //Fill Omega Structures for Priming1:
       if(m_CurrentPriming)
@@ -1108,9 +1217,18 @@ bool RTrade::Emulate_Trading_AllOHLC_WO_Indicator(const bool Priming1,const MqlR
          //Priming 1
          switch(Case)
            {
-            case  0: m_arr_sim_q[m_simulated_primings_total].P1_Q1_Simul=BUY_Signal_Count;  break;
-            case  1: m_arr_sim_q[m_simulated_primings_total].P1_Q4_Simul=SELL_Signal_Count;  break;
-            case  2: m_arr_sim_q[m_simulated_primings_total].P1_Q14_Simul=BUY_Signal_Count+SELL_Signal_Count;break;
+            case  0:
+               m_arr_sim_q[m_simulated_primings_total].P1_Q1_Simul=BUY_Signal_Count;
+               m_arr_sim_np[m_simulated_primings_total].P1_NP1=CaseNetProfit;
+               break;
+            case  1:
+               m_arr_sim_q[m_simulated_primings_total].P1_Q4_Simul=SELL_Signal_Count;
+               m_arr_sim_np[m_simulated_primings_total].P1_NP4=CaseNetProfit;
+               break;
+            case  2:
+               m_arr_sim_q[m_simulated_primings_total].P1_Q14_Simul=BUY_Signal_Count+SELL_Signal_Count;
+               m_arr_sim_np[m_simulated_primings_total].P1_NP14=CaseNetProfit;
+               break;
 
             default:
                break;
@@ -1121,22 +1239,39 @@ bool RTrade::Emulate_Trading_AllOHLC_WO_Indicator(const bool Priming1,const MqlR
          //Priming 2
          switch(Case)
            {
-            case  0: m_arr_sim_q[m_simulated_primings_total].P2_Q1_Simul=BUY_Signal_Count;  break;
-            case  1: m_arr_sim_q[m_simulated_primings_total].P2_Q4_Simul=SELL_Signal_Count;  break;
-            case  2: m_arr_sim_q[m_simulated_primings_total].P2_Q14_Simul=BUY_Signal_Count+SELL_Signal_Count;
+            case  0:
+               m_arr_sim_q[m_simulated_primings_total].P2_Q1_Simul=BUY_Signal_Count;
+               m_arr_sim_np[m_simulated_primings_total].P2_NP1=CaseNetProfit;
+               break;
+            case  1:
+               m_arr_sim_q[m_simulated_primings_total].P2_Q4_Simul=SELL_Signal_Count;
+               m_arr_sim_np[m_simulated_primings_total].P2_NP4=CaseNetProfit;
+               break;
+            case  2:
+               m_arr_sim_q[m_simulated_primings_total].P2_Q14_Simul=BUY_Signal_Count+SELL_Signal_Count;
+               m_arr_sim_np[m_simulated_primings_total].P2_NP14=CaseNetProfit;
 
-            //Only after Second Priming Case2 : Add +1 Cell to Dynamic Array of Primings Omegas
-            ArrayResize(m_arr_sim_q,ArraySize(m_arr_sim_q)+1);
+               //Only after Second Priming Case2 : Add +1 Cell to Dynamic Array of Primings Omegas
+               ArrayResize(m_arr_sim_q,ArraySize(m_arr_sim_q)+1);
+               ArrayResize(m_arr_sim_np,ArraySize(m_arr_sim_np)+1);
 
-            //Always increase by 1 this counter, otherwise program writes to [0]
-            m_simulated_primings_total++;
-            break;
+               //Always increase by 1 this counter, otherwise program writes to [0]
+               m_simulated_primings_total++;
+               break;
 
             default:
                break;
            }//End of Switch FILLING Priming1 Omega Structures
+
         }//End of Priming 2 Switch
+
+      //Clear Total NPs of Current Case
+      CaseNetProfit=0;
+
      }//END OF ALL CASES
+
+//Print Q
+   m_PrintLast_Q(Priming1);
 
 //If Ok
    return(true);
@@ -1285,7 +1420,10 @@ bool RTrade::Emulate_Trading_ALLClose_WO_Indicator(const bool Priming1,const Mql
       bool SELL_OPENED=false;
       double Calculated_Dc=0;
       double Calculated_DcOld=0;
+      //Profit of only one position
       double PositionProfit=0;
+      //Accumulated Posittion Profit inside one Case
+      double CaseNetProfit=0;
       double Current_OHLC_Price=0;
 
       //From first day 00:00 to 23:50 last day in Priming1
@@ -1301,16 +1439,19 @@ bool RTrade::Emulate_Trading_ALLClose_WO_Indicator(const bool Priming1,const Mql
          int OTR_RESULT=m_EMUL_OpenRule_CLOSE_Feed(m_open_rule_num_emul,Case,i,-1,Feed);
 
          //2. Check if pos opened, try to close,if closed continue   
-         if(m_CheckClose(Current_OHLC_Price,BUY_OPENED,SELL_OPENED,PositionProfit,BUY_OPENED_PRICE,SELL_OPENED_PRICE,
-            Calculated_Dc,Rates[i].spread)) continue;
+         if(m_CheckClose(Current_OHLC_Price,BUY_OPENED,SELL_OPENED,PositionProfit,CaseNetProfit,
+            BUY_OPENED_PRICE,SELL_OPENED_PRICE,Calculated_Dc,Rates[i].spread)) continue;
 
          //3. Check Spread (if > max then next iteration)
          if(CheckSpread(m_max_spread_emul,Rates[i].spread)) continue;
 
-         //4. +++OPEN POSITION+++ (:true -> next iteration)
+         //4. +++OPEN POSITION+++ (:true -> next iteration)(Always 1.00 Lot)
          if(m_CheckOpen(Current_OHLC_Price,OTR_RESULT,BUY_OPENED,SELL_OPENED,BUY_OPENED_PRICE,
-            SELL_OPENED_PRICE,BUY_Signal_Count,SELL_Signal_Count)) continue;
+            SELL_OPENED_PRICE,BUY_Signal_Count,SELL_Signal_Count,Rates[i].spread)) continue;
         }//END OF CASE
+
+      //If Position still opened when period ends, then save her Profit to TotalCaseNetProfit
+      CaseNetProfit+=PositionProfit;
 
       //Fill Omega Structures for Priming1:
       if(m_CurrentPriming)
@@ -1318,9 +1459,18 @@ bool RTrade::Emulate_Trading_ALLClose_WO_Indicator(const bool Priming1,const Mql
          //Priming 1
          switch(Case)
            {
-            case  0: m_arr_sim_q[m_simulated_primings_total].P1_Q1_Simul=BUY_Signal_Count;  break;
-            case  1: m_arr_sim_q[m_simulated_primings_total].P1_Q4_Simul=SELL_Signal_Count;  break;
-            case  2: m_arr_sim_q[m_simulated_primings_total].P1_Q14_Simul=BUY_Signal_Count+SELL_Signal_Count;break;
+            case  0:
+               m_arr_sim_q[m_simulated_primings_total].P1_Q1_Simul=BUY_Signal_Count;
+               m_arr_sim_np[m_simulated_primings_total].P1_NP1=CaseNetProfit;
+               break;
+            case  1:
+               m_arr_sim_q[m_simulated_primings_total].P1_Q4_Simul=SELL_Signal_Count;
+               m_arr_sim_np[m_simulated_primings_total].P1_NP4=CaseNetProfit;
+               break;
+            case  2:
+               m_arr_sim_q[m_simulated_primings_total].P1_Q14_Simul=BUY_Signal_Count+SELL_Signal_Count;
+               m_arr_sim_np[m_simulated_primings_total].P1_NP14=CaseNetProfit;
+               break;
 
             default:
                break;
@@ -1331,22 +1481,39 @@ bool RTrade::Emulate_Trading_ALLClose_WO_Indicator(const bool Priming1,const Mql
          //Priming 2
          switch(Case)
            {
-            case  0: m_arr_sim_q[m_simulated_primings_total].P2_Q1_Simul=BUY_Signal_Count;  break;
-            case  1: m_arr_sim_q[m_simulated_primings_total].P2_Q4_Simul=SELL_Signal_Count;  break;
-            case  2: m_arr_sim_q[m_simulated_primings_total].P2_Q14_Simul=BUY_Signal_Count+SELL_Signal_Count;
+            case  0:
+               m_arr_sim_q[m_simulated_primings_total].P2_Q1_Simul=BUY_Signal_Count;
+               m_arr_sim_np[m_simulated_primings_total].P2_NP1=CaseNetProfit;
+               break;
+            case  1:
+               m_arr_sim_q[m_simulated_primings_total].P2_Q4_Simul=SELL_Signal_Count;
+               m_arr_sim_np[m_simulated_primings_total].P2_NP4=CaseNetProfit;
+               break;
+            case  2:
+               m_arr_sim_q[m_simulated_primings_total].P2_Q14_Simul=BUY_Signal_Count+SELL_Signal_Count;
+               m_arr_sim_np[m_simulated_primings_total].P2_NP14=CaseNetProfit;
 
-            //Only after Second Priming Case2 : Add +1 Cell to Dynamic Array of Primings Omegas
-            ArrayResize(m_arr_sim_q,ArraySize(m_arr_sim_q)+1);
+               //Only after Second Priming Case2 : Add +1 Cell to Dynamic Array of Primings Omegas
+               ArrayResize(m_arr_sim_q,ArraySize(m_arr_sim_q)+1);
+               ArrayResize(m_arr_sim_np,ArraySize(m_arr_sim_np)+1);
 
-            //Always increase by 1 this counter, otherwise program writes to [0]
-            m_simulated_primings_total++;
-            break;
+               //Always increase by 1 this counter, otherwise program writes to [0]
+               m_simulated_primings_total++;
+               break;
 
             default:
                break;
            }//End of Switch FILLING Priming1 Omega Structures
+
         }//End of Priming 2 Switch
+
+      //Clear Total NPs of Current Case
+      CaseNetProfit=0;
+
      }//END OF ALL CASES
+
+//Print Q
+   m_PrintLast_Q(Priming1);
 
 //If Ok
    return(true);
@@ -1417,3 +1584,166 @@ int RTrade::m_EMUL_TR_Caterpillar_CLOSE_Feed(const char Case,const int Iteration
 //If No Signal
    return(-1);
   }//END OF TR Caterpillar WO Indicator CLOSE Only prices
+//+------------------------------------------------------------------+
+//|  Print 3 Q before Ck prediction                                  |
+//+------------------------------------------------------------------+
+void RTrade::m_PrintLast_Q(const bool Priming1)
+  {
+//Get Total Size
+   int ArrSize=ArraySize(m_arr_sim_q)-1;
+
+   if(Priming1)
+     {
+      Print("P1 Q1="+IntegerToString(m_arr_sim_q[ArrSize].P1_Q1_Simul),
+            "|  Q4="+IntegerToString(m_arr_sim_q[ArrSize].P1_Q4_Simul),
+            "|  Q14="+IntegerToString(m_arr_sim_q[ArrSize].P1_Q14_Simul)
+            );
+     }
+   else
+     {
+      //After Priming2 (-1) because we Resize arr(+1)
+      Print("P2  Q1="+IntegerToString(m_arr_sim_q[ArrSize-1].P2_Q1_Simul),
+            "|   Q4="+IntegerToString(m_arr_sim_q[ArrSize-1].P2_Q4_Simul),
+            "|   Q14="+IntegerToString(m_arr_sim_q[ArrSize-1].P2_Q14_Simul)
+            );
+     }
+
+  }//END OF Print Last Q
+//+------------------------------------------------------------------+
+//| Print All Ck Predictions                                         |
+//+------------------------------------------------------------------+
+void RTrade::PrintAll_Ck(void)
+  {
+//Get Size of all Cks arr
+   int ArrSize=ArraySize(m_arr_ck_predictions);
+
+//Check if Cks exist
+   if(ArrSize<0)
+     {
+      Print(__FUNCTION__+"Ck predictions count = "+IntegerToString(ArrSize)+", Exit");
+      return;
+     }
+
+//Clear 
+   m_Ck_NoSignal_Count=0;
+   m_Ck_Buys_Count=0;
+   m_Ck_Sells_Count=0;
+   m_Ck_BuysSells_Count=0;
+   m_Ck_BuySingularities_Count=0;
+   m_Ck_SellSingularities_Count=0;
+
+//Sum all Cks by category
+   for(int i=0;i<ArrSize;i++)
+     {
+      if(m_arr_ck_predictions[i]==CkBuySell14)        {m_Ck_BuysSells_Count++; continue;}
+      if(m_arr_ck_predictions[i]==CkBuy1)             {m_Ck_Buys_Count++; continue;}
+      if(m_arr_ck_predictions[i]==CkSell4)            {m_Ck_Sells_Count++; continue;}
+      if(m_arr_ck_predictions[i]==CkSingularityBuy)   {m_Ck_BuySingularities_Count++; continue;}
+      if(m_arr_ck_predictions[i]==CkSingularitySell)  {m_Ck_SellSingularities_Count++; continue;}
+      if(m_arr_ck_predictions[i]==CkNoSignal)         {m_Ck_NoSignal_Count++; continue;}
+     }
+
+//Total Cks
+   m_Ck_Total_Count=m_Ck_BuysSells_Count+m_Ck_Buys_Count+m_Ck_Sells_Count+
+                    m_Ck_NoSignal_Count+m_Ck_BuySingularities_Count+m_Ck_SellSingularities_Count;
+
+//Print All Cks
+   Print("Total Cks: "+IntegerToString(m_Ck_Total_Count)+
+         " Ck14= "+IntegerToString(m_Ck_BuysSells_Count)+
+         " Ck1= "+IntegerToString(m_Ck_Buys_Count)+
+         " Ck4= "+IntegerToString(m_Ck_Sells_Count)+
+         " CkSBuy= "+IntegerToString(m_Ck_BuySingularities_Count)+
+         " CkSSell= "+IntegerToString(m_Ck_SellSingularities_Count)+
+         " CkNo= "+IntegerToString(m_Ck_NoSignal_Count)
+         );
+
+  }//END Of Print All Ck Predictions
+//+------------------------------------------------------------------+
+//| Only CK14                                                        |
+//+------------------------------------------------------------------+
+char RTrade::m_BUILD_CK_TR14(void)
+  {
+   return(CkBuySell14);
+  }//End of CK14
+//+------------------------------------------------------------------+
+//| Export Q&NP to CSV (for MAC .txt)                                | 
+//|  FOR MAC "NUMNERS" use "TAB" (\t) , not "," for field delimeters |
+//+------------------------------------------------------------------+
+void RTrade::ExportQNP_CSV(const TIMEMARKS &arr_tm[],const ENUM_myPredictPeriod PredictPeriod,const ENUM_EMUL_OHLC_PRICE &OHLCPRICE_emul)
+  {
+//Get Info:
+   string G_Company=AccountInfoString(ACCOUNT_COMPANY);
+   string G_Server=AccountInfoString(ACCOUNT_SERVER);
+   long G_AccountNumber=AccountInfoInteger(ACCOUNT_LOGIN);
+   string G_AccountOwner=AccountInfoString(ACCOUNT_NAME);
+   long G_AccountLeverage=AccountInfoInteger(ACCOUNT_LEVERAGE);
+
+//Init filename
+   string fname="//"+G_Server+"_"+m_pair+IntegerToString(PredictPeriod)+
+                +IntegerToString(OHLCPRICE_emul)+
+                "_QNP.txt";
+
+//If exist, del file
+   if(FileIsExist(fname,FILE_READ|FILE_WRITE|FILE_COMMON|FILE_CSV|FILE_ANSI))
+     {
+      FileDelete(fname,FILE_READ|FILE_WRITE|FILE_COMMON|FILE_CSV|FILE_ANSI);
+     }
+
+//Create handle
+   int file_handle=FileOpen(fname,FILE_READ|FILE_WRITE|FILE_COMMON|FILE_CSV|FILE_ANSI);
+
+//Check if can`t create     
+   if(file_handle==INVALID_HANDLE)
+     {
+      Print(__FUNCTION__+"Err:",GetLastError()," on FileOpen");
+      return;
+     }
+
+//Get Primings Count (2 primings inside 1 unit)
+   int ArrSize=ArraySize(arr_tm);
+
+//Output string
+
+   string s="Company: "+G_Company+"\r\n";
+   s+=" Server: "+G_Server+"\r\n";
+   s+=" Account: "+IntegerToString(G_AccountNumber)+"\r\n";
+   s+=" Owner: "+G_AccountOwner+"\r\n";
+   s+=" Leverage: "+IntegerToString(G_AccountLeverage)+"\r\n";
+   s+=m_pair+"\r\n";
+   s+=" Total periods: "+IntegerToString(ArrSize)+"\r\n";
+   s+=" Period: "+IntegerToString(PredictPeriod);
+   s+=" Feed: "+IntegerToString(OHLCPRICE_emul);
+   s+=" From: "+TimeToString(arr_tm[0].P1_Start,TIME_DATE|TIME_MINUTES|TIME_SECONDS);
+   s+=" To: "+TimeToString(arr_tm[ArrSize-1].P2_Stop,TIME_DATE|TIME_MINUTES|TIME_SECONDS);
+   s+=" Emul Bottle Size: "+IntegerToString(m_bottle_size_emul)+"\r\n";
+   s+=" ID,P1: Start Date,   Q1,   Q4,   Q14,   NP1,  NP4,  NP14 |"+
+      "    P2: Start Date,   Q1,   Q4,   Q14,   NP1,  NP4,  NP14  \r\n";
+
+// --- Print other NPs and trades count
+   for(int i=0;i<ArrSize;i++)
+     {
+      s+=IntegerToString(i)+"\t"
+         +TimeToString(arr_tm[i].P1_Start,TIME_DATE)+"\t"
+         +IntegerToString(m_arr_sim_q[i].P1_Q1_Simul)+"\t"
+         +IntegerToString(m_arr_sim_q[i].P1_Q4_Simul)+"\t"
+         +IntegerToString(m_arr_sim_q[i].P1_Q14_Simul)+"\t"
+         +DoubleToString(m_arr_sim_np[i].P1_NP1,0)+"\t"
+         +DoubleToString(m_arr_sim_np[i].P1_NP4,0)+"\t"
+         +DoubleToString(m_arr_sim_np[i].P1_NP14,0)+"\t"
+         +TimeToString(arr_tm[i].P2_Start,TIME_DATE)+"\t"
+         +IntegerToString(m_arr_sim_q[i].P2_Q1_Simul)+"\t"
+         +IntegerToString(m_arr_sim_q[i].P2_Q4_Simul)+"\t"
+         +IntegerToString(m_arr_sim_q[i].P2_Q14_Simul)+"\t"
+         +DoubleToString(m_arr_sim_np[i].P2_NP1,0)+"\t"
+         +DoubleToString(m_arr_sim_np[i].P2_NP4,0)+"\t"
+         +DoubleToString(m_arr_sim_np[i].P2_NP14,0)
+         +"\r\n";
+     }//END of FOR
+
+//Write String to CSV
+   FileWriteString(file_handle,s);
+
+//Close File
+   FileClose(file_handle);
+  }//END Of Export QNP to CSV
+//+------------------------------------------------------------------+

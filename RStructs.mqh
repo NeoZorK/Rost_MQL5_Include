@@ -5,7 +5,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, Shcherbyna Rostyslav"
 #property link      ""
-#property version   "1.6"
+#property version   "1.7"
 
 #include <Tools\DateTime.mqh>
 
@@ -14,6 +14,7 @@ Include all structures and global constants
 */
 /*
 +++++CHANGE LOG+++++
+1.7  04.07.2016--Add QNP Export
 1.6  20.06.2016--Add Custom Feed WO Indicator to Emulation and Trading
 1.5  30.05.2016--Clear Old Code , better perfomance (33 sec from 2010 to 2016.04 Daily)
 1.41 28.05.2016--Minor version with ability to Export OHLC to CSV & BIN
@@ -144,6 +145,16 @@ struct SIMUL_Q
    int               P2_Q4_Simul;
    int               P2_Q14_Simul;
   };
+//---Structure for simulated NPs
+struct SIMUL_NP
+  {
+   double            P1_NP1;
+   double            P1_NP4;
+   double            P1_NP14;
+   double            P2_NP1;
+   double            P2_NP4;
+   double            P2_NP14;
+  };
 //+------------------------------------------------------------------+
 //| Compounding (Dynamic or Maximal Only)                            |
 //+------------------------------------------------------------------+
@@ -203,7 +214,8 @@ enum ENUM_EMUL_CloseRule
 //+------------------------------------------------------------------+
 enum ENUM_TRCK
   {
-   CK_TR18_0330_Virt
+   CK_TR18_0330_Virt,
+   CK_TR14
   };
 //RealTime Open TR
 enum ENUM_RT_OpenRule
