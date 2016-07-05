@@ -2023,15 +2023,6 @@ int RHistory::_FillPriming(const bool Priming1,const TIMEMARKS &TimeMarks,MqlRat
    datetime Priming_Start=0;
    datetime Priming_Stop=0;
 
-//If bars not calculated in indicator, then exit
-   int bars_calc=BarsCalculated(m_handle_ind_POM);
-
-   if(bars_calc<0)
-     {
-      //  Print("Waiting for POM calculations...");
-      return(-1);
-     }
-
 //Check Priming1 or Priming2
    if(Priming1)
      {

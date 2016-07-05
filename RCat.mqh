@@ -325,6 +325,7 @@ int RCat::m_POMI()
      {
       return(-2);
      }
+
 //---2:1 
 //(case 4) or (case14)
    if(m_current_ck==CkSell4 || m_current_ck==CkBuySell14)
@@ -812,8 +813,8 @@ bool RCat::m_WhoFirst(void)
 //Private case H==L
 //Private case, when many H or L, and don`t know who >
    if(index_H>index_L) { m_first = HighFirst; return(true);}
-   if(index_H<index_L) { m_first =  LowFirst;  return(true);}
-   if(index_H==index_L){ m_first= EqualFirst;  return(true);}
+   if(index_H<index_L) { m_first =  LowFirst; return(true);}
+   if(index_H==index_L){ m_first= EqualFirst; return(true);}
 
    return(true);
   }//End of Who First
