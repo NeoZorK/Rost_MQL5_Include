@@ -931,6 +931,7 @@ bool RCat::m_PomSignal(void)
         }
       else
         {
+         m_signal=NOSIGNAL;
          m_pom=1-(1/(1+ga));
          return(true);
         }
@@ -951,6 +952,7 @@ bool RCat::m_PomSignal(void)
         }
       else
         {
+         m_signal=NOSIGNAL;
          m_pom=1-(1/(1+ga));
          return(true);
         }
