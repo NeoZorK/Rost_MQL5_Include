@@ -215,7 +215,8 @@ enum ENUM_EMUL_CloseRule
 enum ENUM_TRCK
   {
    CK_TR18_0330_Virt,
-   CK_TR14
+   CK_TR14,
+   CK_TR_0711
   };
 //RealTime Open TR
 enum ENUM_RT_OpenRule

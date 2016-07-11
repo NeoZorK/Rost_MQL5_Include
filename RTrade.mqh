@@ -82,6 +82,9 @@ private:
    STRUCT_Priming    m_P1;
    STRUCT_Priming    m_P2;
 
+   //Is Previous Period has Buy or Sell Singularitys? 
+   bool              m_PrevMonth_Singularity;
+
    //Methods
 
    //Print 3 cases q before each prediction
@@ -113,16 +116,22 @@ private:
                                                 const int OHLC,const STRUCT_FEED_CLOSE &FeedClose[]);
    //Calculate Ck Prediction 0,1,2 : 1,4,14
    char              m_BUILD_CK_TR18_0330_Virt(const bool USDFirst);
+
+   //Calculate Ck Prediction 0,1,2 : 1,4,14
+   char              m_BUILD_CK_TR_0711(const bool USDFirst);
+
    //Only Ck 14
    char              m_BUILD_CK_TR14();
 
    //Check for Close Position (:true->continue)
    bool              m_CheckClose(const double Price,bool &BUY_OPENED,bool &SELL_OPENED,double &PositionProfit,double &CaseNP,
                                   double &BUY_OPENED_PRICE,double &SELL_OPENED_PRICE,const double Dc,const int Spread);
+
    //Check for Open Position (:true->continue)
    bool              m_CheckOpen(const double Price,const int OTR_RESULT,bool &BUY_OPENED,bool &SELL_OPENED,
                                  double &BUY_OPENED_PRICE,double &SELL_OPENED_PRICE,int &BUY_Signal_Count,
                                  int &SELL_Signal_Count,const uint &Spread);
+
 public:
                      RTrade(const double OneLotFee);
                     ~RTrade();
@@ -177,6 +186,9 @@ RTrade::RTrade(const double OneLotFee)
   {
    MassiveSetAsSeries(m_P1);
    MassiveSetAsSeries(m_P2);
+
+//Clear Previous Month Singularity
+   m_PrevMonth_Singularity=false;
 
    m_Total_Minutes_in_period=0;
    m_CurrentPriming=0;
@@ -365,6 +377,7 @@ char RTrade::TR_PredictCk(const ENUM_TRCK TRCk_Name,const bool USDFirst)
          break;
 
       case CK_TR_0711:
+         TR_RES=m_BUILD_CK_TR_0711(USDFirst);
 
          break;
 
@@ -1771,4 +1784,139 @@ bool RTrade::CheckPairUSD_Odd(const string Pair)
 //if no USD 
    return(false);
   }
+//+------------------------------------------------------------------+
+//| TR_0711 (Ck) 0,1,2,3,4:1,4,14,SingulBuy,SingulSell               |
+//+------------------------------------------------------------------+
+char RTrade::m_BUILD_CK_TR_0711(const bool USDFirst)
+  {
+//IF not USDCHF , err  
+   if(!USDFirst) return(-2);
+
+//Exceptions Limits:  
+   const uchar Ex1_limit = 3;
+   const uchar Ex2_limit = 3;
+   const uchar Ex3_limit = 3;
+   const uchar Ex4_limit = 4;
+
+//For * Exceptions   
+   const char Yes= -1;
+   const char No = 1;
+
+//Exceptions:
+   char Ex1=No;
+   char Ex2=No;
+   char Ex3=No;
+   char Ex4=No;
+
+//0.Save simple value  
+   SIMUL_Q Omega=m_arr_sim_q[m_simulated_primings_total-1];
+
+//1.Calculate DeltaOmega
+   int dO1 = Omega.P2_Q1_Simul - Omega.P1_Q1_Simul;
+   int dO4 = Omega.P2_Q4_Simul - Omega.P1_Q4_Simul;
+   int dO14= Omega.P2_Q14_Simul-Omega.P1_Q14_Simul;
+
+//Exception Equal dO1==dO4 --> C14
+   if(dO1==dO4)
+     {
+      return(CkBuySell14);
+     }
+
+//Check if previous month has singularity?
+   if(m_PrevMonth_Singularity)
+     {
+      //Then current formula is
+
+      //Clear singularity flag
+      m_PrevMonth_Singularity=false;
+     }
+
+//Exception 3 Singularity dO1==0 or dO4==0 
+   if(dO1==0 || dO4==0)
+     {
+      Ex3=Yes;
+
+      //SELL For EURUSD Only
+      m_PrevMonth_Singularity=true;
+      return(CkSingularitySell);
+     }
+
+//2.Calculate F (div 0 Error?)
+   int f=(dO4*dO1)/MathAbs(dO4*dO1);
+
+//3.Caluclate F1
+   int f1=(dO1-dO4)/MathAbs(dO1-dO4);
+
+//4.Calculate F*F1
+   int ff1=f*f1;
+
+//5.Calculate -C1
+   int mC1=MathAbs(dO14-dO1);
+
+//6.Calculate -C4
+   int mC4=MathAbs(dO14-dO4);
+
+//Exception 1 (dO1<3 and dO4<3)
+   if(dO1<Ex1_limit && dO4<Ex1_limit)
+     {
+      Ex1=Yes;
+     }
+
+//Exception 2 0<|14-1|<3 or 0<|14-4|<3 or 0<|14|<3  
+   if((mC1<Ex2_limit) || (mC4<Ex2_limit) || (MathAbs(dO14)<Ex2_limit))
+     {
+      Ex2=Yes;
+     }
+
+//Exception 4 (||14-1|-|14-4||)<4 
+   if(MathAbs(mC1-mC4)<Ex4_limit)
+     {
+      Ex3=Yes;
+     }
+
+//If [..]=0 then C14 -->????
+
+   int ResMin=0;
+
+//Find Min
+   if(ff1==-1)
+     {
+      ResMin=MathMin(f1*mC1*Ex1*Ex2*Ex4,f1*mC4*Ex1*Ex2*Ex4);
+
+      //Show Ck C1
+      if(MathAbs(ResMin)==mC1)
+        {
+         return(CkBuy1);
+        }//END of Ck=C1
+
+      //Show Ck C4
+      if(MathAbs(ResMin)==mC4)
+        {
+         return(CkSell4);
+        }//END of Ck=C4    
+     }//END OF -1 MIN;
+
+   int ResMax=0;
+
+//Find Max
+   if(ff1==1)
+     {
+      ResMax=MathMax(mC1*Ex1*Ex2*Ex4,mC4*Ex1*Ex2*Ex4);
+
+      //Show Ck C1
+      if(MathAbs(ResMax)==mC1)
+        {
+         return(CkBuy1);
+        }//END of Ck=C1
+
+      //Show Ck C4
+      if(MathAbs(ResMax)==mC4)
+        {
+         return(CkSell4);
+        }//END of Ck=C4    
+     }//END OF -1 MIN;
+
+//If No Signal
+   return(CkNoSignal);
+  }//End of m_BUILD_CK_TR_0711  
 //+------------------------------------------------------------------+
