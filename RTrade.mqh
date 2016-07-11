@@ -167,6 +167,8 @@ public:
    //Export Q&NP to CSV
    void              ExportQNP_CSV(const TIMEMARKS &arr_tm[],const ENUM_myPredictPeriod _PredictPeriod,
                                    const ENUM_EMUL_OHLC_PRICE &_OHLCPRICE_emul);
+   //Check Pair USD Odd (USD First - true, else - false) (!!!IF NO USD in Pair then FALSE!!!)
+   bool              CheckPairUSD_Odd(const string Pair);
   };
 //+------------------------------------------------------------------+
 //| Init                                                             |
@@ -360,6 +362,10 @@ char RTrade::TR_PredictCk(const ENUM_TRCK TRCk_Name,const bool USDFirst)
 
       case CK_TR14:
          TR_RES=m_BUILD_CK_TR14();
+         break;
+
+      case CK_TR_0711:
+
          break;
 
       default:
@@ -1745,5 +1751,24 @@ void RTrade::ExportQNP_CSV(const TIMEMARKS &arr_tm[],const ENUM_myPredictPeriod 
 
 //Close File
    FileClose(file_handle);
-  }//END Of Export QNP to CSV
+  }//END Of Export QNP to CSV  
+//+------------------------------------------------------------------+
+//| Check USD Pair Odd (USD First = true, else = false)              |
+//+------------------------------------------------------------------+
+bool RTrade::CheckPairUSD_Odd(const string Pair)
+  {
+   string symb1=StringSubstr(Pair,0,3);
+   string symb2=StringSubstr(Pair,3,3);
+   if(symb1=="USD")
+     {
+      return(true);
+     }
+
+   if(symb2=="USD")
+     {
+      return(false);
+     }
+//if no USD 
+   return(false);
+  }
 //+------------------------------------------------------------------+
