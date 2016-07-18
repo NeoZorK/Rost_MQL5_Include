@@ -328,7 +328,7 @@ int RCat::m_POMI()
 
 //---2:1 
 //(case 4) or (case14)
-   if(m_current_ck==CkSell4 || m_current_ck==CkBuySell14)
+   if(m_current_ck==CkSell4 || m_current_ck==CkBuySell14 || m_current_ck==CkSingularitySell)
      {
       if((m_signal==Ind_Sell) && (m_pom>=m_pom_sell) && (m_pom<m_pom_sell+m_pom_koef))
         {
@@ -337,7 +337,7 @@ int RCat::m_POMI()
      }//END of BUY
 //---1:2
 // (case 1) or (case14)
-   if(m_current_ck==CkBuy1 || m_current_ck==CkBuySell14)
+   if(m_current_ck==CkBuy1 || m_current_ck==CkBuySell14 || m_current_ck==CkSingularityBuy)
      {
       if((m_signal==Ind_Buy) && (m_pom>=m_pom_buy) && (m_pom<m_pom_buy+m_pom_koef))
         {
