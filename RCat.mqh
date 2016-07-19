@@ -5,7 +5,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, Shcherbyna Rostyslav"
 #property link      ""
-#property version   "1.7"
+#property version   "1.75"
 
 #include <Tools\DateTime.mqh>
 #include <RInclude\RTrade.mqh>
@@ -14,6 +14,7 @@
 //+------------------------------------------------------------------+
 /*
 +++++CHANGE LOG+++++
+1.75 19.07.2016--Add CkTR 0711 xUSD with Singularity (f,f1)
 1.7  04.07.2016--Add QNP Export
 1.6  20.06.2016--Add Custom Feed WO Indicator to Emulation and Trading
 1.5  30.05.2016--Clear Old Code , better perfomance (33 sec from 2010 to 2016.04 Daily)
