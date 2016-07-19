@@ -5,7 +5,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, Shcherbyna Rostyslav"
 #property link      ""
-#property version   "1.7"
+#property version   "1.75"
 
 #include <Tools\DateTime.mqh>
 #include <RInclude\RStructs.mqh>
@@ -22,6 +22,7 @@ Can determine last & first day minute, last week minute, last month minute, last
 */
 /*
 +++++CHANGE LOG+++++
+1.75 19.07.2016--Add CkTR 0711 xUSD with Singularity (f,f1)
 1.7  04.07.2016--Add QNP Export
 1.6  20.06.2016--Add Custom Feed WO Indicator to Emulation and Trading
 1.5  30.05.2016--Clear Old Code , better perfomance (33 sec from 2010 to 2016.04 Daily)
@@ -2022,15 +2023,6 @@ int RHistory::_FillPriming(const bool Priming1,const TIMEMARKS &TimeMarks,MqlRat
 
    datetime Priming_Start=0;
    datetime Priming_Stop=0;
-
-//If bars not calculated in indicator, then exit
-   int bars_calc=BarsCalculated(m_handle_ind_POM);
-
-   if(bars_calc<0)
-     {
-      //  Print("Waiting for POM calculations...");
-      return(-1);
-     }
 
 //Check Priming1 or Priming2
    if(Priming1)
