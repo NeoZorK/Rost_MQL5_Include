@@ -5,7 +5,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, Shcherbyna Rostyslav"
 #property link      ""
-#property version   "1.7"
+#property version   "1.75"
 
 #include <Tools\DateTime.mqh>
 #include <RInclude\RTrade.mqh>
@@ -14,6 +14,7 @@
 //+------------------------------------------------------------------+
 /*
 +++++CHANGE LOG+++++
+1.75 19.07.2016--Add CkTR 0711 xUSD with Singularity (f,f1)
 1.7  04.07.2016--Add QNP Export
 1.6  20.06.2016--Add Custom Feed WO Indicator to Emulation and Trading
 1.5  30.05.2016--Clear Old Code , better perfomance (33 sec from 2010 to 2016.04 Daily)
@@ -328,7 +329,7 @@ int RCat::m_POMI()
 
 //---2:1 
 //(case 4) or (case14)
-   if(m_current_ck==CkSell4 || m_current_ck==CkBuySell14)
+   if(m_current_ck==CkSell4 || m_current_ck==CkBuySell14 || m_current_ck==CkSingularitySell)
      {
       if((m_signal==Ind_Sell) && (m_pom>=m_pom_sell) && (m_pom<m_pom_sell+m_pom_koef))
         {
@@ -337,7 +338,7 @@ int RCat::m_POMI()
      }//END of BUY
 //---1:2
 // (case 1) or (case14)
-   if(m_current_ck==CkBuy1 || m_current_ck==CkBuySell14)
+   if(m_current_ck==CkBuy1 || m_current_ck==CkBuySell14 || m_current_ck==CkSingularityBuy)
      {
       if((m_signal==Ind_Buy) && (m_pom>=m_pom_buy) && (m_pom<m_pom_buy+m_pom_koef))
         {
