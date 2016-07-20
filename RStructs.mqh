@@ -156,6 +156,18 @@ struct SIMUL_NP
    double            P2_NP4;
    double            P2_NP14;
   };
+//---Structure for real time Qs
+struct RT_Q
+  {
+   int               Q1_RT;
+   int               Q4_RT;
+  };
+//---Structure for real time NPs
+struct RT_NP
+  {
+   double            NP1_RT;
+   double            NP4_RT;
+  };
 //+------------------------------------------------------------------+
 //| Compounding (Dynamic or Maximal Only)                            |
 //+------------------------------------------------------------------+
