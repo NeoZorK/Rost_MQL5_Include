@@ -624,14 +624,14 @@ bool RCat::CloseAllPositions(const string CustomComment)
       //If Buy Opened, close it  
       if(pos_type==POSITION_TYPE_BUY)
         {
-         OpenMarketOrder(pos_volume,OP_SELL,m_stoploss,m_takeprofit,MAGIC_IS,CustomComment,false,0);
+         OpenMarketOrder(pos_volume,OP_SELL,m_stoploss,m_takeprofit,m_Real_Period_Count,CustomComment,false,0);
          res=true;
         }//END OF CLOSE BUY
 
       //If Sell Opened, close it  
       if(pos_type==POSITION_TYPE_SELL)
         {
-         OpenMarketOrder(pos_volume,OP_BUY,m_stoploss,m_takeprofit,MAGIC_IB,CustomComment,false,0);
+         OpenMarketOrder(pos_volume,OP_BUY,m_stoploss,m_takeprofit,m_Real_Period_Count,CustomComment,false,0);
          res=true;
         }//END OF CLOSE SELL
      }//END of FOR
