@@ -231,6 +231,7 @@ enum ENUM_TRCK
    CK_TR18_0330_Virt,
    CK_TR14,
    CK_TR_0711,
+   CK_TR_0722,
    CK_TR1,
    CK_TR4
   };
