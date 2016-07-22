@@ -5,7 +5,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, Shcherbyna Rostyslav"
 #property link      ""
-#property version   "1.75"
+#property version   "1.78"
 
 #include <Tools\DateTime.mqh>
 #include <RInclude\RTrade.mqh>
@@ -14,6 +14,7 @@
 //+------------------------------------------------------------------+
 /*
 +++++CHANGE LOG+++++
+1.78 22.07.2016--Add to Emulated QNP -  RT QNP
 1.75 19.07.2016--Add CkTR 0711 xUSD with Singularity (f,f1)
 1.7  04.07.2016--Add QNP Export
 1.6  20.06.2016--Add Custom Feed WO Indicator to Emulation and Trading
@@ -91,6 +92,9 @@ private:
    ulong             m_buypos_count;
    ulong             m_sellpos_count;
 
+   //Counts each end of the period
+   int               m_Real_Period_Count;
+
    //Add Volume to opened position
    bool              m_AddVolume();
 
@@ -134,6 +138,11 @@ public:
    //Calculate Total Info onDeInit
    bool              Calculate_TotalInfo(const datetime &StartDate,const double StartBalance);
 
+   //Add +1 Period Count
+   void              IncPeriodCounter();
+
+   //PeriodCount
+   int               PeriodCount();
   };
 //+------------------------------------------------------------------+
 //| Constructor                                                      |
@@ -142,6 +151,7 @@ RCat::RCat(const string Pair,const double &Pom_Koef,const double &PomBuy,const d
            const ushort &Fee,const uchar &SleepPage,const ushort &MaxSpread,const uint &BottleSize)
   {
    m_pair=Pair;
+   m_Real_Period_Count=0;
    m_pom_koef= Pom_Koef;
    m_pom_buy = PomBuy;
    m_pom_sell= PomSell;
@@ -235,13 +245,13 @@ bool RCat::TradeInd(const double &First,const double &Pom,const double &Dc,const
       switch(m_TR_RES)
         {
          //BUY
-         case  1005: OpenMarketOrder(m_start_volume,OP_BUY,m_stoploss,m_takeprofit,MAGIC_IB,
+         case  1005: OpenMarketOrder(m_start_volume,OP_BUY,m_stoploss,m_takeprofit,m_Real_Period_Count,
                                      DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
                                      TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
             return(true); break;
 
             //SELL
-         case  2006: OpenMarketOrder(m_start_volume,OP_SELL,m_stoploss,m_takeprofit,MAGIC_IS,
+         case  2006: OpenMarketOrder(m_start_volume,OP_SELL,m_stoploss,m_takeprofit,m_Real_Period_Count,
                                      DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
                                      TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
             return(true); break;
@@ -398,13 +408,13 @@ bool RCat::ClosePosition(const string CustomComment)
 //If Buy Opened, Close It  
    if(m_position_close_direction==POSITION_TYPE_BUY)
      {
-      OpenMarketOrder(pos_volume,OP_SELL,m_stoploss,m_takeprofit,MAGIC_IS,CustomComment,false,0);
+      OpenMarketOrder(pos_volume,OP_SELL,m_stoploss,m_takeprofit,m_Real_Period_Count,CustomComment,false,0);
       res=true;
      }//END OF Close BUY
 //If Sell Opened, Close it   
    if(m_position_close_direction==POSITION_TYPE_SELL)
      {
-      OpenMarketOrder(pos_volume,OP_BUY,m_stoploss,m_takeprofit,MAGIC_IB,CustomComment,false,0);
+      OpenMarketOrder(pos_volume,OP_BUY,m_stoploss,m_takeprofit,m_Real_Period_Count,CustomComment,false,0);
       res=true;
      }//END OF Close SELL
 
@@ -615,14 +625,14 @@ bool RCat::CloseAllPositions(const string CustomComment)
       //If Buy Opened, close it  
       if(pos_type==POSITION_TYPE_BUY)
         {
-         OpenMarketOrder(pos_volume,OP_SELL,m_stoploss,m_takeprofit,MAGIC_IS,CustomComment,false,0);
+         OpenMarketOrder(pos_volume,OP_SELL,m_stoploss,m_takeprofit,m_Real_Period_Count,CustomComment,false,0);
          res=true;
         }//END OF CLOSE BUY
 
       //If Sell Opened, close it  
       if(pos_type==POSITION_TYPE_SELL)
         {
-         OpenMarketOrder(pos_volume,OP_BUY,m_stoploss,m_takeprofit,MAGIC_IB,CustomComment,false,0);
+         OpenMarketOrder(pos_volume,OP_BUY,m_stoploss,m_takeprofit,m_Real_Period_Count,CustomComment,false,0);
          res=true;
         }//END OF CLOSE SELL
      }//END of FOR
@@ -750,7 +760,7 @@ bool RCat::m_AddVolume(void)
       if(pos_current_price>pos_open_price-(m_add_vol_shift_points*point_size)) return(false);
 
       //Add BUY
-      OpenMarketOrder(m_start_volume,OP_BUY,m_stoploss,m_takeprofit,MAGIC_IB,"+V"+
+      OpenMarketOrder(m_start_volume,OP_BUY,m_stoploss,m_takeprofit,m_Real_Period_Count,"+V"+
                       DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
                       TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
       return(true);
@@ -762,7 +772,7 @@ bool RCat::m_AddVolume(void)
       if(pos_current_price<pos_open_price+(m_add_vol_shift_points*point_size)) return(false);
 
       //Add SELL
-      OpenMarketOrder(m_start_volume,OP_SELL,m_stoploss,m_takeprofit,MAGIC_IS,"+V"+
+      OpenMarketOrder(m_start_volume,OP_SELL,m_stoploss,m_takeprofit,m_Real_Period_Count,"+V"+
                       DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
                       TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
       return(true);
@@ -1055,13 +1065,13 @@ bool RCat::Trade(const double &Sl,const double &Tp,const double &StartVol,const 
       switch(m_TR_RES)
         {
          //BUY
-         case  1005: OpenMarketOrder(m_start_volume,OP_BUY,m_stoploss,m_takeprofit,MAGIC_IB,
+         case  1005: OpenMarketOrder(m_start_volume,OP_BUY,m_stoploss,m_takeprofit,m_Real_Period_Count,
                                      DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
                                      TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
             return(true); break;
 
             //SELL
-         case  2006: OpenMarketOrder(m_start_volume,OP_SELL,m_stoploss,m_takeprofit,MAGIC_IS,
+         case  2006: OpenMarketOrder(m_start_volume,OP_SELL,m_stoploss,m_takeprofit,m_Real_Period_Count,
                                      DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
                                      TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
             return(true); break;
@@ -1117,3 +1127,16 @@ bool RCat::Calculate_TotalInfo(const datetime &StartDate,const double StartBalan
 //If Ok
    return(true);
   }//END OF  Calculate MonthCount,Avg & Total Profit in %  
+//+------------------------------------------------------------------+
+//| Real Time Period Counter                                         |
+//+------------------------------------------------------------------+
+int RCat::PeriodCount(void)
+  {
+   return(m_Real_Period_Count);
+  }
+//+------------------------------------------------------------------+
+void RCat::IncPeriodCounter(void)
+  {
+   m_Real_Period_Count++;
+  }
+//+------------------------------------------------------------------+

@@ -5,7 +5,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, Shcherbyna Rostyslav"
 #property link      ""
-#property version   "1.75"
+#property version   "1.78"
 
 #include <Tools\DateTime.mqh>
 
@@ -14,6 +14,7 @@ Include all structures and global constants
 */
 /*
 +++++CHANGE LOG+++++
+1.78 22.07.2016--Add to Emulated QNP -  RT QNP
 1.75 19.07.2016--Add CkTR 0711 xUSD with Singularity (f,f1)
 1.7  04.07.2016--Add QNP Export
 1.6  20.06.2016--Add Custom Feed WO Indicator to Emulation and Trading
@@ -156,6 +157,18 @@ struct SIMUL_NP
    double            P2_NP4;
    double            P2_NP14;
   };
+//---Structure for real time Qs
+struct RT_Q
+  {
+   int               Q1_RT;
+   int               Q4_RT;
+  };
+//---Structure for real time NPs
+struct RT_NP
+  {
+   double            NP1_RT;
+   double            NP4_RT;
+  };
 //+------------------------------------------------------------------+
 //| Compounding (Dynamic or Maximal Only)                            |
 //+------------------------------------------------------------------+
@@ -217,7 +230,9 @@ enum ENUM_TRCK
   {
    CK_TR18_0330_Virt,
    CK_TR14,
-   CK_TR_0711
+   CK_TR_0711,
+   CK_TR1,
+   CK_TR4
   };
 //RealTime Open TR
 enum ENUM_RT_OpenRule
