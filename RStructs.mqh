@@ -169,6 +169,33 @@ struct RT_NP
    double            NP1_RT;
    double            NP4_RT;
   };
+//---Structure for Ck values
+struct STRUCT_CK
+  {
+   int               f;
+   int               f1;
+   int               f_f1;
+   int               a;
+   int               b;
+   int               g;
+  };
+//---Exceptions for Ck
+struct STRUCT_EXCK
+  {
+   uchar             ex_Limit;
+   bool              ex_F_Singularity;
+   bool              ex_F1_Singularity;
+   bool              ex_SleepMarket;
+   bool              ex_G_Zero;
+   bool              ex_G_Less_Limit;
+   bool              ex_A_Eq_B;
+   bool              ex_A_Minus_B_Zero;
+   bool              ex_A_Minus_B_LessLimit;
+   bool              ex_B_LessLimit;
+   bool              ex_A_LessLimit;
+   bool              ex_Abs14_LessLimit;
+   bool              ex_Abs1Abs4_LessLimit;
+  };
 //+------------------------------------------------------------------+
 //| Compounding (Dynamic or Maximal Only)                            |
 //+------------------------------------------------------------------+
