@@ -28,6 +28,8 @@ Include all structures and global constants
 */
 
 //CONSTANTS
+const string MacSeparator="\t";
+const string WindowsSeparator=",";
 const uint MAGIC_IB=3000000;
 const uint MAGIC_IS=3100000;
 const uchar OP_BUY=0;
