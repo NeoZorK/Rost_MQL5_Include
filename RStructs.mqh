@@ -264,10 +264,13 @@ enum ENUM_TRCK
    CK_TR1,
    CK_TR4
   };
-//RealTime Open TR
+//RealTime Open TR (BBB->CkBuy,SignalBuy,->OpenBuy)
 enum ENUM_RT_OpenRule
   {
-   POMI
+   POMI_BBB,
+   POMI_BBS,
+   POMI_BSB,
+   POMI_BSS,
   };
 //RealTime Close TR
 enum ENUM_RT_CloseRule
