@@ -5,7 +5,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, Shcherbyna Rostyslav"
 #property link      ""
-#property version   "1.78"
+#property version   "1.82"
 
 #include <Tools\DateTime.mqh>
 
@@ -14,6 +14,7 @@ Include all structures and global constants
 */
 /*
 +++++CHANGE LOG+++++
+1.82 28.07.2016--Add 4 Version for POM TR (+Reverse)
 1.78 22.07.2016--Add to Emulated QNP -  RT QNP
 1.75 19.07.2016--Add CkTR 0711 xUSD with Singularity (f,f1)
 1.7  04.07.2016--Add QNP Export
@@ -264,10 +265,13 @@ enum ENUM_TRCK
    CK_TR1,
    CK_TR4
   };
-//RealTime Open TR
+//RealTime Open TR (BBB->CkBuy,SignalBuy,->OpenBuy)
 enum ENUM_RT_OpenRule
   {
-   POMI
+   POMI_BBB,
+   POMI_BBS,
+   POMI_BSB,
+   POMI_BSS,
   };
 //RealTime Close TR
 enum ENUM_RT_CloseRule
