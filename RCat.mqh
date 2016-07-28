@@ -5,7 +5,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, Shcherbyna Rostyslav"
 #property link      ""
-#property version   "1.78"
+#property version   "1.82"
 
 #include <Tools\DateTime.mqh>
 #include <RInclude\RTrade.mqh>
@@ -14,6 +14,7 @@
 //+------------------------------------------------------------------+
 /*
 +++++CHANGE LOG+++++
+1.82 28.07.2016--Add 4 Version for POM TR (+Reverse)
 1.78 22.07.2016--Add to Emulated QNP -  RT QNP
 1.75 19.07.2016--Add CkTR 0711 xUSD with Singularity (f,f1)
 1.7  04.07.2016--Add QNP Export
@@ -81,7 +82,10 @@ private:
    ENUM_RT_CloseRule m_current_close_rule;
    //Open TR 
    int               m_OpenRule(const ENUM_RT_OpenRule &OpenRule);
-   int               m_POMI();
+   int               m_POMI_BBB();
+   int               m_POMI_BBS();
+   int               m_POMI_BSB();
+   int               m_POMI_BSS();
    //Close TR 
    int               m_CloseRule(const ENUM_RT_CloseRule &CloseRule);
    bool              m_AutoCloseDcSpread();
@@ -285,7 +289,16 @@ int RCat::m_OpenRule(const ENUM_RT_OpenRule &OpenRule)
 //Check OpenRule
    switch(OpenRule)
      {
-      case  0:TR_RES=m_POMI();
+      case  POMI_BBB:TR_RES=m_POMI_BBB();
+      break;
+
+      case  POMI_BBS:TR_RES=m_POMI_BBS();
+      break;
+
+      case  POMI_BSB:TR_RES=m_POMI_BSB();
+      break;
+
+      case  POMI_BSS:TR_RES=m_POMI_BSS();
       break;
 
       default:
@@ -319,9 +332,9 @@ int RCat::m_CloseRule(const ENUM_RT_CloseRule &CloseRule)
    return(TR_RES);
   }//END OF CLOSE RULE
 //+------------------------------------------------------------------+
-//| Open TR #0 POMI                                                  |
+//| Open TR #0 POMI  CkBuy,SignalBuy->OpenBuy(BBB)                   |
 //+------------------------------------------------------------------+
-int RCat::m_POMI()
+int RCat::m_POMI_BBB(void)
   {
    int res=-1;
 
@@ -357,7 +370,127 @@ int RCat::m_POMI()
      }//END OF SELL
 
    return(res);
-  }//END OF POMI
+  }//END OF POMI BBB
+//+------------------------------------------------------------------+
+//| Open TR #1  POMI BBS CkBuy,SignalBuy->OpenSell                   |
+//+------------------------------------------------------------------+
+int RCat::m_POMI_BBS(void)
+  {
+   int res=-1;
+
+//If no signal
+   if(m_signal==0)
+     {
+      return(-2);
+     }
+
+//if no who first
+   if(m_first==0)
+     {
+      return(-2);
+     }
+
+//---2:1 
+//(case 4) or (case14)
+   if(m_current_ck==CkSell4 || m_current_ck==CkBuySell14 || m_current_ck==CkSingularitySell)
+     {
+      if((m_signal==Ind_Sell) && (m_pom>=m_pom_sell) && (m_pom<m_pom_sell+m_pom_koef))
+        {
+         return(BUY1);
+        }
+     }//END of BUY
+//---1:2
+// (case 1) or (case14)
+   if(m_current_ck==CkBuy1 || m_current_ck==CkBuySell14 || m_current_ck==CkSingularityBuy)
+     {
+      if((m_signal==Ind_Buy) && (m_pom>=m_pom_buy) && (m_pom<m_pom_buy+m_pom_koef))
+        {
+         return(SELL1);
+        }
+     }//END OF SELL
+
+   return(res);
+  }//END OF POMI BBS
+//+------------------------------------------------------------------+
+//| Open TR #2  POMI  BSB CkBuy,SignalSell,->OpenBuy                 |
+//+------------------------------------------------------------------+
+int RCat::m_POMI_BSB(void)
+  {
+   int res=-1;
+
+//If no signal
+   if(m_signal==0)
+     {
+      return(-2);
+     }
+
+//if no who first
+   if(m_first==0)
+     {
+      return(-2);
+     }
+
+//---2:1 
+//(case 4) or (case14)
+   if(m_current_ck==CkSell4 || m_current_ck==CkBuySell14 || m_current_ck==CkSingularitySell)
+     {
+      if((m_signal==Ind_Buy) && (m_pom>=m_pom_buy) && (m_pom<m_pom_buy+m_pom_koef))
+        {
+         return(SELL1);
+        }
+     }//END of BUY
+//---1:2
+// (case 1) or (case14)
+   if(m_current_ck==CkBuy1 || m_current_ck==CkBuySell14 || m_current_ck==CkSingularityBuy)
+     {
+      if((m_signal==Ind_Sell) && (m_pom>=m_pom_sell) && (m_pom<m_pom_sell+m_pom_koef))
+        {
+         return(BUY1);
+        }
+     }//END OF SELL
+
+   return(res);
+  }//END OF POMI BSB    
+//+------------------------------------------------------------------+
+//| Open TR #3  POMI  BSS CkBuy,SignalSell,->OpenSell                |
+//+------------------------------------------------------------------+
+int RCat::m_POMI_BSS(void)
+  {
+   int res=-1;
+
+//If no signal
+   if(m_signal==0)
+     {
+      return(-2);
+     }
+
+//if no who first
+   if(m_first==0)
+     {
+      return(-2);
+     }
+
+//---2:1 
+//(case 4) or (case14)
+   if(m_current_ck==CkSell4 || m_current_ck==CkBuySell14 || m_current_ck==CkSingularitySell)
+     {
+      if((m_signal==Ind_Buy) && (m_pom>=m_pom_buy) && (m_pom<m_pom_buy+m_pom_koef))
+        {
+         return(BUY1);
+        }
+     }//END of BUY
+//---1:2
+// (case 1) or (case14)
+   if(m_current_ck==CkBuy1 || m_current_ck==CkBuySell14 || m_current_ck==CkSingularityBuy)
+     {
+      if((m_signal==Ind_Sell) && (m_pom>=m_pom_sell) && (m_pom<m_pom_sell+m_pom_koef))
+        {
+         return(SELL1);
+        }
+     }//END OF SELL
+
+   return(res);
+  }//END OF POMI BSS      
 //+------------------------------------------------------------------+
 //| AutoClose by |DeltaC|+Spread+Commission                          |
 //+------------------------------------------------------------------+
