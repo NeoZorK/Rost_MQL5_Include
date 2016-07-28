@@ -5,7 +5,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, Shcherbyna Rostyslav"
 #property link      ""
-#property version   "1.78"
+#property version   "1.82"
 
 #include <Tools\DateTime.mqh>
 
@@ -14,6 +14,7 @@ Include all structures and global constants
 */
 /*
 +++++CHANGE LOG+++++
+1.82 28.07.2016--Add 4 Version for POM TR (+Reverse)
 1.78 22.07.2016--Add to Emulated QNP -  RT QNP
 1.75 19.07.2016--Add CkTR 0711 xUSD with Singularity (f,f1)
 1.7  04.07.2016--Add QNP Export
@@ -28,6 +29,8 @@ Include all structures and global constants
 */
 
 //CONSTANTS
+const string MacSeparator="\t";
+const string WindowsSeparator=",";
 const uint MAGIC_IB=3000000;
 const uint MAGIC_IS=3100000;
 const uchar OP_BUY=0;
@@ -169,6 +172,33 @@ struct RT_NP
    double            NP1_RT;
    double            NP4_RT;
   };
+//---Structure for Ck values
+struct STRUCT_CK
+  {
+   int               f;
+   int               f1;
+   int               f_f1;
+   int               a;
+   int               b;
+   int               g;
+  };
+//---Exceptions for Ck
+struct STRUCT_EXCK
+  {
+   uchar             ex_Limit;
+   bool              ex_F_Singularity;
+   bool              ex_F1_Singularity;
+   bool              ex_SleepMarket;
+   bool              ex_G_Zero;
+   bool              ex_G_Less_Limit;
+   bool              ex_A_Eq_B;
+   bool              ex_A_Minus_B_Zero;
+   bool              ex_A_Minus_B_LessLimit;
+   bool              ex_B_LessLimit;
+   bool              ex_A_LessLimit;
+   bool              ex_Abs14_LessLimit;
+   bool              ex_Abs1Abs4_LessLimit;
+  };
 //+------------------------------------------------------------------+
 //| Compounding (Dynamic or Maximal Only)                            |
 //+------------------------------------------------------------------+
@@ -231,13 +261,17 @@ enum ENUM_TRCK
    CK_TR18_0330_Virt,
    CK_TR14,
    CK_TR_0711,
+   CK_TR_0722,
    CK_TR1,
    CK_TR4
   };
-//RealTime Open TR
+//RealTime Open TR (BBB->CkBuy,SignalBuy,->OpenBuy)
 enum ENUM_RT_OpenRule
   {
-   POMI
+   POMI_BBB,
+   POMI_BBS,
+   POMI_BSB,
+   POMI_BSS,
   };
 //RealTime Close TR
 enum ENUM_RT_CloseRule
