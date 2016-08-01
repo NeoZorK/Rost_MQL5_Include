@@ -1425,7 +1425,7 @@ bool RCat::m_PartiallySendOrder(const double &Volume,const uchar BuyOrSell)
         }//END OF FOR
 
       //Close\Open other lot
-      if(part_notClosed_lot>=0)
+      if(part_notClosed_lot>0)
         {
          OpenMarketOrder(part_notClosed_lot,BuyOrSell,m_stoploss,m_takeprofit,m_Real_Period_Count,
                          DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
