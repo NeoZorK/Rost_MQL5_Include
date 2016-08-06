@@ -1459,7 +1459,7 @@ bool RCat::QuantMode(const ENUM_QuantMode &QuantMode)
 //Check QuantMode
    switch(QuantMode)
      {
-      case  None:return(false);
+      case  None:return(true);
       break;
 
       case CloseOnly: if(m_Quant_CloseOnly()) return(true);
