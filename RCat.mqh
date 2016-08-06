@@ -115,6 +115,9 @@ private:
    //Partially Open\Close orders (to avoid MaxBroker Lots Volume)
    bool              m_PartiallySendOrder(const double &Volume,const uchar BuyOrSell);
 
+   //Quant Mode (Close Only price)
+   bool              m_Quant_CloseOnly();
+
 public:
                      RCat(const string Pair,const double &Pom_Koef,const double &PomBuy,const double &PomSell,
                                             const ushort &Fee,const uchar &SleepPage,const ushort &MaxSpread,const uint &BottleSize);
@@ -1453,8 +1456,36 @@ bool RCat::m_PartiallySendOrder(const double &Volume,const uchar BuyOrSell)
 //+------------------------------------------------------------------+
 bool RCat::QuantMode(const ENUM_QuantMode &QuantMode)
   {
+//Check QuantMode
+   switch(QuantMode)
+     {
+      case  None:return(false);
+      break;
+
+      case CloseOnly: if(m_Quant_CloseOnly()) return(true);
+      else return(false);
+      break;
+
+      default: return(false);
+      break;
+     }//END OF SWITCH
 
 //By Default skip price
    return(false);
   }//END OF QUANT MODE  
+//+------------------------------------------------------------------+
+//| Quant Close Only Price                                           |
+//+------------------------------------------------------------------+
+bool RCat::m_Quant_CloseOnly(void)
+  {
+   MqlDateTime  mqdt;
+
+//Get Current Time
+   TimeCurrent(mqdt);
+
+   if(mqdt.sec==59) return(true);
+
+//By Default 
+   return(false);
+  }//END OF Quant CloseOnly  
 //+------------------------------------------------------------------+
