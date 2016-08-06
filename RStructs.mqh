@@ -200,6 +200,18 @@ struct STRUCT_EXCK
    bool              ex_Abs1Abs4_LessLimit;
   };
 //+------------------------------------------------------------------+
+//| Quant Modes for All ticks(real ticks) MT5 Setup                  |
+//+------------------------------------------------------------------+
+enum ENUM_QuantMode
+  {
+   None,             // Calculate All ticks
+   CloseOnly,        // Only Close Price in 59 second
+   OpenClose,        // Open and Close Prices (Seconds: 0,59)
+   mt5_OHLC,         // Seconds: 0,20,40,59
+   Every_10,         // Every 10 seconds(0,10,20,30,40,50,59)
+   SmartMode,        // Trys to find local high\low levels
+  };
+//+------------------------------------------------------------------+
 //| Compounding (Dynamic or Maximal Only)                            |
 //+------------------------------------------------------------------+
 enum ENUM_AutoLot
