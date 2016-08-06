@@ -121,6 +121,9 @@ private:
    //Quant Mode (Open & Close Only price)
    bool              m_Quant_OpenClose();
 
+   //Quant Mode (mt5 OHLC 0,20,40,59 seconds)
+   bool              m_Quant_MT5_OHLC();
+
 public:
                      RCat(const string Pair,const double &Pom_Koef,const double &PomBuy,const double &PomSell,
                                             const ushort &Fee,const uchar &SleepPage,const ushort &MaxSpread,const uint &BottleSize);
@@ -1473,6 +1476,10 @@ bool RCat::QuantMode(const ENUM_QuantMode &QuantMode)
       else return(false);
       break;
 
+      case MT5_OHLC: if(m_Quant_MT5_OHLC()) return(true);
+      else return(false);
+      break;
+
       default: return(false);
       break;
      }//END OF SWITCH
@@ -1510,4 +1517,20 @@ bool RCat::m_Quant_OpenClose(void)
 //By Default 
    return(false);
   }//END OF Quant Open & Close  
+//+------------------------------------------------------------------+
+//| Quant Mt5 OHLC                                                   |
+//+------------------------------------------------------------------+
+bool RCat::m_Quant_MT5_OHLC(void)
+  {
+   MqlDateTime  mqdt;
+
+//Get Current Time
+   TimeCurrent(mqdt);
+
+   if((mqdt.sec==59) || (mqdt.sec==0) || (mqdt.sec==20) || (mqdt.sec==40)) return(true);
+
+//By Default 
+   return(false);
+  }//END OF Quant MT5 OHLC 
+//+------------------------------------------------------------------+ 
 //+------------------------------------------------------------------+
