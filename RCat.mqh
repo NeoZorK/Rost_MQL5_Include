@@ -118,6 +118,9 @@ private:
    //Quant Mode (Close Only price)
    bool              m_Quant_CloseOnly();
 
+   //Quant Mode (Open & Close Only price)
+   bool              m_Quant_OpenClose();
+
 public:
                      RCat(const string Pair,const double &Pom_Koef,const double &PomBuy,const double &PomSell,
                                             const ushort &Fee,const uchar &SleepPage,const ushort &MaxSpread,const uint &BottleSize);
@@ -1466,6 +1469,10 @@ bool RCat::QuantMode(const ENUM_QuantMode &QuantMode)
       else return(false);
       break;
 
+      case OpenClose: if(m_Quant_OpenClose()) return(true);
+      else return(false);
+      break;
+
       default: return(false);
       break;
      }//END OF SWITCH
@@ -1488,4 +1495,19 @@ bool RCat::m_Quant_CloseOnly(void)
 //By Default 
    return(false);
   }//END OF Quant CloseOnly  
+//+------------------------------------------------------------------+
+//| Quant Open & Close Only Price                                    |
+//+------------------------------------------------------------------+
+bool RCat::m_Quant_OpenClose(void)
+  {
+   MqlDateTime  mqdt;
+
+//Get Current Time
+   TimeCurrent(mqdt);
+
+   if((mqdt.sec==59) || (mqdt.sec==0)) return(true);
+
+//By Default 
+   return(false);
+  }//END OF Quant Open & Close  
 //+------------------------------------------------------------------+
