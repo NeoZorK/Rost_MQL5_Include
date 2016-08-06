@@ -207,7 +207,7 @@ enum ENUM_QuantMode
    None,             // Calculate All ticks
    CloseOnly,        // Only Close Price in 59 second
    OpenClose,        // Open and Close Prices(0,59)
-   MT5_OHLC,         // Seconds: 0,20,40,59
+   MT5_OHLC,         // MT5 OHLC
    Every_10,         // Every 10 seconds
    SmartMode,        // SmartMode
   };

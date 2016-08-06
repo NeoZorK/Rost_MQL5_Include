@@ -124,6 +124,9 @@ private:
    //Quant Mode (mt5 OHLC 0,20,40,59 seconds)
    bool              m_Quant_MT5_OHLC();
 
+   //Quant Mode Every 10 seconds
+   bool              m_Quant_Every_10();
+
 public:
                      RCat(const string Pair,const double &Pom_Koef,const double &PomBuy,const double &PomSell,
                                             const ushort &Fee,const uchar &SleepPage,const ushort &MaxSpread,const uint &BottleSize);
@@ -1480,6 +1483,10 @@ bool RCat::QuantMode(const ENUM_QuantMode &QuantMode)
       else return(false);
       break;
 
+      case Every_10: if(m_Quant_Every_10()) return(true);
+      else return(false);
+      break;
+
       default: return(false);
       break;
      }//END OF SWITCH
@@ -1532,5 +1539,21 @@ bool RCat::m_Quant_MT5_OHLC(void)
 //By Default 
    return(false);
   }//END OF Quant MT5 OHLC 
+//+------------------------------------------------------------------+
+//| Quant Every 10 seconds                                           |
+//+------------------------------------------------------------------+
+bool RCat::m_Quant_Every_10(void)
+  {
+   MqlDateTime  mqdt;
+
+//Get Current Time
+   TimeCurrent(mqdt);
+
+   if((mqdt.sec==59) || (mqdt.sec==0) || (mqdt.sec==20) || (mqdt.sec==40)
+      || (mqdt.sec==10) || (mqdt.sec==30) || (mqdt.sec==50)) return(true);
+
+//By Default 
+   return(false);
+  }//END OF Quant Every 10 seconds  
 //+------------------------------------------------------------------+ 
 //+------------------------------------------------------------------+
