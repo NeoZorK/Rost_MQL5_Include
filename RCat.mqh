@@ -153,6 +153,9 @@ public:
 
    //PeriodCount
    int               PeriodCount();
+
+   //Quant Mode (False = Exit, True = Calculate)
+   bool              QuantMode(const ENUM_QuantMode &QuantMode);
   };
 //+------------------------------------------------------------------+
 //| Constructor                                                      |
@@ -1445,4 +1448,13 @@ bool RCat::m_PartiallySendOrder(const double &Volume,const uchar BuyOrSell)
      }//END OF NORMAL Open Position
 
   }//END OF Partially Send Order
+//+------------------------------------------------------------------+
+//| Quant Mode for All ticks (True - Calculate, False - Skip price)  |
+//+------------------------------------------------------------------+
+bool RCat::QuantMode(const ENUM_QuantMode &QuantMode)
+  {
+
+//By Default skip price
+   return(false);
+  }//END OF QUANT MODE  
 //+------------------------------------------------------------------+
