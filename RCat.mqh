@@ -115,6 +115,18 @@ private:
    //Partially Open\Close orders (to avoid MaxBroker Lots Volume)
    bool              m_PartiallySendOrder(const double &Volume,const uchar BuyOrSell);
 
+   //Quant Mode (Close Only price)
+   bool              m_Quant_CloseOnly();
+
+   //Quant Mode (Open & Close Only price)
+   bool              m_Quant_OpenClose();
+
+   //Quant Mode (mt5 OHLC 0,20,40,59 seconds)
+   bool              m_Quant_MT5_OHLC();
+
+   //Quant Mode Every 10 seconds
+   bool              m_Quant_Every_10();
+
 public:
                      RCat(const string Pair,const double &Pom_Koef,const double &PomBuy,const double &PomSell,
                                             const ushort &Fee,const uchar &SleepPage,const ushort &MaxSpread,const uint &BottleSize);
@@ -153,6 +165,9 @@ public:
 
    //PeriodCount
    int               PeriodCount();
+
+   //Quant Mode (False = Exit, True = Calculate)
+   bool              QuantMode(const ENUM_QuantMode &QuantMode);
   };
 //+------------------------------------------------------------------+
 //| Constructor                                                      |
@@ -1445,4 +1460,100 @@ bool RCat::m_PartiallySendOrder(const double &Volume,const uchar BuyOrSell)
      }//END OF NORMAL Open Position
 
   }//END OF Partially Send Order
+//+------------------------------------------------------------------+
+//| Quant Mode for All ticks (True - Calculate, False - Skip price)  |
+//+------------------------------------------------------------------+
+bool RCat::QuantMode(const ENUM_QuantMode &QuantMode)
+  {
+//Check QuantMode
+   switch(QuantMode)
+     {
+      case  None:return(true);
+      break;
+
+      case CloseOnly: if(m_Quant_CloseOnly()) return(true);
+      else return(false);
+      break;
+
+      case OpenClose: if(m_Quant_OpenClose()) return(true);
+      else return(false);
+      break;
+
+      case MT5_OHLC: if(m_Quant_MT5_OHLC()) return(true);
+      else return(false);
+      break;
+
+      case Every_10: if(m_Quant_Every_10()) return(true);
+      else return(false);
+      break;
+
+      default: return(false);
+      break;
+     }//END OF SWITCH
+
+//By Default skip price
+   return(false);
+  }//END OF QUANT MODE  
+//+------------------------------------------------------------------+
+//| Quant Close Only Price                                           |
+//+------------------------------------------------------------------+
+bool RCat::m_Quant_CloseOnly(void)
+  {
+   MqlDateTime  mqdt;
+
+//Get Current Time
+   TimeCurrent(mqdt);
+
+   if(mqdt.sec==59) return(true);
+
+//By Default 
+   return(false);
+  }//END OF Quant CloseOnly  
+//+------------------------------------------------------------------+
+//| Quant Open & Close Only Price                                    |
+//+------------------------------------------------------------------+
+bool RCat::m_Quant_OpenClose(void)
+  {
+   MqlDateTime  mqdt;
+
+//Get Current Time
+   TimeCurrent(mqdt);
+
+   if((mqdt.sec==59) || (mqdt.sec==0)) return(true);
+
+//By Default 
+   return(false);
+  }//END OF Quant Open & Close  
+//+------------------------------------------------------------------+
+//| Quant Mt5 OHLC                                                   |
+//+------------------------------------------------------------------+
+bool RCat::m_Quant_MT5_OHLC(void)
+  {
+   MqlDateTime  mqdt;
+
+//Get Current Time
+   TimeCurrent(mqdt);
+
+   if((mqdt.sec==59) || (mqdt.sec==0) || (mqdt.sec==20) || (mqdt.sec==40)) return(true);
+
+//By Default 
+   return(false);
+  }//END OF Quant MT5 OHLC 
+//+------------------------------------------------------------------+
+//| Quant Every 10 seconds                                           |
+//+------------------------------------------------------------------+
+bool RCat::m_Quant_Every_10(void)
+  {
+   MqlDateTime  mqdt;
+
+//Get Current Time
+   TimeCurrent(mqdt);
+
+   if((mqdt.sec==59) || (mqdt.sec==0) || (mqdt.sec==20) || (mqdt.sec==40)
+      || (mqdt.sec==10) || (mqdt.sec==30) || (mqdt.sec==50)) return(true);
+
+//By Default 
+   return(false);
+  }//END OF Quant Every 10 seconds  
+//+------------------------------------------------------------------+ 
 //+------------------------------------------------------------------+

@@ -206,10 +206,10 @@ enum ENUM_QuantMode
   {
    None,             // Calculate All ticks
    CloseOnly,        // Only Close Price in 59 second
-   OpenClose,        // Open and Close Prices (Seconds: 0,59)
-   mt5_OHLC,         // Seconds: 0,20,40,59
-   Every_10,         // Every 10 seconds(0,10,20,30,40,50,59)
-   SmartMode,        // Trys to find local high\low levels
+   OpenClose,        // Open and Close Prices(0,59)
+   MT5_OHLC,         // MT5 OHLC
+   Every_10,         // Every 10 seconds
+   SmartMode,        // SmartMode
   };
 //+------------------------------------------------------------------+
 //| Compounding (Dynamic or Maximal Only)                            |
@@ -275,7 +275,8 @@ enum ENUM_TRCK
    CK_TR_0711,
    CK_TR_0722,
    CK_TR1,
-   CK_TR4
+   CK_TR4,
+   CK_0808JPY,
   };
 //RealTime Open TR (BBB->CkBuy,SignalBuy,->OpenBuy)
 enum ENUM_RT_OpenRule
