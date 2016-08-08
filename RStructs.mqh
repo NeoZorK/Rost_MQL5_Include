@@ -275,7 +275,8 @@ enum ENUM_TRCK
    CK_TR_0711,
    CK_TR_0722,
    CK_TR1,
-   CK_TR4
+   CK_TR4,
+   CK_0808JPY,
   };
 //RealTime Open TR (BBB->CkBuy,SignalBuy,->OpenBuy)
 enum ENUM_RT_OpenRule
