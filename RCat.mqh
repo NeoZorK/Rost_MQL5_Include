@@ -68,6 +68,7 @@ private:
    double            m_start_vol_koef;
    double            m_max_vol_koef;
    double            m_add_vol_shift_points;
+   bool              m_partially_order;
 
    //Total Monthes Count
    double            m_TotalMonthsCount;
@@ -111,6 +112,21 @@ private:
    //DC RealTime
    bool              m_DC();
 
+   //Partially Open\Close orders (to avoid MaxBroker Lots Volume)
+   bool              m_PartiallySendOrder(const double &Volume,const uchar BuyOrSell);
+
+   //Quant Mode (Close Only price)
+   bool              m_Quant_CloseOnly();
+
+   //Quant Mode (Open & Close Only price)
+   bool              m_Quant_OpenClose();
+
+   //Quant Mode (mt5 OHLC 0,20,40,59 seconds)
+   bool              m_Quant_MT5_OHLC();
+
+   //Quant Mode Every 10 seconds
+   bool              m_Quant_Every_10();
+
 public:
                      RCat(const string Pair,const double &Pom_Koef,const double &PomBuy,const double &PomSell,
                                             const ushort &Fee,const uchar &SleepPage,const ushort &MaxSpread,const uint &BottleSize);
@@ -118,11 +134,13 @@ public:
 
    //Initialisation     
    bool              Init(const char &Ck_Case,const ENUM_RT_OpenRule &OpenRule,const ENUM_RT_CloseRule &CloseRule,
-                          const double AddVol_Shift_Pt);
+                          const double AddVol_Shift_Pt,const bool PartiallyOrder);
+
    //Main Trade on Ind Feed         
    bool              TradeInd(const double &First,const double &Pom,const double &Dc,const double &Signal,
                               const double &Sl,const double &Tp,const double &StartVol,const double &MaxVol,
                               const ENUM_AutoLot &AutoLot);
+
    //Trade on Calculated Feed (WO Indicator)
    bool              Trade(const double &Sl,const double &Tp,const double &StartVol,const double &MaxVol,
                            const ENUM_AutoLot &AutoLot);
@@ -147,6 +165,9 @@ public:
 
    //PeriodCount
    int               PeriodCount();
+
+   //Quant Mode (False = Exit, True = Calculate)
+   bool              QuantMode(const ENUM_QuantMode &QuantMode);
   };
 //+------------------------------------------------------------------+
 //| Constructor                                                      |
@@ -187,8 +208,8 @@ RCat::~RCat()
 //+------------------------------------------------------------------+
 //| Initialisation                                                   |
 //+------------------------------------------------------------------+
-bool RCat::Init(const char &Ck_Case,const ENUM_RT_OpenRule &OpenRule,
-                const ENUM_RT_CloseRule &CloseRule,const double AddVol_Shift_Pt)
+bool RCat::Init(const char &Ck_Case,const ENUM_RT_OpenRule &OpenRule,const ENUM_RT_CloseRule &CloseRule,
+                const double AddVol_Shift_Pt,const bool PartiallyOrder)
   {
    if(Ck_Case>4 || Ck_Case<0)
      {
@@ -198,6 +219,7 @@ bool RCat::Init(const char &Ck_Case,const ENUM_RT_OpenRule &OpenRule,
    m_current_open_rule=OpenRule;
    m_current_close_rule=CloseRule;
    m_add_vol_shift_points=AddVol_Shift_Pt;
+   m_partially_order=PartiallyOrder;
    return(true);
   }//END OF Init
 //+------------------------------------------------------------------+
@@ -239,6 +261,9 @@ bool RCat::TradeInd(const double &First,const double &Pom,const double &Dc,const
 // NoSignal, Err -> Exit
    if(m_TR_RES <0) return(false);
 
+//Current Volume (changes if partially order enabled)
+   double CurrentVolume=m_start_volume;
+
 //QuantMode here?
 
 //  If any Open Position?
@@ -249,15 +274,38 @@ bool RCat::TradeInd(const double &First,const double &Pom,const double &Dc,const
       switch(m_TR_RES)
         {
          //BUY
-         case  1005: OpenMarketOrder(m_start_volume,OP_BUY,m_stoploss,m_takeprofit,m_Real_Period_Count,
-                                     DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
-                                     TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
+         case  1005:
+
+            //If PartiallyOrder
+            if(m_partially_order)
+              {
+               m_PartiallySendOrder(CurrentVolume,OP_BUY);
+              }//END OF Partially order
+            else
+              {
+               //Normal Open
+               OpenMarketOrder(CurrentVolume,OP_BUY,m_stoploss,m_takeprofit,m_Real_Period_Count,
+                               DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
+                               TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
+              }//END Of normal order
+
             return(true); break;
 
             //SELL
-         case  2006: OpenMarketOrder(m_start_volume,OP_SELL,m_stoploss,m_takeprofit,m_Real_Period_Count,
-                                     DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
-                                     TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
+         case  2006:
+
+            //If PartiallyOrder
+            if(m_partially_order)
+              {
+               m_PartiallySendOrder(CurrentVolume,OP_SELL);
+              }//END OF Partially order
+            else
+              {
+               //Normal Open
+               OpenMarketOrder(CurrentVolume,OP_SELL,m_stoploss,m_takeprofit,m_Real_Period_Count,
+                               DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
+                               TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
+              }//END Of normal order
             return(true); break;
 
          default:
@@ -510,6 +558,7 @@ bool RCat::m_AutoCloseDcSpread(void)
 
 //GetCurrent Spread
    int temp_spread=(int)SymbolInfoInteger(m_pair,SYMBOL_SPREAD);
+
 //Check to close position   
    if(pos_profit>=MathAbs(dc*10)+(temp_spread*pos_volume)+(m_comission*pos_volume))
      {
@@ -538,17 +587,39 @@ bool RCat::ClosePosition(const string CustomComment)
 
 //Position Volume
    double pos_volume=PositionGetDouble(POSITION_VOLUME);
+
 //If Buy Opened, Close It  
    if(m_position_close_direction==POSITION_TYPE_BUY)
      {
-      OpenMarketOrder(pos_volume,OP_SELL,m_stoploss,m_takeprofit,m_Real_Period_Count,CustomComment,false,0);
-      res=true;
+      //If PartiallyOrder
+      if(m_partially_order)
+        {
+         m_PartiallySendOrder(pos_volume,OP_SELL);
+         res=true;
+        }//END OF Partially order
+      else
+        {
+         //Normal Open
+         OpenMarketOrder(pos_volume,OP_SELL,m_stoploss,m_takeprofit,m_Real_Period_Count,CustomComment,false,0);
+         res=true;
+        }//END OF NORMAL BUY
      }//END OF Close BUY
+
 //If Sell Opened, Close it   
    if(m_position_close_direction==POSITION_TYPE_SELL)
      {
-      OpenMarketOrder(pos_volume,OP_BUY,m_stoploss,m_takeprofit,m_Real_Period_Count,CustomComment,false,0);
-      res=true;
+      //If PartiallyOrder
+      if(m_partially_order)
+        {
+         m_PartiallySendOrder(pos_volume,OP_BUY);
+         res=true;
+        }//END OF Partially order
+      else
+        {
+         //Normal Open
+         OpenMarketOrder(pos_volume,OP_BUY,m_stoploss,m_takeprofit,m_Real_Period_Count,CustomComment,false,0);
+         res=true;
+        }//END OF NORMAL SELL
      }//END OF Close SELL
 
    return(res);
@@ -758,15 +829,33 @@ bool RCat::CloseAllPositions(const string CustomComment)
       //If Buy Opened, close it  
       if(pos_type==POSITION_TYPE_BUY)
         {
-         OpenMarketOrder(pos_volume,OP_SELL,m_stoploss,m_takeprofit,m_Real_Period_Count,CustomComment,false,0);
-         res=true;
+         //If PartiallyOrder
+         if(m_partially_order)
+           {
+            m_PartiallySendOrder(pos_volume,OP_SELL);
+           }//END OF Partially order
+         else
+           {
+            //Normal Close
+            OpenMarketOrder(pos_volume,OP_SELL,m_stoploss,m_takeprofit,m_Real_Period_Count,CustomComment,false,0);
+            res=true;
+           }//END of normal close buy
         }//END OF CLOSE BUY
 
       //If Sell Opened, close it  
       if(pos_type==POSITION_TYPE_SELL)
         {
-         OpenMarketOrder(pos_volume,OP_BUY,m_stoploss,m_takeprofit,m_Real_Period_Count,CustomComment,false,0);
-         res=true;
+         //If PartiallyOrder
+         if(m_partially_order)
+           {
+            m_PartiallySendOrder(pos_volume,OP_BUY);
+           }//END OF Partially order
+         else
+           {
+            //Normal Open
+            OpenMarketOrder(pos_volume,OP_BUY,m_stoploss,m_takeprofit,m_Real_Period_Count,CustomComment,false,0);
+            res=true;
+           }//END OF normal close buy
         }//END OF CLOSE SELL
      }//END of FOR
    return(res);
@@ -886,6 +975,10 @@ bool RCat::m_AddVolume(void)
 
 //Pair point
    double point_size=SymbolInfoDouble(m_pair,SYMBOL_POINT);
+
+//Current AddVolume(Changed if partially order enabled)
+   double CurrentAddVolume=m_start_volume;
+
 //Add Volume BUY
    if(pos_type==POSITION_TYPE_BUY && m_TR_RES==BUY1)
      {
@@ -893,10 +986,20 @@ bool RCat::m_AddVolume(void)
       if(pos_current_price>pos_open_price-(m_add_vol_shift_points*point_size)) return(false);
 
       //Add BUY
-      OpenMarketOrder(m_start_volume,OP_BUY,m_stoploss,m_takeprofit,m_Real_Period_Count,"+V"+
-                      DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
-                      TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
-      return(true);
+      //If PartiallyOrder
+      if(m_partially_order)
+        {
+         m_PartiallySendOrder(CurrentAddVolume,OP_BUY);
+         return(true);
+        }//END OF Partially order
+      else
+        {
+         //Normal Open
+         OpenMarketOrder(CurrentAddVolume,OP_BUY,m_stoploss,m_takeprofit,m_Real_Period_Count,"+V"+
+                         DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
+                         TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
+         return(true);
+        }//END OF NORMAL ADD BUY
      }//END OF ADD VOL BUY
 //Add Volume SELL
    if((pos_type==POSITION_TYPE_SELL) && (m_TR_RES==SELL1))
@@ -905,10 +1008,20 @@ bool RCat::m_AddVolume(void)
       if(pos_current_price<pos_open_price+(m_add_vol_shift_points*point_size)) return(false);
 
       //Add SELL
-      OpenMarketOrder(m_start_volume,OP_SELL,m_stoploss,m_takeprofit,m_Real_Period_Count,"+V"+
-                      DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
-                      TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
-      return(true);
+      //If PartiallyOrder
+      if(m_partially_order)
+        {
+         m_PartiallySendOrder(CurrentAddVolume,OP_SELL);
+         return(true);
+        }//END OF Partially order
+      else
+        {
+         //Normal Open
+         OpenMarketOrder(CurrentAddVolume,OP_SELL,m_stoploss,m_takeprofit,m_Real_Period_Count,"+V"+
+                         DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
+                         TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
+         return(true);
+        }//END OF NORMAL ADD SELL
      }//END OF ADD VOL SELL
 //If no pos,
    return(false);
@@ -1188,6 +1301,9 @@ bool RCat::Trade(const double &Sl,const double &Tp,const double &StartVol,const 
 // NoSignal, Err -> Exit
    if(m_TR_RES <0) return(false);
 
+//Current Volume (changes if partially order enabled)
+   double CurrentVolume=m_start_volume;
+
 //QuantMode here?
 
 //  If any Open Position?
@@ -1198,15 +1314,37 @@ bool RCat::Trade(const double &Sl,const double &Tp,const double &StartVol,const 
       switch(m_TR_RES)
         {
          //BUY
-         case  1005: OpenMarketOrder(m_start_volume,OP_BUY,m_stoploss,m_takeprofit,m_Real_Period_Count,
-                                     DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
-                                     TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
+         case  1005:
+
+            //If PartiallyOrder
+            if(m_partially_order)
+              {
+               m_PartiallySendOrder(CurrentVolume,OP_BUY);
+              }//END OF Partially order
+            else
+              {
+               //Normal Open
+               OpenMarketOrder(CurrentVolume,OP_BUY,m_stoploss,m_takeprofit,m_Real_Period_Count,
+                               DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
+                               TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
+              }//END OF NORMAL BUY
             return(true); break;
 
             //SELL
-         case  2006: OpenMarketOrder(m_start_volume,OP_SELL,m_stoploss,m_takeprofit,m_Real_Period_Count,
-                                     DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
-                                     TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
+         case  2006:
+
+            //If PartiallyOrder
+            if(m_partially_order)
+              {
+               m_PartiallySendOrder(CurrentVolume,OP_SELL);
+              }//END OF Partially order
+            else
+              {
+               //Normal Open
+               OpenMarketOrder(CurrentVolume,OP_SELL,m_stoploss,m_takeprofit,m_Real_Period_Count,
+                               DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
+                               TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
+              }//END OF NORAL SELL
             return(true); break;
 
          default:
@@ -1272,4 +1410,150 @@ void RCat::IncPeriodCounter(void)
   {
    m_Real_Period_Count++;
   }
+//+------------------------------------------------------------------+
+//| Real Time Period Counter                                         |
+//+------------------------------------------------------------------+
+bool RCat::m_PartiallySendOrder(const double &Volume,const uchar BuyOrSell)
+  {
+//Get Maximum Availables Volume on broker
+   double max_broker_vol=SymbolInfoDouble(m_pair,SYMBOL_VOLUME_MAX);
+
+//Vol > Max Broker Volume 
+   if(Volume>=max_broker_vol)
+     {
+      //New partially volume
+      double   part_volume=NormalizeDouble(Volume/(max_broker_vol),2);
+
+      //Lots Count for circle 
+      int  part_count=(int)NormalizeDouble(part_volume,0);
+
+      //Difference between Circle Closed position & not closed position yet
+      double part_notClosed_lot=Volume-(part_count*max_broker_vol);
+
+      //Part SendOrder
+      for(int i=0;i<part_count;i++)
+        {
+         OpenMarketOrder(max_broker_vol,BuyOrSell,m_stoploss,m_takeprofit,m_Real_Period_Count,
+                         DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
+                         TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
+         Sleep(50);
+        }//END OF FOR
+
+      //Close\Open other lot
+      if(part_notClosed_lot>0)
+        {
+         OpenMarketOrder(part_notClosed_lot,BuyOrSell,m_stoploss,m_takeprofit,m_Real_Period_Count,
+                         DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
+                         TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
+        }
+
+      return(true);
+     }
+   else
+     {
+      //Normal Open Position
+      OpenMarketOrder(Volume,BuyOrSell,m_stoploss,m_takeprofit,m_Real_Period_Count,
+                      DoubleToString(m_pom,2)+"|"+DoubleToString(m_dc,5)+"|"+
+                      TimeToString(TimeCurrent(),TIME_SECONDS),false,0);
+
+      return(true);
+     }//END OF NORMAL Open Position
+
+  }//END OF Partially Send Order
+//+------------------------------------------------------------------+
+//| Quant Mode for All ticks (True - Calculate, False - Skip price)  |
+//+------------------------------------------------------------------+
+bool RCat::QuantMode(const ENUM_QuantMode &QuantMode)
+  {
+//Check QuantMode
+   switch(QuantMode)
+     {
+      case  None:return(true);
+      break;
+
+      case CloseOnly: if(m_Quant_CloseOnly()) return(true);
+      else return(false);
+      break;
+
+      case OpenClose: if(m_Quant_OpenClose()) return(true);
+      else return(false);
+      break;
+
+      case MT5_OHLC: if(m_Quant_MT5_OHLC()) return(true);
+      else return(false);
+      break;
+
+      case Every_10: if(m_Quant_Every_10()) return(true);
+      else return(false);
+      break;
+
+      default: return(false);
+      break;
+     }//END OF SWITCH
+
+//By Default skip price
+   return(false);
+  }//END OF QUANT MODE  
+//+------------------------------------------------------------------+
+//| Quant Close Only Price                                           |
+//+------------------------------------------------------------------+
+bool RCat::m_Quant_CloseOnly(void)
+  {
+   MqlDateTime  mqdt;
+
+//Get Current Time
+   TimeCurrent(mqdt);
+
+   if(mqdt.sec==59) return(true);
+
+//By Default 
+   return(false);
+  }//END OF Quant CloseOnly  
+//+------------------------------------------------------------------+
+//| Quant Open & Close Only Price                                    |
+//+------------------------------------------------------------------+
+bool RCat::m_Quant_OpenClose(void)
+  {
+   MqlDateTime  mqdt;
+
+//Get Current Time
+   TimeCurrent(mqdt);
+
+   if((mqdt.sec==59) || (mqdt.sec==0)) return(true);
+
+//By Default 
+   return(false);
+  }//END OF Quant Open & Close  
+//+------------------------------------------------------------------+
+//| Quant Mt5 OHLC                                                   |
+//+------------------------------------------------------------------+
+bool RCat::m_Quant_MT5_OHLC(void)
+  {
+   MqlDateTime  mqdt;
+
+//Get Current Time
+   TimeCurrent(mqdt);
+
+   if((mqdt.sec==59) || (mqdt.sec==0) || (mqdt.sec==20) || (mqdt.sec==40)) return(true);
+
+//By Default 
+   return(false);
+  }//END OF Quant MT5 OHLC 
+//+------------------------------------------------------------------+
+//| Quant Every 10 seconds                                           |
+//+------------------------------------------------------------------+
+bool RCat::m_Quant_Every_10(void)
+  {
+   MqlDateTime  mqdt;
+
+//Get Current Time
+   TimeCurrent(mqdt);
+
+   if((mqdt.sec==59) || (mqdt.sec==0) || (mqdt.sec==20) || (mqdt.sec==40)
+      || (mqdt.sec==10) || (mqdt.sec==30) || (mqdt.sec==50)) return(true);
+
+//By Default 
+   return(false);
+  }//END OF Quant Every 10 seconds  
+//+------------------------------------------------------------------+ 
 //+------------------------------------------------------------------+
