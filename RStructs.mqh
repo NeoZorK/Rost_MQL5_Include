@@ -185,19 +185,26 @@ struct STRUCT_CK
 //---Exceptions for Ck
 struct STRUCT_EXCK
   {
-   uchar             ex_Limit;
-   bool              ex_F_Singularity;
-   bool              ex_F1_Singularity;
-   bool              ex_SleepMarket;
-   bool              ex_G_Zero;
-   bool              ex_G_Less_Limit;
-   bool              ex_A_Eq_B;
-   bool              ex_A_Minus_B_Zero;
-   bool              ex_A_Minus_B_LessLimit;
-   bool              ex_B_LessLimit;
-   bool              ex_A_LessLimit;
-   bool              ex_Abs14_LessLimit;
-   bool              ex_Abs1Abs4_LessLimit;
+   uchar             ex_Limit;                        // Limit=3
+   bool              ex_F_Singularity;                // F div 0
+   bool              ex_F1_Singularity;               // F1 div 0
+   bool              ex_SleepMarket;                  // dO1=dO4=dO14
+   bool              ex_G_Zero;                       // G = 0
+   bool              ex_G_Less_Limit;                 // G <= 3
+   bool              ex_A_Eq_B;                       // A==B
+   bool              ex_A_Minus_B_Zero;               // A-B==0
+   bool              ex_A_Minus_B_LessLimit;          // (A-B)<=3
+   bool              ex_B_LessLimit;                  // B<3   
+   bool              ex_A_LessLimit;                  // A<3
+   bool              ex_Abs14_LessLimit;              // |14|<3
+   bool              ex_Abs1Abs4_LessLimit;           // |1-4|<3
+   bool              ex_dQ1_Equal_dQ4;                // 1=4
+   bool              ex_AMinusB_0_AND_Q1NotEqualQ4;   // (A-B==0) AND Q1!=Q4
+   bool              ex_Abs_dO1_LessLimit;            // |1|<3
+   bool              ex_Abs_dO4_LessLimit;            // |4|<3   
+   bool              ex_A_LessLimit_AND_NOT_ZERO;     // A<3 AND A-B!=0   
+   bool              ex_B_LessLimit_AND_NOT_ZERO;     // B<3 AND A-B!=0   
+   char              ex_TOTAL;                        // SUM of Exceptions   
   };
 //+------------------------------------------------------------------+
 //| Quant Modes for All ticks(real ticks) MT5 Setup                  |
