@@ -5,7 +5,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, Shcherbyna Rostyslav"
 #property link      ""
-#property version   "1.82"
+#property version   "1.84"
 
 #include <Tools\DateTime.mqh>
 
@@ -14,6 +14,7 @@ Include all structures and global constants
 */
 /*
 +++++CHANGE LOG+++++
+1.84 09.08.2016--Add USDJPY TR & Build Ck Params & Exceptions
 1.82 28.07.2016--Add 4 Version for POM TR (+Reverse)
 1.78 22.07.2016--Add to Emulated QNP -  RT QNP
 1.75 19.07.2016--Add CkTR 0711 xUSD with Singularity (f,f1)
@@ -29,6 +30,8 @@ Include all structures and global constants
 */
 
 //CONSTANTS
+const char Yes = -1;
+const char No  = 1;
 const string MacSeparator="\t";
 const string WindowsSeparator=",";
 const uint MAGIC_IB=3000000;
@@ -185,19 +188,26 @@ struct STRUCT_CK
 //---Exceptions for Ck
 struct STRUCT_EXCK
   {
-   uchar             ex_Limit;
-   bool              ex_F_Singularity;
-   bool              ex_F1_Singularity;
-   bool              ex_SleepMarket;
-   bool              ex_G_Zero;
-   bool              ex_G_Less_Limit;
-   bool              ex_A_Eq_B;
-   bool              ex_A_Minus_B_Zero;
-   bool              ex_A_Minus_B_LessLimit;
-   bool              ex_B_LessLimit;
-   bool              ex_A_LessLimit;
-   bool              ex_Abs14_LessLimit;
-   bool              ex_Abs1Abs4_LessLimit;
+   uchar             ex_Limit;                        // Limit=3
+   char              ex_F_Singularity;                // F div 0
+   char              ex_F1_Singularity;               // F1 div 0
+   char              ex_SleepMarket;                  // dO1=dO4=dO14
+   char              ex_G_Zero;                       // G = 0
+   char              ex_G_Less_Limit;                 // G <= 3
+   char              ex_A_Eq_B;                       // A==B
+   char              ex_A_Minus_B_Zero;               // A-B==0
+   char              ex_A_Minus_B_LessLimit;          // (A-B)<=3
+   char              ex_B_LessLimit;                  // B<3   
+   char              ex_A_LessLimit;                  // A<3
+   char              ex_Abs14_LessLimit;              // |14|<3
+   char              ex_Abs1Abs4_LessLimit;           // |1-4|<3
+   char              ex_dQ1_Equal_dQ4;                // 1=4
+   char              ex_AMinusB_0_AND_Q1NotEqualQ4;   // (A-B==0) AND Q1!=Q4
+   char              ex_Abs_dO1_LessLimit;            // |1|<3
+   char              ex_Abs_dO4_LessLimit;            // |4|<3   
+   char              ex_A_LessLimit_AND_NOT_ZERO;     // A<3 AND A-B!=0   
+   char              ex_B_LessLimit_AND_NOT_ZERO;     // B<3 AND A-B!=0   
+   char              ex_TOTAL;                        // SUM of Exceptions   
   };
 //+------------------------------------------------------------------+
 //| Quant Modes for All ticks(real ticks) MT5 Setup                  |
