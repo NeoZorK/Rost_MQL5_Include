@@ -301,7 +301,8 @@ enum ENUM_RT_OpenRule
 //RealTime Close TR
 enum ENUM_RT_CloseRule
   {
-   AutoCloseDcSpread
+   AutoCloseDcSpread,
+   AutoCloseInflectionPoint,
   };
 //History Load Results
 enum ENUM_HistResults
