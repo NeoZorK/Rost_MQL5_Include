@@ -295,6 +295,8 @@ enum ENUM_RT_OpenRule
    POMI_BBS,
    POMI_BSB,
    POMI_BSS,
+   POM_Z1,
+   POM_Z2,
   };
 //RealTime Close TR
 enum ENUM_RT_CloseRule
