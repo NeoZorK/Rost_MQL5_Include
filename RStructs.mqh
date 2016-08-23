@@ -303,6 +303,10 @@ enum ENUM_RT_CloseRule
   {
    AutoCloseDcSpread,
    AutoCloseInflectionPoint,
+   AutoCloseReverseYY,
+   AutoCloseIP_ReverseYY,
+   AutoCloseIP_DC,
+   AutoCloseReverse_DC,
   };
 //History Load Results
 enum ENUM_HistResults
