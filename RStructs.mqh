@@ -58,6 +58,9 @@ const char CkSell4=1;
 const char CkBuySell14=2;
 const char CkSingularityBuy=3;
 const char CkSingularitySell=4;
+
+//Global VAR
+ulong draw_object_counter=0;
 //---Primings structs
 struct STRUCT_TICKVOL_OHLC
   {
@@ -408,6 +411,21 @@ bool CompareDoubleArrays(const double &Arr1[],const double &Arr2[])
 //If Ok
    return(true);
   }//End of compare arrays
+//+------------------------------------------------------------------+
+//| Draw Objects                                                     |
+//+------------------------------------------------------------------+
+bool DrawObject(const double Price,const ENUM_OBJECT DrawObject,const long DrawColor)
+  {
+//Create
+   ObjectCreate(0,IntegerToString(draw_object_counter),DrawObject,0,TimeCurrent(),Price);
+
+//Set Color
+   ObjectSetInteger(0,IntegerToString(draw_object_counter),OBJPROP_COLOR,DrawColor);
+
+   draw_object_counter++;
+   return(true);
+  }//END OF DRAW Objects
+
 //+------------------------------------------------------------------+
 //| defines                                                          |
 //+------------------------------------------------------------------+
