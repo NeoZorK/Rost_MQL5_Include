@@ -295,7 +295,7 @@ enum ENUM_RT_OpenRule
    POMI_BBS,
    POMI_BSB,
    POMI_BSS,
-   POM_Z1,
+   POM_Z1,//Tick Version
    POM_Z2,
   };
 //RealTime Close TR
@@ -304,9 +304,10 @@ enum ENUM_RT_CloseRule
    AutoCloseDcSpread,
    AutoCloseInflectionPoint,
    AutoCloseReverseYY,
+   AutoClose_TickDC,
    AutoCloseIP_ReverseYY,
-   AutoCloseIP_DC,
-   AutoCloseReverse_DC,
+   AutoCloseIP_TickDC,
+   AutoCloseReverse_TickDC,
   };
 //History Load Results
 enum ENUM_HistResults
