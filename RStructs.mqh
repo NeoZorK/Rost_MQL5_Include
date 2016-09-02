@@ -5,7 +5,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, Shcherbyna Rostyslav"
 #property link      ""
-#property version   "1.84"
+#property version   "1.90"
 
 #include <Tools\DateTime.mqh>
 
@@ -14,6 +14,7 @@ Include all structures and global constants
 */
 /*
 +++++CHANGE LOG+++++
+1.90 02.09.2016--Add RealTick support + Perfomance optimisation
 1.84 09.08.2016--Add USDJPY TR & Build Ck Params & Exceptions
 1.82 28.07.2016--Add 4 Version for POM TR (+Reverse)
 1.78 22.07.2016--Add to Emulated QNP -  RT QNP
@@ -58,6 +59,9 @@ const char CkSell4=1;
 const char CkBuySell14=2;
 const char CkSingularityBuy=3;
 const char CkSingularitySell=4;
+
+//Global VAR
+ulong draw_object_counter=0;
 //---Primings structs
 struct STRUCT_TICKVOL_OHLC
   {
@@ -295,11 +299,19 @@ enum ENUM_RT_OpenRule
    POMI_BBS,
    POMI_BSB,
    POMI_BSS,
+   POM_Z1,//Tick Version
+   POM_Z2,
   };
 //RealTime Close TR
 enum ENUM_RT_CloseRule
   {
-   AutoCloseDcSpread
+   AutoCloseDcSpread,
+   AutoCloseInflectionPoint,
+   AutoCloseReverseYY,
+   AutoClose_TickDC,
+   AutoCloseIP_ReverseYY,
+   AutoCloseIP_TickDC,
+   AutoCloseReverse_TickDC,
   };
 //History Load Results
 enum ENUM_HistResults
@@ -400,6 +412,21 @@ bool CompareDoubleArrays(const double &Arr1[],const double &Arr2[])
 //If Ok
    return(true);
   }//End of compare arrays
+//+------------------------------------------------------------------+
+//| Draw Objects                                                     |
+//+------------------------------------------------------------------+
+bool DrawObject(const double Price,const ENUM_OBJECT DrawObject,const long DrawColor)
+  {
+//Create
+   ObjectCreate(0,IntegerToString(draw_object_counter),DrawObject,0,TimeCurrent(),Price);
+
+//Set Color
+   ObjectSetInteger(0,IntegerToString(draw_object_counter),OBJPROP_COLOR,DrawColor);
+
+   draw_object_counter++;
+   return(true);
+  }//END OF DRAW Objects
+
 //+------------------------------------------------------------------+
 //| defines                                                          |
 //+------------------------------------------------------------------+
