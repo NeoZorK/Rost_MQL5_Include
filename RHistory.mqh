@@ -5,7 +5,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, Shcherbyna Rostyslav"
 #property link      ""
-#property version   "1.90"
+#property version   "1.91"
 
 #include <Tools\DateTime.mqh>
 #include <RInclude\RStructs.mqh>
@@ -22,6 +22,7 @@ Can determine last & first day minute, last week minute, last month minute, last
 */
 /*
 +++++CHANGE LOG+++++
+1.91 03.09.2016--Caterpillar perfomance optimisation
 1.90 02.09.2016--Add RealTick support + Perfomance optimisation
 1.84 09.08.2016--Add USDJPY TR & Build Ck Params & Exceptions
 1.82 28.07.2016--Add 4 Version for POM TR (+Reverse)
