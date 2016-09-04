@@ -215,6 +215,16 @@ struct STRUCT_EXCK
    char              ex_TOTAL;                        // SUM of Exceptions   
   };
 //+------------------------------------------------------------------+
+//|Requested ranges for periods in day count(left range)             |
+//+------------------------------------------------------------------+
+enum ENUM_RequestRange
+  {
+   rDay=10,
+   rWeek=30,
+   rMonth=90,
+   rQuarter=300,
+  };
+//+------------------------------------------------------------------+
 //| Quant Modes for All ticks(real ticks) MT5 Setup                  |
 //+------------------------------------------------------------------+
 enum ENUM_QuantMode
