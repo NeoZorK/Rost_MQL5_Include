@@ -226,7 +226,11 @@ enum ENUM_RequestRange
    rMinimumSessionMinutes=60,        //Minimum session minutes foe ProcessDay, If minutes < 60 then this day skips
    rMaximumRequestTrysCount=100,     //Maximum trys count to get requested CopyArrays (Price\Times\Spreads)
    rShifted_fwd_Seconds=300,         //Shifted End Of T (5 min =300 seconds, if closes in 23:50)
-   rShifted_fwd_Hours=12,            //Shift hours for the next day
+   rShifted_fwd_Hours=12,            //Shift hours for the next day                                   
+   rFnp_day=1,                       //For searching NextPeriod (increments by day)
+   rFnp_week=3,
+   rFnp_month=2,
+   rFnp_quarter=1,
   };
 //+------------------------------------------------------------------+
 //| Quant Modes for All ticks(real ticks) MT5 Setup                  |
