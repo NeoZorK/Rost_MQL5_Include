@@ -5,7 +5,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, Shcherbyna Rostyslav"
 #property link      ""
-#property version   "1.91"
+#property version   "1.92"
 
 #include <Tools\DateTime.mqh>
 
@@ -14,6 +14,7 @@ Include all structures and global constants
 */
 /*
 +++++CHANGE LOG+++++
+1.92 09.09.2016--Fully Stable Tick CVTR
 1.91 03.09.2016--Caterpillar perfomance optimisation
 1.90 02.09.2016--Add RealTick support + Perfomance optimisation
 1.84 09.08.2016--Add USDJPY TR & Build Ck Params & Exceptions
