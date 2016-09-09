@@ -5,7 +5,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, Shcherbyna Rostyslav"
 #property link      ""
-#property version   "1.91"
+#property version   "1.92"
 
 #include <Tools\DateTime.mqh>
 
@@ -14,6 +14,7 @@ Include all structures and global constants
 */
 /*
 +++++CHANGE LOG+++++
+1.92 09.09.2016--Fully Stable Tick CVTR
 1.91 03.09.2016--Caterpillar perfomance optimisation
 1.90 02.09.2016--Add RealTick support + Perfomance optimisation
 1.84 09.08.2016--Add USDJPY TR & Build Ck Params & Exceptions
@@ -213,6 +214,24 @@ struct STRUCT_EXCK
    char              ex_A_LessLimit_AND_NOT_ZERO;     // A<3 AND A-B!=0   
    char              ex_B_LessLimit_AND_NOT_ZERO;     // B<3 AND A-B!=0   
    char              ex_TOTAL;                        // SUM of Exceptions   
+  };
+//+------------------------------------------------------------------+
+//|Requested ranges for periods in day count(left range)             |
+//+------------------------------------------------------------------+
+enum ENUM_RequestRange
+  {
+   rDay=10,
+   rWeek=30,
+   rMonth=90,
+   rQuarter=300,
+   rMinimumSessionMinutes=60,        //Minimum session minutes foe ProcessDay, If minutes < 60 then this day skips
+   rMaximumRequestTrysCount=100,     //Maximum trys count to get requested CopyArrays (Price\Times\Spreads)
+   rShifted_fwd_Seconds=300,         //Shifted End Of T (5 min =300 seconds, if closes in 23:50)
+   rShifted_fwd_Hours=12,            //Shift hours for the next day                                   
+   rFnp_day=1,                       //For searching NextPeriod (increments by day)
+   rFnp_week=3,
+   rFnp_month=2,
+   rFnp_quarter=1,
   };
 //+------------------------------------------------------------------+
 //| Quant Modes for All ticks(real ticks) MT5 Setup                  |
