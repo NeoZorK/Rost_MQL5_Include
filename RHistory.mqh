@@ -5,7 +5,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, Shcherbyna Rostyslav"
 #property link      ""
-#property version   "1.91"
+#property version   "1.92"
 
 #include <Tools\DateTime.mqh>
 #include <RInclude\RStructs.mqh>
@@ -22,6 +22,7 @@ Can determine last & first day minute, last week minute, last month minute, last
 */
 /*
 +++++CHANGE LOG+++++
+1.92 09.09.2016--Fully Stable Tick CVTR
 1.91 03.09.2016--Caterpillar perfomance optimisation
 1.90 02.09.2016--Add RealTick support + Perfomance optimisation
 1.84 09.08.2016--Add USDJPY TR & Build Ck Params & Exceptions
@@ -104,7 +105,7 @@ private:
                                const double &High,const double &Low,const double &Close,const STRUCT_TICKVOL_OHLC &TickVol[]);
 
 public:
-                     RHistory(const string pair,const string path_to_ind,const uchar bottlesize);
+                     RHistory(const string pair,const string path_to_ind,const uchar bottlesize,const bool UseIndicator);
                     ~RHistory();
    //Check
    bool              _IsInitialised()                const       {return(m_initialised);}
@@ -230,16 +231,17 @@ public:
 //+------------------------------------------------------------------+
 //| Constructor                                                      |
 //+------------------------------------------------------------------+
-RHistory::RHistory(const string pair,const string path_to_ind,const uchar bottlesize):m_initialised(false),
-                                                                                       m_processed(false),
-                                                                                       m_imported(false),
-                                                                                       m_MRS_identical(false),
-                                                                                       m_copyed_all_datetimes(0),
-                                                                                       m_first_server_time(0),
-                                                                                       m_first_server_spread(0),
-                                                                                       //m_last_server_time(0),
-m_total_working_days_count(0),
-m_debug(false)
+RHistory::RHistory(const string pair,const string path_to_ind,const uchar bottlesize,
+                   const bool UseIndicator):m_initialised(false),
+                   m_processed(false),
+                   m_imported(false),
+                   m_MRS_identical(false),
+                   m_copyed_all_datetimes(0),
+                   m_first_server_time(0),
+                   m_first_server_spread(0),
+                   //m_last_server_time(0),
+                   m_total_working_days_count(0),
+                   m_debug(false)
   {
 
 //Check symbol 
@@ -283,11 +285,12 @@ m_debug(false)
    m_path=Server+m_pair+".FLM";
 
 //Connect Indicator
-   if(!_ConnectIndicator())
-     {
-      m_result=-22;
-      return;
-     }
+   if(UseIndicator)
+      if(!_ConnectIndicator())
+        {
+         m_result=-22;
+         return;
+        }
   }//End of Constructor
 //+------------------------------------------------------------------+
 //| Destructor                                                       |
