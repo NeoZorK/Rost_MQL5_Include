@@ -217,6 +217,10 @@ struct STRUCT_EXCK
    char              ex_A_Eq_B_Eq_Zero;               // A=B=0
    char              ex_AbsA_LessLimit;               // |A|<3
    char              ex_AbsB_LessLimit;               // |B|<3
+   char              ex_AbsA_LessLim_AND_B_NOTZERO;   // 0<|A|<=Lim AND B!=0;
+   char              ex_AbsB_LessLim_AND_A_NOTZERO;   // 0<|B|<=Lim AND A!=0;
+   char              ex_AbsA_Minus_AbsB_LessLim;      // 0<|A-B|<=Lim
+
    char              ex_TOTAL;                        // SUM of Exceptions   
   };
 //+------------------------------------------------------------------+
