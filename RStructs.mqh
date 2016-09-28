@@ -190,6 +190,7 @@ struct STRUCT_CK
    int               a;
    int               b;
    int               g;
+   bool              beta;
   };
 //---Exceptions for Ck
 struct STRUCT_EXCK
