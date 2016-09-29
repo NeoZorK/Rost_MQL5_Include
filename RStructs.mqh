@@ -191,6 +191,7 @@ struct STRUCT_CK
    int               b;
    int               g;
    bool              beta;
+   int               Beta;
   };
 //---Exceptions for Ck
 struct STRUCT_EXCK
@@ -198,6 +199,8 @@ struct STRUCT_EXCK
    uchar             ex_Limit;                        // Limit=3
    char              ex_F_Singularity;                // F div 0
    char              ex_F1_Singularity;               // F1 div 0
+   char              ex_Beta_Singularity;             // A*B=0 && A+B!=0
+   char              ex_NormalNavigators;             // |f|==|f1|==|Beta|==1
    char              ex_SleepMarket;                  // dO1=dO4=dO14
    char              ex_G_Zero;                       // G = 0
    char              ex_G_Less_Limit;                 // G <= 3
