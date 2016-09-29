@@ -206,8 +206,8 @@ struct STRUCT_EXCK
    char              ex_A_Minus_B_LessLimit;          // (A-B)<=3
    char              ex_B_LessLimit;                  // B<3   
    char              ex_A_LessLimit;                  // A<3
-   char              ex_Abs14_LessLimit;              // |14|<3
-   char              ex_Abs1Abs4_LessLimit;           // |1-4|<3
+   char              ex_Abs14_LessLimit;              // 0<|14|<=3
+   char              ex_Abs1Abs4_LessLimit;           // 0<|1|<3 && 0<|4|<3
    char              ex_dQ1_Equal_dQ4;                // 1=4
    char              ex_AMinusB_0_AND_Q1NotEqualQ4;   // (A-B==0) AND Q1!=Q4
    char              ex_Abs_dO1_LessLimit;            // |1|<3
@@ -215,8 +215,8 @@ struct STRUCT_EXCK
    char              ex_A_LessLimit_AND_NOT_ZERO;     // A<3 AND A-B!=0   
    char              ex_B_LessLimit_AND_NOT_ZERO;     // B<3 AND A-B!=0   
    char              ex_A_Eq_B_Eq_Zero;               // A=B=0
-   char              ex_AbsA_LessLimit;               // |A|<3
-   char              ex_AbsB_LessLimit;               // |B|<3
+   char              ex_AbsA_LessLimit;               // 0<=|A|<3
+   char              ex_AbsB_LessLimit;               // 0<=|B|<3
    char              ex_AbsA_LessLim_AND_B_NOTZERO;   // 0<|A|<=Lim AND B!=0;
    char              ex_AbsB_LessLim_AND_A_NOTZERO;   // 0<|B|<=Lim AND A!=0;
    char              ex_AbsA_Minus_AbsB_LessLim;      // 0<|A-B|<=Lim
