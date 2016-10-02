@@ -308,6 +308,8 @@ enum ENUM_EMUL_CloseRule
 enum ENUM_CK_SIGNALS
   {
    //Constants for Ck signals:
+   CkArrayBoundErr=-5,
+   Ck=-4,
    CkDefaultErr=-3,
    CkUnknownTR=-2,
    CkNoSignal=-1,
