@@ -61,6 +61,8 @@ const char CkSell4=1;
 const char CkBuySell14=2;
 const char CkSingularityBuy=3;
 const char CkSingularitySell=4;
+const char CkBetaSingularityBuy=5;
+const char CkBetaSingularitySell=6;
 
 //Global VAR
 ulong draw_object_counter=0;
