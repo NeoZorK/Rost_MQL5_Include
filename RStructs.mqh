@@ -320,10 +320,9 @@ enum ENUM_CK_SIGNALS
    CkSingularitySell=4,
    Ck_F_Singularity_Buy=5,
    Ck_F_Singularity_Sell=6,
-   Ck_F1_Singularity_Buy=7,
-   Ck_F1_Singularity_Sell=8,
-   Ck_Beta_Singularity_Buy=9,
-   Ck_Beta_Singularity_Sell=10,
+   Ck_F1_SingularityBuySell=7,
+   Ck_Beta_Singularity_Buy=8,
+   Ck_Beta_Singularity_Sell=9,
   };
 //+------------------------------------------------------------------+
 //| Trading Rule for Ck                                              |
