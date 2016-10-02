@@ -54,14 +54,6 @@ const char LowFirst = -1;
 const char EqualFirst=0; //High==Open or other Private Case
 const ushort     inpDeltaC_koef=1000; //Dc * 
                                       //
-//Constants for Ck signals:
-const char CkNoSignal=-1;
-const char CkBuy1=0;
-const char CkSell4=1;
-const char CkBuySell14=2;
-const char CkSingularityBuy=3;
-const char CkSingularitySell=4;
-
 //Global VAR
 ulong draw_object_counter=0;
 //---Primings structs
@@ -191,6 +183,7 @@ struct STRUCT_CK
    int               b;
    int               g;
    bool              beta;
+   int               Beta;
   };
 //---Exceptions for Ck
 struct STRUCT_EXCK
@@ -198,6 +191,8 @@ struct STRUCT_EXCK
    uchar             ex_Limit;                        // Limit=3
    char              ex_F_Singularity;                // F div 0
    char              ex_F1_Singularity;               // F1 div 0
+   char              ex_Beta_Singularity;             // A*B=0 && A+B!=0
+   char              ex_NormalNavigators;             // |f|==|f1|==|Beta|==1
    char              ex_SleepMarket;                  // dO1=dO4=dO14
    char              ex_G_Zero;                       // G = 0
    char              ex_G_Less_Limit;                 // G <= 3
@@ -206,8 +201,8 @@ struct STRUCT_EXCK
    char              ex_A_Minus_B_LessLimit;          // (A-B)<=3
    char              ex_B_LessLimit;                  // B<3   
    char              ex_A_LessLimit;                  // A<3
-   char              ex_Abs14_LessLimit;              // |14|<3
-   char              ex_Abs1Abs4_LessLimit;           // |1-4|<3
+   char              ex_Abs14_LessLimit;              // 0<|14|<=3
+   char              ex_Abs1Abs4_LessLimit;           // 0<|1|<3 && 0<|4|<3
    char              ex_dQ1_Equal_dQ4;                // 1=4
    char              ex_AMinusB_0_AND_Q1NotEqualQ4;   // (A-B==0) AND Q1!=Q4
    char              ex_Abs_dO1_LessLimit;            // |1|<3
@@ -215,6 +210,12 @@ struct STRUCT_EXCK
    char              ex_A_LessLimit_AND_NOT_ZERO;     // A<3 AND A-B!=0   
    char              ex_B_LessLimit_AND_NOT_ZERO;     // B<3 AND A-B!=0   
    char              ex_A_Eq_B_Eq_Zero;               // A=B=0
+   char              ex_AbsA_LessLimit;               // 0<=|A|<3
+   char              ex_AbsB_LessLimit;               // 0<=|B|<3
+   char              ex_AbsA_LessLim_AND_B_NOTZERO;   // 0<|A|<=Lim AND B!=0;
+   char              ex_AbsB_LessLim_AND_A_NOTZERO;   // 0<|B|<=Lim AND A!=0;
+   char              ex_AbsA_Minus_AbsB_LessLim;      // 0<|A-B|<=Lim
+
    char              ex_TOTAL;                        // SUM of Exceptions   
   };
 //+------------------------------------------------------------------+
@@ -300,6 +301,28 @@ enum ENUM_EMUL_OpenRule
 enum ENUM_EMUL_CloseRule
   {
    CloseTR_DcSpread
+  };
+//+------------------------------------------------------------------+
+//| CK SIGNALS                                                       |
+//+------------------------------------------------------------------+
+enum ENUM_CK_SIGNALS
+  {
+   //Constants for Ck signals:
+   CkArrayBoundErr=-5,
+   Ck=-4,
+   CkDefaultErr=-3,
+   CkUnknownTR=-2,
+   CkNoSignal=-1,
+   CkBuy1=0,
+   CkSell4=1,
+   CkBuySell14=2,
+   CkSingularityBuy=3,
+   CkSingularitySell=4,
+   Ck_F_Singularity_Buy=5,
+   Ck_F_Singularity_Sell=6,
+   Ck_F1_SingularityBuySell=7,
+   Ck_Beta_Singularity_Buy=8,
+   Ck_Beta_Singularity_Sell=9,
   };
 //+------------------------------------------------------------------+
 //| Trading Rule for Ck                                              |
