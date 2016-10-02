@@ -54,16 +54,6 @@ const char LowFirst = -1;
 const char EqualFirst=0; //High==Open or other Private Case
 const ushort     inpDeltaC_koef=1000; //Dc * 
                                       //
-//Constants for Ck signals:
-const char CkNoSignal=-1;
-const char CkBuy1=0;
-const char CkSell4=1;
-const char CkBuySell14=2;
-const char CkSingularityBuy=3;
-const char CkSingularitySell=4;
-const char CkBetaSingularityBuy=5;
-const char CkBetaSingularitySell=6;
-
 //Global VAR
 ulong draw_object_counter=0;
 //---Primings structs
@@ -311,6 +301,25 @@ enum ENUM_EMUL_OpenRule
 enum ENUM_EMUL_CloseRule
   {
    CloseTR_DcSpread
+  };
+//+------------------------------------------------------------------+
+//| CK SIGNALS                                                       |
+//+------------------------------------------------------------------+
+enum ENUM_CK_SIGNALS
+  {
+   //Constants for Ck signals:
+   CkNoSignal=-1,
+   CkBuy1=0,
+   CkSell4=1,
+   CkBuySell14=2,
+   CkSingularityBuy=3,
+   CkSingularitySell=4,
+   Ck_F_Singularity_Buy=5,
+   Ck_F_Singularity_Sell=6,
+   Ck_F1_Singularity_Buy=7,
+   Ck_F1_Singularity_Sell=8,
+   Ck_Beta_Singularity_Buy=9,
+   Ck_Beta_Singularity_Sell=10,
   };
 //+------------------------------------------------------------------+
 //| Trading Rule for Ck                                              |
