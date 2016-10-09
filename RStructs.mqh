@@ -345,8 +345,8 @@ enum ENUM_RT_OpenRule
    POMI_BBS,
    POMI_BSB,
    POMI_BSS,
-   POM_Z1,//Tick Version
-   POM_Z2,
+   POM_Z1,//Tick Version 1
+   POM_Z2,//Tick Version 2 New Singularities
   };
 //RealTime Close TR
 enum ENUM_RT_CloseRule
