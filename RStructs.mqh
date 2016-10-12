@@ -185,6 +185,7 @@ struct STRUCT_CK
    int               g;
    bool              beta;
    int               Beta;
+   double            gamma;
   };
 //---Exceptions for Ck
 struct STRUCT_EXCK
