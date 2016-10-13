@@ -185,6 +185,7 @@ struct STRUCT_CK
    int               g;
    bool              beta;
    int               Beta;
+   double            gamma;
   };
 //---Exceptions for Ck
 struct STRUCT_EXCK
@@ -324,6 +325,8 @@ enum ENUM_CK_SIGNALS
    Ck_F1_SingularityBuySell=7,
    Ck_Beta_Singularity_Buy=8,
    Ck_Beta_Singularity_Sell=9,
+   Ck_F1_Singularity_Buy=10,
+   Ck_F1_Singularity_Sell=11,
   };
 //+------------------------------------------------------------------+
 //| Trading Rule for Ck                                              |
@@ -338,6 +341,7 @@ enum ENUM_TRCK
    CK_TR4,
    CK_0808JPY,
    CK_20160918_USDX,
+   CK_20161009_EURUSD,
   };
 //RealTime Open TR (BBB->CkBuy,SignalBuy,->OpenBuy)
 enum ENUM_RT_OpenRule
