@@ -342,6 +342,7 @@ enum ENUM_TRCK
    CK_0808JPY,
    CK_20160918_USDX,
    CK_20161009_EURUSD,
+   CK_20161009_USDJPY,
   };
 //RealTime Open TR (BBB->CkBuy,SignalBuy,->OpenBuy)
 enum ENUM_RT_OpenRule
