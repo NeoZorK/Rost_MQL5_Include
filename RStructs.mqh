@@ -194,6 +194,7 @@ struct STRUCT_EXCK
    char              ex_F_Singularity;                // F div 0
    char              ex_F1_Singularity;               // F1 div 0
    char              ex_Beta_Singularity;             // A*B=0 && A+B!=0
+   char              ex_Gamma_Singularity;            // dO14=0
    char              ex_NormalNavigators;             // |f|==|f1|==|Beta|==1
    char              ex_SleepMarket;                  // dO1=dO4=dO14
    char              ex_G_Zero;                       // G = 0
@@ -217,7 +218,6 @@ struct STRUCT_EXCK
    char              ex_AbsA_LessLim_AND_B_NOTZERO;   // 0<|A|<=Lim AND B!=0;
    char              ex_AbsB_LessLim_AND_A_NOTZERO;   // 0<|B|<=Lim AND A!=0;
    char              ex_AbsA_Minus_AbsB_LessLim;      // 0<|A-B|<=Lim
-   char              ex_AbsBeta_NotEqual_1;           // |Beta|!=1
 
    char              ex_TOTAL;                        // SUM of Exceptions   
   };
@@ -328,6 +328,8 @@ enum ENUM_CK_SIGNALS
    Ck_Beta_Singularity_Sell=9,
    Ck_F1_Singularity_Buy=10,
    Ck_F1_Singularity_Sell=11,
+   Ck_Gamma_Singularity_Buy,
+   Ck_Gamma_Singularity_Sell,
   };
 //+------------------------------------------------------------------+
 //| Trading Rule for Ck                                              |
