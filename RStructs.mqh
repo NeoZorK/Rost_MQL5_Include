@@ -337,6 +337,7 @@ enum ENUM_CK_SIGNALS
 enum ENUM_TRCK
   {
    CK_TR18_0330_Virt,
+   CK_TR18_0330_Orig,//With Abs on A,B (For Billions)
    CK_TR14,
    CK_TR_0711,
    CK_TR_0722,
