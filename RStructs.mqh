@@ -205,6 +205,7 @@ struct STRUCT_EXCK
    char              ex_B_LessLimit;                  // B<3   
    char              ex_A_LessLimit;                  // A<3
    char              ex_Abs14_LessLimit;              // 0<|14|<=3
+   char              ex_Abs14_LessTwo;                // |14|<2
    char              ex_Abs1Abs4_LessLimit;           // 0<|1|<3 && 0<|4|<3
    char              ex_dQ1_Equal_dQ4;                // 1=4
    char              ex_AMinusB_0_AND_Q1NotEqualQ4;   // (A-B==0) AND Q1!=Q4
