@@ -333,7 +333,7 @@ enum ENUM_CK_SIGNALS
    Ck_Gamma_Singularity_Sell,
   };
 //+------------------------------------------------------------------+
-//| Trading Rule for Ck                                              |
+//| Trading Rule for Ck      T-ticks                                 |
 //+------------------------------------------------------------------+
 enum ENUM_TRCK
   {
@@ -344,12 +344,12 @@ enum ENUM_TRCK
    CK_TR_0722,
    CK_TR1,
    CK_TR4,
-   CK_0808JPY,
-   CK_20160918_USDX,
-   CK_20161009_EURUSD,
-   CK_20161009_USDJPY,
-   CK_20161009_USDCHF,
-   CK_20161009_GBPUSD,
+   CKT_0808JPY,
+   CKT_20160918_USDX,
+   CKT_20161009_EURUSD,
+   CKT_20161009_USDJPY,
+   CKT_20161009_USDCHF,
+   CKT_20161009_GBPUSD,
   };
 //RealTime Open TR (BBB->CkBuy,SignalBuy,->OpenBuy)
 enum ENUM_RT_OpenRule
