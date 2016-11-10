@@ -219,6 +219,8 @@ struct STRUCT_EXCK
    char              ex_AbsB_LessLimit;               // 0<=|B|<3
    char              ex_AbsA_LessLim_AND_B_NOTZERO;   // 0<|A|<=Lim AND B!=0;
    char              ex_AbsB_LessLim_AND_A_NOTZERO;   // 0<|B|<=Lim AND A!=0;
+   char              ex_AbsA_LessFour_AND_B_NOTZERO;  // 0<|A|<=4 AND B!=0;
+   char              ex_AbsB_LessFour_AND_A_NOTZERO;  // 0<|B|<=4 AND A!=0;
    char              ex_AbsA_Minus_AbsB_LessLim;      // 0<|A-B|<=Lim
 
    char              ex_TOTAL;                        // SUM of Exceptions   
