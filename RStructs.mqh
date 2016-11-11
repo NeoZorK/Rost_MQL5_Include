@@ -340,13 +340,13 @@ enum ENUM_CK_SIGNALS
 //+------------------------------------------------------------------+
 enum ENUM_TRCK
   {
-   CK_TR18_0330_Virt,
-   CK_TR18_0330_Orig,//With Abs on A,B (For Billions)
-   CK_TR14,
-   CK_TR_0711,
-   CK_TR_0722,
    CK_TR1,
    CK_TR4,
+   CK_TR14,
+   CK_TR18_0330_Virt,
+   CK_TR18_0330_Orig,//With Abs on A,B (For Billions)
+   CK_TR_0711,
+   CK_TR_0722,
    CKT_0808JPY,
    CKT_20160918_USDX,
    CKT_20161009_EURUSD,
