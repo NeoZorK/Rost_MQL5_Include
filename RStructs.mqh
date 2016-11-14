@@ -354,6 +354,7 @@ enum ENUM_TRCK
    CKT_20161009_USDJPY,
    CKT_20161104_USDCHF,
    CKT_20161105_GBPUSD,
+   CKT_20161111_GBPUSD,
   };
 //RealTime Open TR (BBB->CkBuy,SignalBuy,->OpenBuy)
 enum ENUM_RT_OpenRule
