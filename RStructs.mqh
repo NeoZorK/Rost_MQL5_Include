@@ -5,7 +5,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, Shcherbyna Rostyslav"
 #property link      ""
-#property version   "1.94"
+#property version   "1.95"
 
 #include <Tools\DateTime.mqh>
 
@@ -14,6 +14,7 @@ Include all structures and global constants
 */
 /*
 +++++CHANGE LOG+++++
+1.95 16.11.2016--Add Additional Report Info+New TRs
 1.94 10.10.2016--Tick USDJPY USDx working TR
 1.92 09.09.2016--Fully Stable Tick CVTR
 1.91 03.09.2016--Caterpillar perfomance optimisation
@@ -194,6 +195,7 @@ struct STRUCT_EXCK
    char              ex_F_Singularity;                // F div 0
    char              ex_F1_Singularity;               // F1 div 0
    char              ex_Beta_Singularity;             // A*B=0 && A+B!=0
+   char              ex_Gamma_Singularity;            // dO14=0
    char              ex_NormalNavigators;             // |f|==|f1|==|Beta|==1
    char              ex_SleepMarket;                  // dO1=dO4=dO14
    char              ex_G_Zero;                       // G = 0
@@ -204,6 +206,8 @@ struct STRUCT_EXCK
    char              ex_B_LessLimit;                  // B<3   
    char              ex_A_LessLimit;                  // A<3
    char              ex_Abs14_LessLimit;              // 0<|14|<=3
+   char              ex_Abs14_LessTwo;                // |14|<2
+   char              ex_Abs14_LessOrEqualTwo;         // |14|<=2; (Gamma singularity)
    char              ex_Abs1Abs4_LessLimit;           // 0<|1|<3 && 0<|4|<3
    char              ex_dQ1_Equal_dQ4;                // 1=4
    char              ex_AMinusB_0_AND_Q1NotEqualQ4;   // (A-B==0) AND Q1!=Q4
@@ -216,7 +220,12 @@ struct STRUCT_EXCK
    char              ex_AbsB_LessLimit;               // 0<=|B|<3
    char              ex_AbsA_LessLim_AND_B_NOTZERO;   // 0<|A|<=Lim AND B!=0;
    char              ex_AbsB_LessLim_AND_A_NOTZERO;   // 0<|B|<=Lim AND A!=0;
+   char              ex_AbsA_LessFour_AND_B_NOTZERO;  // 0<|A|<=4 AND B!=0;
+   char              ex_AbsB_LessFour_AND_A_NOTZERO;  // 0<|B|<=4 AND A!=0;
+   char              ex_AbsA_StrongLessFour_AND_B_NOTZERO;  // 0<|A|<4 AND B!=0;
+   char              ex_AbsB_StrongLessFour_AND_A_NOTZERO;  // 0<|B|<4 AND A!=0;
    char              ex_AbsA_Minus_AbsB_LessLim;      // 0<|A-B|<=Lim
+   char              ex_AbsA_Minus_AbsB_StrongLessLim;// 0<|A-B|<Lim
 
    char              ex_TOTAL;                        // SUM of Exceptions   
   };
@@ -327,21 +336,28 @@ enum ENUM_CK_SIGNALS
    Ck_Beta_Singularity_Sell=9,
    Ck_F1_Singularity_Buy=10,
    Ck_F1_Singularity_Sell=11,
+   Ck_Gamma_Singularity_Buy,
+   Ck_Gamma_Singularity_Sell,
   };
 //+------------------------------------------------------------------+
-//| Trading Rule for Ck                                              |
+//| Trading Rule for Ck      T-ticks                                 |
 //+------------------------------------------------------------------+
 enum ENUM_TRCK
   {
-   CK_TR18_0330_Virt,
-   CK_TR14,
-   CK_TR_0711,
-   CK_TR_0722,
    CK_TR1,
    CK_TR4,
-   CK_0808JPY,
-   CK_20160918_USDX,
-   CK_20161009_EURUSD,
+   CK_TR14,
+   CK_TR18_0330_Virt,
+   CK_TR18_0330_Orig,//With Abs on A,B (For Billions)
+   CK_TR_0711,
+   CK_TR_0722,
+   CKT_0808JPY,
+   CKT_20160918_USDX,
+   CKT_20161009_EURUSD,
+   CKT_20161009_USDJPY,
+   CKT_20161104_USDCHF,
+   CKT_20161105_GBPUSD,
+   CKT_20161111_GBPUSD,
   };
 //RealTime Open TR (BBB->CkBuy,SignalBuy,->OpenBuy)
 enum ENUM_RT_OpenRule
