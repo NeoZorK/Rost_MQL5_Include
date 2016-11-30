@@ -362,6 +362,7 @@ enum ENUM_TRCK
    CKT_20161111_GBPUSD,
    CKT_20161125_GBPUSD,
    CKT_20161126_GBPUSD,
+   CKT_20161130_GBPUSD,
   };
 //RealTime Open TR (BBB->CkBuy,SignalBuy,->OpenBuy)
 enum ENUM_RT_OpenRule
