@@ -5,7 +5,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, Shcherbyna Rostyslav"
 #property link      ""
-#property version   "1.95"
+#property version   "1.96"
 
 #include <Tools\DateTime.mqh>
 
@@ -14,6 +14,7 @@ Include all structures and global constants
 */
 /*
 +++++CHANGE LOG+++++
+1.96 01.12.2016--Add new CHF and GBP Tick TRs
 1.95 16.11.2016--Add Additional Report Info+New TRs
 1.94 10.10.2016--Tick USDJPY USDx working TR
 1.92 09.09.2016--Fully Stable Tick CVTR
@@ -356,8 +357,14 @@ enum ENUM_TRCK
    CKT_20161009_EURUSD,
    CKT_20161009_USDJPY,
    CKT_20161104_USDCHF,
+   CKT_20161120_USDCHF,
+   CKT_20161122_USDCHF,
    CKT_20161105_GBPUSD,
    CKT_20161111_GBPUSD,
+   CKT_20161125_GBPUSD,
+   CKT_20161126_GBPUSD,
+   CKT_20161130_GBPUSD,
+   CKT_20161130a_GBPUSD,
   };
 //RealTime Open TR (BBB->CkBuy,SignalBuy,->OpenBuy)
 enum ENUM_RT_OpenRule
