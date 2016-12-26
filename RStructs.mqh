@@ -199,6 +199,9 @@ struct STRUCT_EXCK
    char              ex_Gamma_Singularity;            // dO14=0
    char              ex_NormalNavigators;             // |f|==|f1|==|Beta|==1
    char              ex_SleepMarket;                  // dO1=dO4=dO14
+   char              ex_FS_Singularity;               // 1*4=0 && 1+4<>0 
+   char              ex_F1S_Singularity;              // 1-4=0 && 1+4<>0 
+   char              ex_SS_SleepMarket;               // 1=0 && 4=0 (SS)
    char              ex_G_Zero;                       // G = 0
    char              ex_G_Less_Limit;                 // G <= 3
    char              ex_A_Eq_B;                       // A==B
@@ -337,6 +340,10 @@ enum ENUM_CK_SIGNALS
    Ck_Beta_Singularity_Sell=9,
    Ck_F1_Singularity_Buy=10,
    Ck_F1_Singularity_Sell=11,
+   Ck_SS_SleepMarket=12,
+   Ck_FS_Singularity_Buy=13,
+   Ck_FS_Singularity_Sell=14,
+   Ck_F1S_Singularity=15,
    Ck_Gamma_Singularity_Buy,
    Ck_Gamma_Singularity_Sell,
   };
@@ -365,6 +372,7 @@ enum ENUM_TRCK
    CKT_20161126_GBPUSD,
    CKT_20161130_GBPUSD,
    CKT_20161130a_GBPUSD,
+   CKT_D_20161225_EURUSD,
   };
 //RealTime Open TR (BBB->CkBuy,SignalBuy,->OpenBuy)
 enum ENUM_RT_OpenRule
