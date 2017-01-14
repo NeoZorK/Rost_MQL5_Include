@@ -230,6 +230,13 @@ struct STRUCT_EXCK
    char              ex_AbsB_StrongLessFour_AND_A_NOTZERO;  // 0<|B|<4 AND A!=0;
    char              ex_AbsA_Minus_AbsB_LessLim;      // 0<|A-B|<=Lim
    char              ex_AbsA_Minus_AbsB_StrongLessLim;// 0<|A-B|<Lim
+                                                      //
+   //Daily Exs:
+   char              ex_AOne;                         // A==1
+   char              ex_BOne;                         // B==1
+   char              ex_AplusB_LessEqual_Lim;         // 0<=A+B<=Lim
+   char              ex_AminusB_LessEqual_Lim;        // 0<=A-B<=Lim
+   char              ex_BminusA_LessEqual_Lim;        // 0<=B-A<=Lim
 
    char              ex_TOTAL;                        // SUM of Exceptions   
   };
