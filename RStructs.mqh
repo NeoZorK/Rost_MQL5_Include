@@ -237,6 +237,9 @@ struct STRUCT_EXCK
    char              ex_AplusB_LessEqual_Lim;         // 0<=A+B<=Lim
    char              ex_AminusB_LessEqual_Lim;        // 0<=A-B<=Lim
    char              ex_BminusA_LessEqual_Lim;        // 0<=B-A<=Lim
+   char              ex_Abs_AminusB_LessEqual_Lim;        // 0<|A-B|<=Lim
+   char              ex_Abs_AplusB_LessEqual_Lim;        // 0<|A+B|<=Lim
+   
 
    char              ex_TOTAL;                        // SUM of Exceptions   
   };
