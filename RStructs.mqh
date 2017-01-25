@@ -241,7 +241,7 @@ struct STRUCT_EXCK
    char              ex_Abs_AplusB_LessEqual_Lim;     // 0<|A+B|<=Lim
    char              ex_Strong_Abs_AminusB_LessEqual_Lim;//|A-B|<=Lim
    char              ex_Strong_Abs_AplusB_LessEqual_Lim; //|A+B|<=Lim
-   
+
 
    char              ex_TOTAL;                        // SUM of Exceptions   
   };
@@ -396,6 +396,8 @@ enum ENUM_RT_OpenRule
    POMI_BSS,
    POM_Z1,//Tick Version 1
    POM_Z2,//Tick Version 2 New Singularities
+   POM_Z2_Signal,//Same with pom_signal
+   POM_Z3_BBB,//Same as BBB
   };
 //RealTime Close TR
 enum ENUM_RT_CloseRule
