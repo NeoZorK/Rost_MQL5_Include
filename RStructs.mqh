@@ -410,6 +410,13 @@ enum ENUM_RT_CloseRule
    AutoCloseIP_TickDC,
    AutoCloseReverse_TickDC,
   };
+//TCVTR Caterpillar POM Versions
+enum ENUM_POM_Versions
+  {
+   POM_with_out_Signal=1,
+   POM_With_Signal=2,
+   POM_With_Signal_WO_DIV0=3,
+  };
 //History Load Results
 enum ENUM_HistResults
   {
