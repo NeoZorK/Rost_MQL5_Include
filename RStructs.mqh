@@ -188,6 +188,8 @@ struct STRUCT_CK
    bool              beta;
    int               Beta;
    double            gamma;
+   double            w;     //Q1/|Q1|
+   double            aa;    //A/|A|
   };
 //---Exceptions for Ck
 struct STRUCT_EXCK
