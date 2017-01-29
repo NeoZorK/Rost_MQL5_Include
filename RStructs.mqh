@@ -198,6 +198,7 @@ struct STRUCT_EXCK
    char              ex_F_Singularity;                // F div 0
    char              ex_F1_Singularity;               // F1 div 0
    char              ex_Beta_Singularity;             // A*B=0 && A+B!=0
+   char              ex_Daily_Beta_Singularity;       // A*B=0
    char              ex_Gamma_Singularity;            // dO14=0
    char              ex_NormalNavigators;             // |f|==|f1|==|Beta|==1
    char              ex_SleepMarket;                  // dO1=dO4=dO14
