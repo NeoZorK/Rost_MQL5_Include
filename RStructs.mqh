@@ -5,7 +5,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, Shcherbyna Rostyslav"
 #property link      ""
-#property version   "1.96"
+#property version   "1.97"
 
 #include <Tools\DateTime.mqh>
 
@@ -14,6 +14,7 @@ Include all structures and global constants
 */
 /*
 +++++CHANGE LOG+++++
+1.97 03.02.2017--Add 2 new Caterpillars
 1.96 01.12.2016--Add new CHF and GBP Tick TRs
 1.95 16.11.2016--Add Additional Report Info+New TRs
 1.94 10.10.2016--Tick USDJPY USDx working TR
@@ -188,6 +189,8 @@ struct STRUCT_CK
    bool              beta;
    int               Beta;
    double            gamma;
+   double            w;     //Q1/|Q1|
+   double            aa;    //A/|A|
   };
 //---Exceptions for Ck
 struct STRUCT_EXCK
@@ -196,6 +199,7 @@ struct STRUCT_EXCK
    char              ex_F_Singularity;                // F div 0
    char              ex_F1_Singularity;               // F1 div 0
    char              ex_Beta_Singularity;             // A*B=0 && A+B!=0
+   char              ex_Daily_Beta_Singularity;       // A*B=0 && A-B!=0
    char              ex_Gamma_Singularity;            // dO14=0
    char              ex_NormalNavigators;             // |f|==|f1|==|Beta|==1
    char              ex_SleepMarket;                  // dO1=dO4=dO14
@@ -230,6 +234,18 @@ struct STRUCT_EXCK
    char              ex_AbsB_StrongLessFour_AND_A_NOTZERO;  // 0<|B|<4 AND A!=0;
    char              ex_AbsA_Minus_AbsB_LessLim;      // 0<|A-B|<=Lim
    char              ex_AbsA_Minus_AbsB_StrongLessLim;// 0<|A-B|<Lim
+                                                      //
+   //Daily Exs:
+   char              ex_AOne;                         // A==1
+   char              ex_BOne;                         // B==1
+   char              ex_AplusB_LessEqual_Lim;         // 0<=A+B<=Lim
+   char              ex_AminusB_LessEqual_Lim;        // 0<=A-B<=Lim
+   char              ex_BminusA_LessEqual_Lim;        // 0<=B-A<=Lim
+   char              ex_Abs_AminusB_LessEqual_Lim;    // 0<|A-B|<=Lim
+   char              ex_Abs_AplusB_LessEqual_Lim;     // 0<|A+B|<=Lim
+   char              ex_Strong_Abs_AminusB_LessEqual_Lim;//|A-B|<=Lim
+   char              ex_Strong_Abs_AplusB_LessEqual_Lim; //|A+B|<=Lim
+
 
    char              ex_TOTAL;                        // SUM of Exceptions   
   };
@@ -384,6 +400,8 @@ enum ENUM_RT_OpenRule
    POMI_BSS,
    POM_Z1,//Tick Version 1
    POM_Z2,//Tick Version 2 New Singularities
+   POM_Z2_Signal,//Same with pom_signal
+   POM_Z3_BBB,//Same as BBB
   };
 //RealTime Close TR
 enum ENUM_RT_CloseRule
@@ -395,6 +413,13 @@ enum ENUM_RT_CloseRule
    AutoCloseIP_ReverseYY,
    AutoCloseIP_TickDC,
    AutoCloseReverse_TickDC,
+  };
+//TCVTR Caterpillar POM Versions
+enum ENUM_POM_Versions
+  {
+   POM_with_out_Signal=1,
+   POM_With_Signal=2,
+   POM_With_Signal_WO_DIV0=3,
   };
 //History Load Results
 enum ENUM_HistResults
