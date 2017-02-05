@@ -197,6 +197,7 @@ struct STRUCT_EXCK
   {
    uchar             ex_Limit;                        // Limit=3
    char              ex_F_Singularity;                // F div 0
+   char              ex_Daily_F_Singularity;          // 1*4=0
    char              ex_F1_Singularity;               // F1 div 0
    char              ex_Beta_Singularity;             // A*B=0 && A+B!=0
    char              ex_Daily_Beta_Singularity;       // A*B=0 && A-B!=0
