@@ -364,6 +364,10 @@ enum ENUM_CK_SIGNALS
    Ck_F1S_Singularity=15,
    Ck_Gamma_Singularity_Buy,
    Ck_Gamma_Singularity_Sell,
+   Ck_Hybrid_F_F1_Buy,
+   Ck_Hybrid_F_F1_Sell,
+   Ck_Hybrid_F_Gamma_Buy,
+   Ck_Hybrid_F_Gamma_Sell,
   };
 //+------------------------------------------------------------------+
 //| Trading Rule for Ck      T-ticks                                 |
