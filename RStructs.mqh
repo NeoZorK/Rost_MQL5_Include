@@ -251,6 +251,19 @@ struct STRUCT_EXCK
    char              ex_TOTAL;                        // SUM of Exceptions   
   };
 //+------------------------------------------------------------------+
+//|DNK7 struct wf,pom,pomsignal,y1,y2,dc,inflection point            |
+//+------------------------------------------------------------------+ 
+struct STRUCT_DNK7 //(80+2 bytes)
+  {
+   double            pom;
+   double            dc;
+   double            y1;
+   double            y2;
+   double            ip;
+   char              signal;
+   char              wf;
+  };
+//+------------------------------------------------------------------+
 //|Requested ranges for periods in day count(left range)             |
 //+------------------------------------------------------------------+
 enum ENUM_RequestRange
