@@ -255,6 +255,7 @@ struct STRUCT_EXCK
 //+------------------------------------------------------------------+ 
 struct STRUCT_DNK7 //(80+2 bytes)
   {
+   double            price;
    double            pom;
    double            dc;
    double            y1;
