@@ -409,6 +409,7 @@ enum ENUM_TRCK
    CKT_20161130_GBPUSD,
    CKT_20161130a_GBPUSD,
    CKT_D_20161225_EURUSD,
+   CKT_D_20170311_USDCHF,
   };
 //RealTime Open TR (BBB->CkBuy,SignalBuy,->OpenBuy)
 enum ENUM_RT_OpenRule
