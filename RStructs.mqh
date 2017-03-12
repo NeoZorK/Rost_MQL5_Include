@@ -5,7 +5,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, Shcherbyna Rostyslav"
 #property link      ""
-#property version   "1.97"
+#property version   "1.98"
 
 #include <Tools\DateTime.mqh>
 
@@ -14,6 +14,7 @@ Include all structures and global constants
 */
 /*
 +++++CHANGE LOG+++++
+1.98 12.03.2017--Add Real Ticks EURUSD D1+MN1 and USDCHF MN1 Trs
 1.97 03.02.2017--Add 2 new Caterpillars
 1.96 01.12.2016--Add new CHF and GBP Tick TRs
 1.95 16.11.2016--Add Additional Report Info+New TRs
@@ -197,6 +198,7 @@ struct STRUCT_EXCK
   {
    uchar             ex_Limit;                        // Limit=3
    char              ex_F_Singularity;                // F div 0
+   char              ex_Daily_F_Singularity;          // 1*4=0
    char              ex_F1_Singularity;               // F1 div 0
    char              ex_Beta_Singularity;             // A*B=0 && A+B!=0
    char              ex_Daily_Beta_Singularity;       // A*B=0 && A-B!=0
@@ -248,6 +250,20 @@ struct STRUCT_EXCK
 
 
    char              ex_TOTAL;                        // SUM of Exceptions   
+  };
+//+------------------------------------------------------------------+
+//|DNK7 struct wf,pom,pomsignal,y1,y2,dc,inflection point            |
+//+------------------------------------------------------------------+ 
+struct STRUCT_DNK7 //(80+2 bytes)
+  {
+   double            price;
+   double            pom;
+   double            dc;
+   double            y1;
+   double            y2;
+   double            ip;
+   char              signal;
+   char              wf;
   };
 //+------------------------------------------------------------------+
 //|Requested ranges for periods in day count(left range)             |
@@ -363,6 +379,10 @@ enum ENUM_CK_SIGNALS
    Ck_F1S_Singularity=15,
    Ck_Gamma_Singularity_Buy,
    Ck_Gamma_Singularity_Sell,
+   Ck_Hybrid_F_F1_Buy,
+   Ck_Hybrid_F_F1_Sell,
+   Ck_Hybrid_F_Gamma_Buy,
+   Ck_Hybrid_F_Gamma_Sell,
   };
 //+------------------------------------------------------------------+
 //| Trading Rule for Ck      T-ticks                                 |
@@ -390,6 +410,7 @@ enum ENUM_TRCK
    CKT_20161130_GBPUSD,
    CKT_20161130a_GBPUSD,
    CKT_D_20161225_EURUSD,
+   CKT_D_20170311_USDCHF,
   };
 //RealTime Open TR (BBB->CkBuy,SignalBuy,->OpenBuy)
 enum ENUM_RT_OpenRule
