@@ -5,7 +5,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2016, Shcherbyna Rostyslav"
 #property link      ""
-#property version   "1.97"
+#property version   "1.98"
 
 #include <Tools\DateTime.mqh>
 
@@ -14,6 +14,7 @@ Include all structures and global constants
 */
 /*
 +++++CHANGE LOG+++++
+1.98 12.03.2017--Add Real Ticks EURUSD D1+MN1 and USDCHF MN1 Trs
 1.97 03.02.2017--Add 2 new Caterpillars
 1.96 01.12.2016--Add new CHF and GBP Tick TRs
 1.95 16.11.2016--Add Additional Report Info+New TRs
