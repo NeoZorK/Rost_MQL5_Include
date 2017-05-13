@@ -193,6 +193,29 @@ struct STRUCT_CK
    double            w;     //Q1/|Q1|
    double            aa;    //A/|A|
   };
+//+------------------------------------------------------------------+
+//| Export Struct for miniTRs                                        |
+//+------------------------------------------------------------------+
+struct STRUCT_miniTR
+  {
+   datetime          StartTime;
+   double            Gamma;
+   double            w;
+   double            aa;
+   int               F;
+   int               F1;
+   int               A;
+   int               B;
+   int               Beta;
+   int               dQ1;
+   int               dQ4;
+   int               dQ14;
+   char              FSingul;
+   char              F1Singul;
+   char              BetaSingul;
+   char              GammaSingul;
+   char              HybridSingul;
+  };
 //---Exceptions for Ck
 struct STRUCT_EXCK
   {
