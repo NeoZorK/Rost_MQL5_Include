@@ -214,7 +214,6 @@ struct STRUCT_miniTR
    char              F1Singul;
    char              BetaSingul;
    char              GammaSingul;
-   char              HybridSingul;
   };
 //---Exceptions for Ck
 struct STRUCT_EXCK
