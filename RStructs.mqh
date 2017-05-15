@@ -288,6 +288,46 @@ struct STRUCT_DNK7 //(80+2 bytes)
    char              wf;
   };
 //+------------------------------------------------------------------+
+//|Groups ID 5 Singularities + 16=(21)+1 NOTRADE=22                  |
+//+------------------------------------------------------------------+
+enum ENUM_T_GROUP_ID
+  {
+   NOTRADE,                   //#0
+   HybridSingul,
+   FSingul,                   //#2
+   F1Singul,                  //#3
+   BetaSingul,                //#4
+   GammaSingul,               //#5
+   FF1_PPpp,                  //#6 p-plus
+   FF1_PPmm,                  //#7 m-minus
+   FF1_PPpm,                  //#8
+   FF1_PPmp,                  //#9
+   FF1_MMpp,                  //#10 p-plus
+   FF1_MMmm,                  //#11 m-minus
+   FF1_MMpm,                  //#12
+   FF1_MMmp,                  //#13
+   FF1_PMpp,                  //#14 p-plus
+   FF1_PMmm,                  //#15 m-minus
+   FF1_PMpm,                  //#16
+   FF1_PMmp,                  //#17
+   FF1_MPpp,                  //#18 p-plus
+   FF1_MPmm,                  //#19 m-minus
+   FF1_MPpm,                  //#20
+   FF1_MPmp,                  //#21 
+   Unknown                    //#22   
+  };//TOTALLY 23!
+//+------------------------------------------------------------------+
+//| miniTR functions ID (ex:MinAB = 0)                               |
+//+------------------------------------------------------------------+  
+enum ENUM_miniTR_ID
+  {
+   C1,
+   C4,
+   Min_A_B,
+   Max_A_B,
+   VirtualLast,
+  };   
+//+------------------------------------------------------------------+
 //|Requested ranges for periods in day count(left range)             |
 //+------------------------------------------------------------------+
 enum ENUM_RequestRange
