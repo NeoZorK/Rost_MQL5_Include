@@ -288,11 +288,19 @@ struct STRUCT_DNK7 //(80+2 bytes)
    char              wf;
   };
 //+------------------------------------------------------------------+
+//| miniTR Struct                                                    |
+//+------------------------------------------------------------------+
+struct STRUCT_miniTRID
+  {
+   int               minitr;
+   double            BestNP;
+  };
+//+------------------------------------------------------------------+
 //|Groups ID 5 Singularities + 16=(21)+1 NOTRADE=22                  |
 //+------------------------------------------------------------------+
 enum ENUM_T_GROUP_ID
   {
-   NOTRADE,                   //#0
+   NOTRADE,//#0
    HybridSingul,
    FSingul,                   //#2
    F1Singul,                  //#3
@@ -326,7 +334,7 @@ enum ENUM_miniTR_ID
    Min_A_B,
    Max_A_B,
    VirtualLast,
-  };   
+  };
 //+------------------------------------------------------------------+
 //|Requested ranges for periods in day count(left range)             |
 //+------------------------------------------------------------------+
@@ -473,6 +481,7 @@ enum ENUM_TRCK
    CKT_20161130a_GBPUSD,
    CKT_D_20161225_EURUSD,
    CKT_D_20170311_USDCHF,
+   CKT_20170517,
   };
 //RealTime Open TR (BBB->CkBuy,SignalBuy,->OpenBuy)
 enum ENUM_RT_OpenRule
