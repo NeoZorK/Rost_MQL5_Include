@@ -331,8 +331,8 @@ enum ENUM_miniTR_ID
   {
    C1,
    C4,
-   Min_A_B,
-   Max_A_B,
+   Min_AB,
+   Max_AB,
    C14,
    VirtualLast,
   };
