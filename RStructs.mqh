@@ -306,22 +306,22 @@ enum ENUM_T_GROUP_ID
    F1Singul,                  //#3
    BetaSingul,                //#4
    GammaSingul,               //#5
-   FF1_PPpp,                  //#6 p-plus
-   FF1_PPmm,                  //#7 m-minus
-   FF1_PPpm,                  //#8
-   FF1_PPmp,                  //#9
-   FF1_MMpp,                  //#10 p-plus
-   FF1_MMmm,                  //#11 m-minus
-   FF1_MMpm,                  //#12
-   FF1_MMmp,                  //#13
-   FF1_PMpp,                  //#14 p-plus
-   FF1_PMmm,                  //#15 m-minus
-   FF1_PMpm,                  //#16
-   FF1_PMmp,                  //#17
-   FF1_MPpp,                  //#18 p-plus
-   FF1_MPmm,                  //#19 m-minus
-   FF1_MPpm,                  //#20
-   FF1_MPmp,                  //#21 
+   PP_pp,                  //#6 p-plus
+   PP_mm,                  //#7 m-minus
+   PP_pm,                  //#8
+   PP_mp,                  //#9
+   MM_pp,                  //#10 p-plus
+   MM_mm,                  //#11 m-minus
+   MM_pm,                  //#12
+   MM_mp,                  //#13
+   PM_pp,                  //#14 p-plus
+   PM_mm,                  //#15 m-minus
+   PM_pm,                  //#16
+   PM_mp,                  //#17
+   MP_pp,                  //#18 p-plus
+   MP_mm,                  //#19 m-minus
+   MP_pm,                  //#20
+   MP_mp,                  //#21 
    Unknown                    //#22   
   };//TOTALLY 23!
 //+------------------------------------------------------------------+
