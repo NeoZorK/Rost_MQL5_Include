@@ -354,6 +354,7 @@ enum ENUM_RequestRange
    rFnp_week=3,
    rFnp_month=2,
    rFnp_quarter=1,
+   rOneDay=5,//For H4,H1,M5,M1, Request included probable holidays
   };
 //+------------------------------------------------------------------+
 //| Quant Modes for All ticks(real ticks) MT5 Setup                  |
@@ -384,7 +385,11 @@ enum ENUM_myPredictPeriod
    Day,
    Week,
    Month,
-   Quarter
+   Quarter,
+   Hour4,
+   Hour1,
+   Minute5,
+   OneMinute
   };
 //+------------------------------------------------------------------+
 //| OHLC Mode in Emulation                                           |
