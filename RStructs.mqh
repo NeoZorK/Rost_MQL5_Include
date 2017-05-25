@@ -193,6 +193,28 @@ struct STRUCT_CK
    double            w;     //Q1/|Q1|
    double            aa;    //A/|A|
   };
+//+------------------------------------------------------------------+
+//| Export Struct for miniTRs                                        |
+//+------------------------------------------------------------------+
+struct STRUCT_miniTR
+  {
+   datetime          StartTime;
+   double            Gamma;
+   double            w;
+   double            aa;
+   int               F;
+   int               F1;
+   int               A;
+   int               B;
+   int               Beta;
+   int               dQ1;
+   int               dQ4;
+   int               dQ14;
+   char              FSingul;
+   char              F1Singul;
+   char              BetaSingul;
+   char              GammaSingul;
+  };
 //---Exceptions for Ck
 struct STRUCT_EXCK
   {
@@ -264,6 +286,55 @@ struct STRUCT_DNK7 //(80+2 bytes)
    double            ip;
    char              signal;
    char              wf;
+  };
+//+------------------------------------------------------------------+
+//| miniTR Struct                                                    |
+//+------------------------------------------------------------------+
+struct STRUCT_miniTRID
+  {
+   int               minitr;
+   double            BestNP;
+  };
+//+------------------------------------------------------------------+
+//|Groups ID 5 Singularities + 16=(21)+1 NOTRADE=22                  |
+//+------------------------------------------------------------------+
+enum ENUM_T_GROUP_ID
+  {
+   NOTRADE,//#0
+   HybridSingul,
+   FSingul,                   //#2
+   F1Singul,                  //#3
+   BetaSingul,                //#4
+   GammaSingul,               //#5
+   PP_pp,                  //#6 p-plus
+   PP_mm,                  //#7 m-minus
+   PP_pm,                  //#8
+   PP_mp,                  //#9
+   MM_pp,                  //#10 p-plus
+   MM_mm,                  //#11 m-minus
+   MM_pm,                  //#12
+   MM_mp,                  //#13
+   PM_pp,                  //#14 p-plus
+   PM_mm,                  //#15 m-minus
+   PM_pm,                  //#16
+   PM_mp,                  //#17
+   MP_pp,                  //#18 p-plus
+   MP_mm,                  //#19 m-minus
+   MP_pm,                  //#20
+   MP_mp,                  //#21 
+   Unknown                    //#22   
+  };//TOTALLY 23!
+//+------------------------------------------------------------------+
+//| miniTR functions ID (ex:MinAB = 0)                               |
+//+------------------------------------------------------------------+  
+enum ENUM_miniTR_ID
+  {
+   C1,
+   C4,
+   Min_AB,
+   Max_AB,
+   C14,
+   VirtualLast,
   };
 //+------------------------------------------------------------------+
 //|Requested ranges for periods in day count(left range)             |
@@ -411,6 +482,7 @@ enum ENUM_TRCK
    CKT_20161130a_GBPUSD,
    CKT_D_20161225_EURUSD,
    CKT_D_20170311_USDCHF,
+   CKT_20170517,
   };
 //RealTime Open TR (BBB->CkBuy,SignalBuy,->OpenBuy)
 enum ENUM_RT_OpenRule
