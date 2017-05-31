@@ -69,6 +69,10 @@ private:
    //Find Best miniTR
    void              m_FindBest_miniTR();
 
+   //Calculation miniTRs:::
+   double            m_MinAB(const int &T_NUM);
+   double            m_MaxAB(const int &T_NUM);
+
    //Calculation miniTR(232)
    double            m_Abs_Cmpd4_Max_pmm(const int &T_NUM);
 
@@ -973,11 +977,11 @@ double miniTR::m_Abs_Cmpd4_Max_pmm(const int &T_NUM)
 double miniTR::m_MinAB(const int &T_NUM)
   {
    m_result=0;
-   m_result=MathMin(arr_mtr[T_NUM].A,arr_mtr[T_NUM].B);
+   m_result=MathMin(m_arr_mtr[T_NUM].A,m_arr_mtr[T_NUM].B);
 
 //Sum NP by Group
-   if(m_result==arr_mtr[T_NUM].A) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_arr_mtr[T_NUM].A) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #3  MaxAB, miniTR                                              |
@@ -985,270 +989,270 @@ double miniTR::m_MinAB(const int &T_NUM)
 double miniTR::m_MaxAB(const int &T_NUM)
   {
    m_result=0;
-   m_result=MathMax(arr_mtr[T_NUM].A,arr_mtr[T_NUM].B);
+   m_result=MathMax(m_arr_mtr[T_NUM].A,m_arr_mtr[T_NUM].B);
 
 //Sum NP by Group
-   if(m_result==arr_mtr[T_NUM].A) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_arr_mtr[T_NUM].A) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #5 ABS  MinAB, miniTR                                          |
 //+------------------------------------------------------------------+  
 double miniTR::m_Abs_Min_AB(const int &T_NUM)
   {
-   AbsA=0; AbsB=0; m_result=0;
-   AbsA = MathAbs(arr_mtr[T_NUM].A);
-   AbsB = MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(AbsA,AbsB);
+   m_AbsA=0; m_AbsB=0; m_result=0;
+   m_AbsA = MathAbs(m_arr_mtr[T_NUM].A);
+   m_AbsB = MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_AbsA,m_AbsB);
 
 //Sum NP by Group
-   if(m_result==AbsA) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_AbsA) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #6 ABS  MaxAB, miniTR                                          |
 //+------------------------------------------------------------------+  
 double miniTR::m_Abs_Max_AB(const int &T_NUM)
   {
-   AbsA=0; AbsB=0; m_result=0;
-   AbsA = MathAbs(arr_mtr[T_NUM].A);
-   AbsB = MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(AbsA,AbsB);
+   m_AbsA=0; m_AbsB=0; m_result=0;
+   m_AbsA = MathAbs(m_arr_mtr[T_NUM].A);
+   m_AbsB = MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_AbsA,m_AbsB);
 
 //Sum NP by Group
-   if(m_result==AbsA) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_AbsA) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #7 Min fAB, miniTR                                             |
 //+------------------------------------------------------------------+  
 double miniTR::m_Min_fAB(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
-   x1 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].B;
-   m_result=MathMin(x1,x2);
+   m_x1=0; m_x2=0; m_result=0;
+   m_x1 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].B;
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #8 Max fAB, miniTR                                             |
 //+------------------------------------------------------------------+  
 double miniTR::m_Max_fAB(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
-   x1 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].B;
-   m_result=MathMax(x1,x2);
+   m_x1=0; m_x2=0; m_result=0;
+   m_x1 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].B;
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #9 ABS Min fAB, miniTR                                         |
 //+------------------------------------------------------------------+  
 double miniTR::m_Abs_Min_fAB(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
-   x1 = arr_mtr[T_NUM].F*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1=0; m_x2=0; m_result=0;
+   m_x1 = m_arr_mtr[T_NUM].F*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #10 ABS Max fAB, miniTR                                        |
 //+------------------------------------------------------------------+  
 double miniTR::m_Abs_Max_fAB(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
-   x1 = arr_mtr[T_NUM].F*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1=0; m_x2=0; m_result=0;
+   m_x1 = m_arr_mtr[T_NUM].F*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #11 Min f1AB, miniTR                                           |
 //+------------------------------------------------------------------+  
 double miniTR::m_Min_f1AB(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
-   x1 = arr_mtr[T_NUM].F1*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].F1*arr_mtr[T_NUM].B;
-   m_result=MathMin(x1,x2);
+   m_x1=0; m_x2=0; m_result=0;
+   m_x1 = m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].B;
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #12 Max f1AB, miniTR                                           |
 //+------------------------------------------------------------------+  
 double miniTR::m_Max_f1AB(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
-   x1 = arr_mtr[T_NUM].F1*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].F1*arr_mtr[T_NUM].B;
-   m_result=MathMax(x1,x2);
+   m_x1=0; m_x2=0; m_result=0;
+   m_x1 = m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].B;
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #13 ABS Min f1AB, miniTR                                       |
 //+------------------------------------------------------------------+  
 double miniTR::m_Abs_Min_f1AB(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
-   x1 = arr_mtr[T_NUM].F1*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F1*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1=0; m_x2=0; m_result=0;
+   m_x1 = m_arr_mtr[T_NUM].F1*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F1*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #14 ABS Max f1AB, miniTR                                       |
 //+------------------------------------------------------------------+  
 double miniTR::m_Abs_Max_f1AB(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
-   x1 = arr_mtr[T_NUM].F1*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F1*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1=0; m_x2=0; m_result=0;
+   m_x1 = m_arr_mtr[T_NUM].F1*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F1*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #15 Min BetaAB, miniTR                                         |
 //+------------------------------------------------------------------+  
 double miniTR::m_Min_BetaAB(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
-   x1 = arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].B;
-   m_result=MathMin(x1,x2);
+   m_x1=0; m_x2=0; m_result=0;
+   m_x1 = m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].B;
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #16 Max BetaAB, miniTR                                         |
 //+------------------------------------------------------------------+  
 double miniTR::m_Max_BetaAB(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
-   x1 = arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].B;
-   m_result=MathMax(x1,x2);
+   m_x1=0; m_x2=0; m_result=0;
+   m_x1 = m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].B;
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #17 ABS Min BetaAB, miniTR                                     |
 //+------------------------------------------------------------------+  
 double miniTR::m_Abs_Min_BetaAB(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
-   x1 = arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1=0; m_x2=0; m_result=0;
+   m_x1 = m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #18 ABS Max BetaAB, miniTR                                     |
 //+------------------------------------------------------------------+  
 double miniTR::m_Abs_Max_BetaAB(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
-   x1 = arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1=0; m_x2=0; m_result=0;
+   m_x1 = m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #19 Min HammaAB, miniTR                                        |
 //+------------------------------------------------------------------+  
 double miniTR::m_Min_GammaAB(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
-   x1 = arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].B;
-   m_result=MathMin(x1,x2);
+   m_x1=0; m_x2=0; m_result=0;
+   m_x1 = m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].B;
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #20 Max GammaAB, miniTR                                        |
 //+------------------------------------------------------------------+  
 double miniTR::m_Max_GammaAB(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
-   x1 = arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].B;
-   m_result=MathMax(x1,x2);
+   m_x1=0; m_x2=0; m_result=0;
+   m_x1 = m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].B;
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #21 ABS Min GammaAB, miniTR                                    |
 //+------------------------------------------------------------------+  
 double miniTR::m_Abs_Min_GammaAB(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
-   x1 = arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1=0; m_x2=0; m_result=0;
+   m_x1 = m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #22 ABS Max GammaAB, miniTR                                    |
 //+------------------------------------------------------------------+  
 double miniTR::m_Abs_Max_GammaAB(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
-   x1 = arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1=0; m_x2=0; m_result=0;
+   m_x1 = m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #24  dQ1=dQ4  C1  , miniTR                                     |
 //+------------------------------------------------------------------+  
 double miniTR::m_Equal_dQ1Q4_C1(const int &T_NUM)
   {
-   if(arr_mtr[T_NUM].dQ1==arr_mtr[T_NUM].dQ4) return(arr_rNP1[T_NUM].NP1_RT);
+   if(m_arr_mtr[T_NUM].dQ1==m_arr_mtr[T_NUM].dQ4) return(m_arr_rNP1[T_NUM].NP1_RT);
    else return(0);
   }
 //+------------------------------------------------------------------+
@@ -1256,7 +1260,7 @@ double miniTR::m_Equal_dQ1Q4_C1(const int &T_NUM)
 //+------------------------------------------------------------------+  
 double miniTR::m_Equal_dQ1Q4_C4(const int &T_NUM)
   {
-   if(arr_mtr[T_NUM].dQ1==arr_mtr[T_NUM].dQ4) return(arr_rNP1[T_NUM].NP1_RT);
+   if(m_arr_mtr[T_NUM].dQ1==m_arr_mtr[T_NUM].dQ4) return(m_arr_rNP1[T_NUM].NP1_RT);
    else return(0);
   }
 //+------------------------------------------------------------------+
@@ -1264,41 +1268,41 @@ double miniTR::m_Equal_dQ1Q4_C4(const int &T_NUM)
 //+------------------------------------------------------------------+  
 double miniTR::m_Equal_dQ1Q4_MinAB(const int &T_NUM)
   {
-   if(arr_mtr[T_NUM].dQ1!=arr_mtr[T_NUM].dQ4) return(0);
+   if(m_arr_mtr[T_NUM].dQ1!=m_arr_mtr[T_NUM].dQ4) return(0);
 
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].B;
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].B;
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #28 dQ1=dQ4 Max, miniTR                                        |
 //+------------------------------------------------------------------+  
 double miniTR::m_Equal_dQ1Q4_MaxAB(const int &T_NUM)
   {
-   if(arr_mtr[T_NUM].dQ1!=arr_mtr[T_NUM].dQ4) return(0);
+   if(m_arr_mtr[T_NUM].dQ1!=m_arr_mtr[T_NUM].dQ4) return(0);
 
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].B;
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].B;
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #29 dQ1=0 dQ4=0 C1, miniTR                                     |
 //+------------------------------------------------------------------+  
 double miniTR::m_Zero_dQ1Q4_C1(const int &T_NUM)
   {
-   if((arr_mtr[T_NUM].dQ1==0) && (arr_mtr[T_NUM].dQ4==0)) return(arr_rNP1[T_NUM].NP1_RT);
+   if((m_arr_mtr[T_NUM].dQ1==0) && (m_arr_mtr[T_NUM].dQ4==0)) return(m_arr_rNP1[T_NUM].NP1_RT);
    else return(0);
   }
 //+------------------------------------------------------------------+
@@ -1306,7 +1310,7 @@ double miniTR::m_Zero_dQ1Q4_C1(const int &T_NUM)
 //+------------------------------------------------------------------+  
 double miniTR::m_Zero_dQ1Q4_C4(const int &T_NUM)
   {
-   if((arr_mtr[T_NUM].dQ1==0) && (arr_mtr[T_NUM].dQ4==0)) return(arr_rNP4[T_NUM].NP4_RT);
+   if((m_arr_mtr[T_NUM].dQ1==0) && (m_arr_mtr[T_NUM].dQ4==0)) return(m_arr_rNP4[T_NUM].NP4_RT);
    else return(0);
   }
 //+------------------------------------------------------------------+
@@ -1314,41 +1318,41 @@ double miniTR::m_Zero_dQ1Q4_C4(const int &T_NUM)
 //+------------------------------------------------------------------+  
 double miniTR::m_Zero_dQ1Q4_MinAB(const int &T_NUM)
   {
-   if((arr_mtr[T_NUM].dQ1!=0) && (arr_mtr[T_NUM].dQ4!=0)) return(0);
+   if((m_arr_mtr[T_NUM].dQ1!=0) && (m_arr_mtr[T_NUM].dQ4!=0)) return(0);
 
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].B;
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].B;
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #33 dQ1=0 dQ4=0 Max, miniTR                                    |
 //+------------------------------------------------------------------+  
 double miniTR::m_Zero_dQ1Q4_MaxAB(const int &T_NUM)
   {
-   if((arr_mtr[T_NUM].dQ1!=0) && (arr_mtr[T_NUM].dQ4!=0)) return(0);
+   if((m_arr_mtr[T_NUM].dQ1!=0) && (m_arr_mtr[T_NUM].dQ4!=0)) return(0);
 
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].B;
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].B;
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #34 A=B C1, miniTR                                             |
 //+------------------------------------------------------------------+  
 double miniTR::m_Equal_AB_C1(const int &T_NUM)
   {
-   if((arr_mtr[T_NUM].A==arr_mtr[T_NUM].B)) return(arr_rNP1[T_NUM].NP1_RT);
+   if((m_arr_mtr[T_NUM].A==m_arr_mtr[T_NUM].B)) return(m_arr_rNP1[T_NUM].NP1_RT);
    else return(0);
   }
 //+------------------------------------------------------------------+
@@ -1356,7 +1360,7 @@ double miniTR::m_Equal_AB_C1(const int &T_NUM)
 //+------------------------------------------------------------------+  
 double miniTR::m_Equal_AB_C4(const int &T_NUM)
   {
-   if((arr_mtr[T_NUM].A==arr_mtr[T_NUM].B)) return(arr_rNP4[T_NUM].NP4_RT);
+   if((m_arr_mtr[T_NUM].A==m_arr_mtr[T_NUM].B)) return(m_arr_rNP4[T_NUM].NP4_RT);
    else return(0);
   }
 //+------------------------------------------------------------------+
@@ -1364,41 +1368,41 @@ double miniTR::m_Equal_AB_C4(const int &T_NUM)
 //+------------------------------------------------------------------+  
 double miniTR::m_Equal_AB_MinAB(const int &T_NUM)
   {
-   if((arr_mtr[T_NUM].A!=arr_mtr[T_NUM].B)) return(0);
+   if((m_arr_mtr[T_NUM].A!=m_arr_mtr[T_NUM].B)) return(0);
 
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].B;
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].B;
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #38 A=B Max , miniTR                                           |
 //+------------------------------------------------------------------+  
 double miniTR::m_Equal_AB_MaxAB(const int &T_NUM)
   {
-   if((arr_mtr[T_NUM].A!=arr_mtr[T_NUM].B)) return(0);
+   if((m_arr_mtr[T_NUM].A!=m_arr_mtr[T_NUM].B)) return(0);
 
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].B;
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].B;
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #39 A*B=0 C1 , miniTR                                          |
 //+------------------------------------------------------------------+  
 double miniTR::m_Zero_AmB_C1(const int &T_NUM)
   {
-   if((arr_mtr[T_NUM].A*arr_mtr[T_NUM].B)==0) return(arr_rNP1[T_NUM].NP1_RT);
+   if((m_arr_mtr[T_NUM].A*m_arr_mtr[T_NUM].B)==0) return(m_arr_rNP1[T_NUM].NP1_RT);
    else return(0);
   }
 //+------------------------------------------------------------------+
@@ -1406,7 +1410,7 @@ double miniTR::m_Zero_AmB_C1(const int &T_NUM)
 //+------------------------------------------------------------------+  
 double miniTR::m_Zero_AmB_C4(const int &T_NUM)
   {
-   if((arr_mtr[T_NUM].A*arr_mtr[T_NUM].B)==0) return(arr_rNP4[T_NUM].NP4_RT);
+   if((m_arr_mtr[T_NUM].A*m_arr_mtr[T_NUM].B)==0) return(m_arr_rNP4[T_NUM].NP4_RT);
    else return(0);
   }
 //+------------------------------------------------------------------+
@@ -1414,2838 +1418,2838 @@ double miniTR::m_Zero_AmB_C4(const int &T_NUM)
 //+------------------------------------------------------------------+  
 double miniTR::m_Zero_AmB_MinAB(const int &T_NUM)
   {
-   if((arr_mtr[T_NUM].A*arr_mtr[T_NUM].B)!=0) return(0);
+   if((m_arr_mtr[T_NUM].A*m_arr_mtr[T_NUM].B)!=0) return(0);
 
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].B;
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].B;
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #43 A*B=0 Max , miniTR                                         |
 //+------------------------------------------------------------------+  
 double miniTR::m_Zero_AmB_MaxAB(const int &T_NUM)
   {
-   if((arr_mtr[T_NUM].A*arr_mtr[T_NUM].B)!=0) return(0);
+   if((m_arr_mtr[T_NUM].A*m_arr_mtr[T_NUM].B)!=0) return(0);
 
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].B;
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].B;
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #44 Compound 2(*) Min FF1 , miniTR                             |
 //+------------------------------------------------------------------+  
 double miniTR::m_Cmpd2_Min_FF1(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].F1*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].F1*arr_mtr[T_NUM].B;
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].B;
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #45 Compound 2(*) Max FF1 , miniTR                             |
 //+------------------------------------------------------------------+  
 double miniTR::m_Cmpd2_Max_FF1(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].F1*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].F1*arr_mtr[T_NUM].B;
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].B;
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #46 ABS Compound 2(*) Min FF1 , miniTR                         |
 //+------------------------------------------------------------------+  
 double miniTR::m_Abs_Cmpd2_Min_FF1(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].F1*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].F1*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].F1*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].F1*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #47 ABS Compound 2(*) Max FF1 , miniTR                         |
 //+------------------------------------------------------------------+  
 double miniTR::m_Abs_Cmpd2_Max_FF1(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].F1*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].F1*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].F1*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].F1*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #48 Compound 2(*) Min FBeta , miniTR                           |
 //+------------------------------------------------------------------+  
 double miniTR::m_Cmpd2_Min_FBeta(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].B;
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].B;
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #49 Compound 2(*) Max FBeta , miniTR                           |
 //+------------------------------------------------------------------+  
 double miniTR::m_Cmpd2_Max_FBeta(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].B;
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].B;
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #50 ABS Compound 2(*) Min FBeta miniTR                         |
 //+------------------------------------------------------------------+  
 double miniTR::m_Abs_Cmpd2_Min_FBeta(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #51 ABS Compound 2(*) Max FBeta , miniTR                       |
 //+------------------------------------------------------------------+  
 double miniTR::m_Abs_Cmpd2_Max_FBeta(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #52 Compound 2(*) Min FGamma , miniTR                          |
 //+------------------------------------------------------------------+  
 double miniTR::m_Cmpd2_Min_FGamma(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].B;
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].B;
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #53 Compound 2(*) Max FGamma , miniTR                          |
 //+------------------------------------------------------------------+  
 double miniTR::m_Cmpd2_Max_FGamma(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].B;
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].B;
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #54 ABS Compound 2(*) Min FGamma miniTR                        |
 //+------------------------------------------------------------------+  
 double miniTR::m_Abs_Cmpd2_Min_FGamma(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #55 ABS Compound 2(*) Max FGamma , miniTR                      |
 //+------------------------------------------------------------------+  
 double miniTR::m_Abs_Cmpd2_Max_FGamma(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #56 Compound 2(*) Min F1Beta , miniTR                          |
 //+------------------------------------------------------------------+  
 double miniTR::m_Cmpd2_Min_F1Beta(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].B;
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].B;
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #57 Compound 2(*) Max F1Beta , miniTR                          |
 //+------------------------------------------------------------------+  
 double miniTR::m_Cmpd2_Max_F1Beta(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].B;
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].B;
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #58 ABS Compound 2(*) Min F1Beta miniTR                        |
 //+------------------------------------------------------------------+  
 double miniTR::m_Abs_Cmpd2_Min_F1Beta(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #59 ABS Compound 2(*) Max F1Beta , miniTR                      |
 //+------------------------------------------------------------------+  
 double miniTR::m_Abs_Cmpd2_Max_F1Beta(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #60 Compound 2(*) Min F1Gamma , miniTR                         |
 //+------------------------------------------------------------------+  
 double miniTR::m_Cmpd2_Min_F1Gamma(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].B;
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].B;
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #61 Compound 2(*) Max F1Gamma , miniTR                         |
 //+------------------------------------------------------------------+  
 double miniTR::m_Cmpd2_Max_F1Gamma(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].B;
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].B;
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #62 ABS Compound 2(*) Min F1Gamma miniTR                       |
 //+------------------------------------------------------------------+  
 double miniTR::m_Abs_Cmpd2_Min_F1Gamma(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #63 ABS Compound 2(*) Max F1Gamma , miniTR                     |
 //+------------------------------------------------------------------+  
 double miniTR::m_Abs_Cmpd2_Max_F1Gamma(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #64 Compound 2(*) Min BetaGamma , miniTR                       |
 //+------------------------------------------------------------------+  
 double miniTR::m_Cmpd2_Min_BetaGamma(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].B;
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].B;
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #65 Compound 2(*) Max BetaGamma , miniTR                       |
 //+------------------------------------------------------------------+  
 double miniTR::m_Cmpd2_Max_BetaGamma(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].B;
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].B;
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #66 ABS Compound 2(*) Min BetaGamma miniTR                     |
 //+------------------------------------------------------------------+  
 double miniTR::m_Abs_Cmpd2_Min_BetaGamma(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #67 ABS Compound 2(*) Max BetaGamma , miniTR                   |
 //+------------------------------------------------------------------+  
 double miniTR::m_Abs_Cmpd2_Max_BetaGamma(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #68 Compound 2(+) Min FF1 , miniTR                             |
 //+------------------------------------------------------------------+  
 double miniTR::m_Cmpd2_Min_FF1_plus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1*arr_mtr[T_NUM].B;
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].B;
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #69 Compound 2(+) Max FF1 , miniTR                             |
 //+------------------------------------------------------------------+  
 double miniTR::m_Cmpd2_Max_FF1_plus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1*arr_mtr[T_NUM].B;
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].B;
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #70 ABS Compound 2(-) Min FF1 , miniTR                         |
 //+------------------------------------------------------------------+  
 double miniTR::m_Abs_Cmpd2_Min_FF1_plus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #71 ABS Compound 2(+) Max FF1 , miniTR                         |
 //+------------------------------------------------------------------+  
 double miniTR::m_Abs_Cmpd2_Max_FF1_plus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #72 Compound 2(+) Min FBeta , miniTR                           |
 //+------------------------------------------------------------------+  
 double miniTR::m_Cmpd2_Min_FBeta_plus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].B;
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].B;
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #73 Compound 2(+) Max FBeta , miniTR                           |
 //+------------------------------------------------------------------+  
 double miniTR::m_Cmpd2_Max_FBeta_plus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].B;
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].B;
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #74 ABS Compound 2(+) Min FBeta miniTR                         |
 //+------------------------------------------------------------------+  
 double miniTR::m_Abs_Cmpd2_Min_FBeta_plus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #75 ABS Compound 2(+) Max FBeta , miniTR                       |
 //+------------------------------------------------------------------+  
 double miniTR::m_Abs_Cmpd2_Max_FBeta_plus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #76 Compound 2(+) Min FGamma , miniTR                          |
 //+------------------------------------------------------------------+  
 double miniTR::m_Cmpd2_Min_FGamma_plus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].B;
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].B;
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #77 Compound 2(+) Max FGamma , miniTR                          |
 //+------------------------------------------------------------------+  
 double miniTR::m_Cmpd2_Max_FGamma_plus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].B;
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].B;
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #78 ABS Compound 2(+) Min FGamma miniTR                        |
 //+------------------------------------------------------------------+  
 double miniTR::m_Abs_Cmpd2_Min_FGamma_plus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #79 ABS Compound 2(+) Max FGamma , miniTR                      |
 //+------------------------------------------------------------------+  
 double miniTR::m_Abs_Cmpd2_Max_FGamma_plus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #80 Compound 2(+) Min F1Beta , miniTR                          |
 //+------------------------------------------------------------------+  
 double miniTR::m_Cmpd2_Min_F1Beta_plus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].B;
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].B;
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #81 Compound 2(+) Max F1Beta , miniTR                          |
 //+------------------------------------------------------------------+  
 double miniTR::m_Cmpd2_Max_F1Beta_plus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].B;
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].B;
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #82 ABS Compound 2(+) Min F1Beta miniTR                        |
 //+------------------------------------------------------------------+  
 double miniTR::m_Abs_Cmpd2_Min_F1Beta_plus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #83 ABS Compound 2(+) Max F1Beta , miniTR                      |
 //+------------------------------------------------------------------+  
 double miniTR::m_Abs_Cmpd2_Max_F1Beta_plus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #84 Compound 2(+) Min F1Gamma , miniTR                         |
 //+------------------------------------------------------------------+  
 double miniTR::m_Cmpd2_Min_F1Gamma_plus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].B;
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].B;
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #85 Compound 2(+) Max F1Gamma , miniTR                         |
 //+------------------------------------------------------------------+  
 double miniTR::m_Cmpd2_Max_F1Gamma_plus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].B;
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].B;
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #86 ABS Compound 2(+) Min F1Gamma miniTR                       |
 //+------------------------------------------------------------------+  
 double miniTR::m_Abs_Cmpd2_Min_F1Gamma_plus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #87 ABS Compound 2(+) Max F1Gamma , miniTR                     |
 //+------------------------------------------------------------------+  
 double miniTR::m_Abs_Cmpd2_Max_F1Gamma_plus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #88 Compound 2(+) Min BetaGamma , miniTR                       |
 //+------------------------------------------------------------------+  
 double miniTR::m_Cmpd2_Min_BetaGamma_plus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].B;
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].B;
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #89 Compound 2(+) Max BetaGamma , miniTR                       |
 //+------------------------------------------------------------------+  
 double miniTR::m_Cmpd2_Max_BetaGamma_plus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].B;
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].B;
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #90 ABS Compound 2(+) Min BetaGamma miniTR                     |
 //+------------------------------------------------------------------+  
 double miniTR::m_Abs_Cmpd2_Min_BetaGamma_plus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
 //|   #91 ABS Compound 2(+) Max BetaGamma , miniTR                   |
 //+------------------------------------------------------------------+  
 double miniTR::m_Abs_Cmpd2_Max_BetaGamma_plus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #92 Compound 2(-) Min FF1 , miniTR                             |
 //--------------------------------------------------------------------  
 double miniTR::m_Cmpd2_Min_FF1_minus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1*arr_mtr[T_NUM].B;
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].B;
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #93 Compound 2(-) Max FF1 , miniTR                             |
 //--------------------------------------------------------------------  
 double miniTR::m_Cmpd2_Max_FF1_minus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1*arr_mtr[T_NUM].B;
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].B;
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #94 ABS Compound 2(-) Min FF1 , miniTR                         |
 //--------------------------------------------------------------------  
 double miniTR::m_Abs_Cmpd2_Min_FF1_minus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #95 ABS Compound 2(-) Max FF1 , miniTR                         |
 //--------------------------------------------------------------------  
 double miniTR::m_Abs_Cmpd2_Max_FF1_minus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #96 Compound 2(-) Min FBeta , miniTR                           |
 //--------------------------------------------------------------------  
 double miniTR::m_Cmpd2_Min_FBeta_minus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].B;
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].B;
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #97 Compound 2(-) Max FBeta , miniTR                           |
 //--------------------------------------------------------------------  
 double miniTR::m_Cmpd2_Max_FBeta_minus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].B;
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].B;
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #98 ABS Compound 2(-) Min FBeta miniTR                         |
 //--------------------------------------------------------------------  
 double miniTR::m_Abs_Cmpd2_Min_FBeta_minus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #99 ABS Compound 2(-) Max FBeta , miniTR                       |
 //--------------------------------------------------------------------  
 double miniTR::m_Abs_Cmpd2_Max_FBeta_minus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #100 Compound 2(-) Min FGamma , miniTR                         |
 //--------------------------------------------------------------------  
 double miniTR::m_Cmpd2_Min_FGamma_minus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].B;
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].B;
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #101 Compound 2(-) Max FGamma , miniTR                         |
 //--------------------------------------------------------------------  
 double miniTR::m_Cmpd2_Max_FGamma_minus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].B;
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].B;
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
-//|   #102 ABS Compound 2(-) Min FGamma miniTR                        |
+//|   #102 ABS Compound 2(-) Min FGamma miniTR                       |
 //--------------------------------------------------------------------  
 double miniTR::m_Abs_Cmpd2_Min_FGamma_minus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
-//|   #103 ABS Compound 2(-) Max FGamma , miniTR                      |
+//|   #103 ABS Compound 2(-) Max FGamma , miniTR                     |
 //--------------------------------------------------------------------  
 double miniTR::m_Abs_Cmpd2_Max_FGamma_minus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
-//|   #104 Compound 2(-) Min F1Beta , miniTR                          |
+//|   #104 Compound 2(-) Min F1Beta , miniTR                         |
 //--------------------------------------------------------------------  
 double miniTR::m_Cmpd2_Min_F1Beta_minus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].B;
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].B;
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
-//|   #105 Compound 2(-) Max F1Beta , miniTR                          |
+//|   #105 Compound 2(-) Max F1Beta , miniTR                         |
 //--------------------------------------------------------------------  
 double miniTR::m_Cmpd2_Max_F1Beta_minus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].B;
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].B;
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
-//|   #106 ABS Compound 2(-) Min F1Beta miniTR                        |
+//|   #106 ABS Compound 2(-) Min F1Beta miniTR                       |
 //--------------------------------------------------------------------  
 double miniTR::m_Abs_Cmpd2_Min_F1Beta_minus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
-//|   #107 ABS Compound 2(-) Max F1Beta , miniTR                      |
+//|   #107 ABS Compound 2(-) Max F1Beta , miniTR                     |
 //--------------------------------------------------------------------  
 double miniTR::m_Abs_Cmpd2_Max_F1Beta_minus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
-//|   #108 Compound 2(-) Min F1Gamma , miniTR                         |
+//|   #108 Compound 2(-) Min F1Gamma , miniTR                        |
 //--------------------------------------------------------------------  
 double miniTR::m_Cmpd2_Min_F1Gamma_minus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].B;
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].B;
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
-//|   #109 Compound 2(-) Max F1Gamma , miniTR                         |
+//|   #109 Compound 2(-) Max F1Gamma , miniTR                        |
 //--------------------------------------------------------------------  
 double miniTR::m_Cmpd2_Max_F1Gamma_minus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].B;
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].B;
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
-//|   #110 ABS Compound 2(-) Min F1Gamma miniTR                       |
+//|   #110 ABS Compound 2(-) Min F1Gamma miniTR                      |
 //--------------------------------------------------------------------  
 double miniTR::m_Abs_Cmpd2_Min_F1Gamma_minus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
-//|   #111 ABS Compound 2(-) Max F1Gamma , miniTR                     |
+//|   #111 ABS Compound 2(-) Max F1Gamma , miniTR                    |
 //--------------------------------------------------------------------  
-double Abs_Cmpd2_Max_F1Gamma_minus(const int &T_NUM)
+double miniTR::m_Abs_Cmpd2_Max_F1Gamma_minus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
-//|   #112 Compound 2(-) Min BetaGamma , miniTR                       |
+//|   #112 Compound 2(-) Min BetaGamma , miniTR                      |
 //--------------------------------------------------------------------  
-double Cmpd2_Min_BetaGamma_minus(const int &T_NUM)
+double miniTR::m_Cmpd2_Min_BetaGamma_minus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].B;
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].B;
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
-//|   #113 Compound 2(-) Max BetaGamma , miniTR                       |
+//|   #113 Compound 2(-) Max BetaGamma , miniTR                      |
 //--------------------------------------------------------------------  
-double Cmpd2_Max_BetaGamma_minus(const int &T_NUM)
+double miniTR::m_Cmpd2_Max_BetaGamma_minus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].A;
-   x2 = arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*arr_mtr[T_NUM].B;
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].A;
+   m_x2 = m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*m_arr_mtr[T_NUM].B;
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
-//|   #114 ABS Compound 2(-) Min BetaGamma miniTR                     |
+//|   #114 ABS Compound 2(-) Min BetaGamma miniTR                    |
 //--------------------------------------------------------------------  
-double Abs_Cmpd2_Min_BetaGamma_minus(const int &T_NUM)
+double miniTR::m_Abs_Cmpd2_Min_BetaGamma_minus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #115 ABS Compound 2(-) Max BetaGamma , miniTR                  |
 //--------------------------------------------------------------------  
-double Abs_Cmpd2_Max_BetaGamma_minus(const int &T_NUM)
+double miniTR::m_Abs_Cmpd2_Max_BetaGamma_minus(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #116  Compound 3(*) Min FF1Beta , miniTR                       |
 //--------------------------------------------------------------------  
-double Cmpd3_Min_FF1Beta(const int &T_NUM)
+double miniTR::m_Cmpd3_Min_FF1Beta(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Beta*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Beta*(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Beta*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Beta*(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #117  Compound 3(*) Max FF1Beta , miniTR                       |
 //--------------------------------------------------------------------  
-double Cmpd3_Max_FF1Beta(const int &T_NUM)
+double miniTR::m_Cmpd3_Max_FF1Beta(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Beta*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Beta*(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Beta*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Beta*(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #118 ABS Compound 3(*) Min FF1Beta , miniTR                    |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Min_FF1Beta(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Min_FF1Beta(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #119  ABS Compound 3(*) Max FF1Beta , miniTR                   |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Max_FF1Beta(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Max_FF1Beta(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #120  Compound 3(*) Min FF1Gamma , miniTR                      |
 //--------------------------------------------------------------------  
-double Cmpd3_Min_FF1Gamma(const int &T_NUM)
+double miniTR::m_Cmpd3_Min_FF1Gamma(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #121  Compound 3(*) Max FF1Gamma , miniTR                      |
 //--------------------------------------------------------------------  
-double Cmpd3_Max_FF1Gamma(const int &T_NUM)
+double miniTR::m_Cmpd3_Max_FF1Gamma(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #122 ABS Compound 3(*) Min FF1Gamma , miniTR                   |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Min_FF1Gamma(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Min_FF1Gamma(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #123  ABS Compound 3(*) Max FF1Gamma , miniTR                  |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Max_FF1Gamma(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Max_FF1Gamma(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #124  Compound 3(*) Min FBetaGamma , miniTR                    |
 //--------------------------------------------------------------------  
-double Cmpd3_Min_FBetaGamma(const int &T_NUM)
+double miniTR::m_Cmpd3_Min_FBetaGamma(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
-//|   #125  Compound 3(*) Max FBetaGamma , miniTR                     |
+//|   #125  Compound 3(*) Max FBetaGamma , miniTR                    |
 //--------------------------------------------------------------------  
-double Cmpd3_Max_FBetaGamma(const int &T_NUM)
+double miniTR::m_Cmpd3_Max_FBetaGamma(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #126 ABS Compound 3(*) Min FBetaGamma , miniTR                 |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Min_FBetaGamma(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Min_FBetaGamma(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #127  ABS Compound 3(*) Max FBetaGamma , miniTR                |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Max_FBetaGamma(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Max_FBetaGamma(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #128  Compound 3(*) Min F1BetaGamma , miniTR                   |
 //--------------------------------------------------------------------  
-double Cmpd3_Min_F1BetaGamma(const int &T_NUM)
+double miniTR::m_Cmpd3_Min_F1BetaGamma(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #129  Compound 3(*) Max F1BetaGamma , miniTR                   |
 //--------------------------------------------------------------------  
-double Cmpd3_Max_F1BetaGamma(const int &T_NUM)
+double miniTR::m_Cmpd3_Max_F1BetaGamma(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #130 ABS Compound 3(*) Min F1BetaGamma , miniTR                |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Min_F1BetaGamma(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Min_F1BetaGamma(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #131  ABS Compound 3(*) Max F1BetaGamma , miniTR               |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Max_F1BetaGamma(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Max_F1BetaGamma(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #132  Compound 3(++) Min FF1Beta , miniTR                      |
 //--------------------------------------------------------------------  
-double Cmpd3_Min_FF1Beta_pp(const int &T_NUM)
+double miniTR::m_Cmpd3_Min_FF1Beta_pp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta*(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta*(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #133  Compound 3(++) Max FF1Beta , miniTR                      |
 //--------------------------------------------------------------------  
-double Cmpd3_Max_FF1Beta_pp(const int &T_NUM)
+double miniTR::m_Cmpd3_Max_FF1Beta_pp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta*(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta*(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #134 ABS Compound 3(++) Min FF1Beta , miniTR                   |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Min_FF1Beta_pp(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Min_FF1Beta_pp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #135  ABS Compound 3(++) Max FF1Beta , miniTR                  |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Max_FF1Beta_pp(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Max_FF1Beta_pp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #136  Compound 3(++) Min FF1Gamma , miniTR                     |
 //--------------------------------------------------------------------  
-double Cmpd3_Min_FF1Gamma_pp(const int &T_NUM)
+double miniTR::m_Cmpd3_Min_FF1Gamma_pp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #137  Compound 3(++) Max FF1Gamma , miniTR                     |
 //--------------------------------------------------------------------  
-double Cmpd3_Max_FF1Gamma_pp(const int &T_NUM)
+double miniTR::m_Cmpd3_Max_FF1Gamma_pp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #138 ABS Compound 3(++) Min FF1Gamma , miniTR                  |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Min_FF1Gamma_pp(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Min_FF1Gamma_pp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #139  ABS Compound 3(++) Max FF1Gamma , miniTR                 |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Max_FF1Gamma_pp(const int &T_NUM)
+double miniTR::m_miniTR::m_Abs_Cmpd3_Max_FF1Gamma_pp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #140  Compound 3(++) Min FBetaGamma , miniTR                   |
 //--------------------------------------------------------------------  
-double Cmpd3_Min_FBetaGamma_pp(const int &T_NUM)
+double miniTR::m_Cmpd3_Min_FBetaGamma_pp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #141  Compound 3(++) Max FBetaGamma , miniTR                   |
 //--------------------------------------------------------------------  
-double Cmpd3_Max_FBetaGamma_pp(const int &T_NUM)
+double miniTR::m_Cmpd3_Max_FBetaGamma_pp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #142 ABS Compound 3(++) Min FBetaGamma , miniTR                |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Min_FBetaGamma_pp(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Min_FBetaGamma_pp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #143  ABS Compound 3(++) Max FBetaGamma , miniTR               |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Max_FBetaGamma_pp(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Max_FBetaGamma_pp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #144  Compound 3(++) Min F1BetaGamma , miniTR                  |
 //--------------------------------------------------------------------  
-double Cmpd3_Min_F1BetaGamma_pp(const int &T_NUM)
+double miniTR::m_Cmpd3_Min_F1BetaGamma_pp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #145  Compound 3(++) Max F1BetaGamma , miniTR                  |
 //--------------------------------------------------------------------  
-double Cmpd3_Max_F1BetaGamma_pp(const int &T_NUM)
+double miniTR::m_Cmpd3_Max_F1BetaGamma_pp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #146 ABS Compound 3(++) Min F1BetaGamma , miniTR               |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Min_F1BetaGamma_pp(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Min_F1BetaGamma_pp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #147  ABS Compound 3(++) Max F1BetaGamma , miniTR              |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Max_F1BetaGamma_pp(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Max_F1BetaGamma_pp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #148  Compound 3(+-) Min FF1Beta , miniTR                      |
 //--------------------------------------------------------------------  
-double Cmpd3_Min_FF1Beta_pm(const int &T_NUM)
+double miniTR::m_Cmpd3_Min_FF1Beta_pm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta*(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta*(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #149  Compound 3(+-) Max FF1Beta , miniTR                      |
 //--------------------------------------------------------------------  
-double Cmpd3_Max_FF1Beta_pm(const int &T_NUM)
+double miniTR::m_Cmpd3_Max_FF1Beta_pm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta*(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta*(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #150 ABS Compound 3(+-) Min FF1Beta , miniTR                   |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Min_FF1Beta_pm(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Min_FF1Beta_pm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #151  ABS Compound 3(+-) Max FF1Beta , miniTR                  |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Max_FF1Beta_pm(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Max_FF1Beta_pm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #152  Compound 3(+-) Min FF1Gamma , miniTR                     |
 //--------------------------------------------------------------------  
-double Cmpd3_Min_FF1Gamma_pm(const int &T_NUM)
+double miniTR::m_Cmpd3_Min_FF1Gamma_pm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #153  Compound 3(+-) Max FF1Gamma , miniTR                     |
 //--------------------------------------------------------------------  
-double Cmpd3_Max_FF1Gamma_pm(const int &T_NUM)
+double miniTR::m_Cmpd3_Max_FF1Gamma_pm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #154 ABS Compound 3(+-) Min FF1Gamma , miniTR                  |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Min_FF1Gamma_pm(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Min_FF1Gamma_pm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #155  ABS Compound 3(+-) Max FF1Gamma , miniTR                 |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Max_FF1Gamma_pm(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Max_FF1Gamma_pm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #156  Compound 3(+-) Min FBetaGamma , miniTR                   |
 //--------------------------------------------------------------------  
-double Cmpd3_Min_FBetaGamma_pm(const int &T_NUM)
+double miniTR::m_Cmpd3_Min_FBetaGamma_pm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #157  Compound 3(+-) Max FBetaGamma , miniTR                   |
 //--------------------------------------------------------------------  
-double Cmpd3_Max_FBetaGamma_pm(const int &T_NUM)
+double miniTR::m_Cmpd3_Max_FBetaGamma_pm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #158 ABS Compound 3(+-) Min FBetaGamma , miniTR                |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Min_FBetaGamma_pm(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Min_FBetaGamma_pm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #159  ABS Compound 3(+-) Max FBetaGamma , miniTR               |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Max_FBetaGamma_pm(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Max_FBetaGamma_pm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #160  Compound 3(+-) Min F1BetaGamma , miniTR                  |
 //--------------------------------------------------------------------  
-double Cmpd3_Min_F1BetaGamma_pm(const int &T_NUM)
+double miniTR::m_Cmpd3_Min_F1BetaGamma_pm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #161  Compound 3(+-) Max F1BetaGamma , miniTR                  |
 //--------------------------------------------------------------------  
-double Cmpd3_Max_F1BetaGamma_pm(const int &T_NUM)
+double miniTR::m_Cmpd3_Max_F1BetaGamma_pm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #162 ABS Compound 3(+-) Min F1BetaGamma , miniTR               |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Min_F1BetaGamma_pm(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Min_F1BetaGamma_pm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #163  ABS Compound 3(+-) Max F1BetaGamma , miniTR              |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Max_F1BetaGamma_pm(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Max_F1BetaGamma_pm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #164  Compound 3(-+) Min FF1Beta , miniTR                      |
 //--------------------------------------------------------------------  
-double Cmpd3_Min_FF1Beta_mp(const int &T_NUM)
+double miniTR::m_Cmpd3_Min_FF1Beta_mp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta*(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta*(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #165  Compound 3(-+) Max FF1Beta , miniTR                      |
 //--------------------------------------------------------------------  
-double Cmpd3_Max_FF1Beta_mp(const int &T_NUM)
+double miniTR::m_Cmpd3_Max_FF1Beta_mp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta*(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta*(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #166 ABS Compound 3(-+) Min FF1Beta , miniTR                   |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Min_FF1Beta_mp(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Min_FF1Beta_mp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #167  ABS Compound 3(-+) Max FF1Beta , miniTR                  |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Max_FF1Beta_mp(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Max_FF1Beta_mp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #168  Compound 3(-+) Min FF1Gamma , miniTR                     |
 //--------------------------------------------------------------------  
-double Cmpd3_Min_FF1Gamma_mp(const int &T_NUM)
+double miniTR::m_Cmpd3_Min_FF1Gamma_mp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #169  Compound 3(-+) Max FF1Gamma , miniTR                     |
 //--------------------------------------------------------------------  
-double Cmpd3_Max_FF1Gamma_mp(const int &T_NUM)
+double miniTR::m_Cmpd3_Max_FF1Gamma_mp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #170 ABS Compound 3(-+) Min FF1Gamma , miniTR                  |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Min_FF1Gamma_mp(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Min_FF1Gamma_mp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #171  ABS Compound 3(-+) Max FF1Gamma , miniTR                 |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Max_FF1Gamma_mp(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Max_FF1Gamma_mp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #172  Compound 3(-+) Min FBetaGamma , miniTR                   |
 //--------------------------------------------------------------------  
-double Cmpd3_Min_FBetaGamma_mp(const int &T_NUM)
+double miniTR::m_Cmpd3_Min_FBetaGamma_mp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #173  Compound 3(-+) Max FBetaGamma , miniTR                   |
 //--------------------------------------------------------------------  
-double Cmpd3_Max_FBetaGamma_mp(const int &T_NUM)
+double miniTR::m_Cmpd3_Max_FBetaGamma_mp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #174 ABS Compound 3(-+) Min FBetaGamma , miniTR                |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Min_FBetaGamma_mp(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Min_FBetaGamma_mp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #175  ABS Compound 3(-+) Max FBetaGamma , miniTR               |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Max_FBetaGamma_mp(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Max_FBetaGamma_mp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #176  Compound 3(-+) Min F1BetaGamma , miniTR                  |
 //--------------------------------------------------------------------  
-double Cmpd3_Min_F1BetaGamma_mp(const int &T_NUM)
+double miniTR::m_Cmpd3_Min_F1BetaGamma_mp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #177  Compound 3(-+) Max F1BetaGamma , miniTR                  |
 //--------------------------------------------------------------------  
-double Cmpd3_Max_F1BetaGamma_mp(const int &T_NUM)
+double miniTR::m_Cmpd3_Max_F1BetaGamma_mp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #178 ABS Compound 3(-+) Min F1BetaGamma , miniTR               |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Min_F1BetaGamma_mp(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Min_F1BetaGamma_mp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #179  ABS Compound 3(-+) Max F1BetaGamma , miniTR              |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Max_F1BetaGamma_mp(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Max_F1BetaGamma_mp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #180  Compound 3(--) Min FF1Beta , miniTR                      |
 //--------------------------------------------------------------------  
-double Cmpd3_Min_FF1Beta_mm(const int &T_NUM)
+double miniTR::m_Cmpd3_Min_FF1Beta_mm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta*(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta*(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #181  Compound 3(--) Max FF1Beta , miniTR                      |
 //--------------------------------------------------------------------  
-double Cmpd3_Max_FF1Beta_mm(const int &T_NUM)
+double miniTR::m_Cmpd3_Max_FF1Beta_mm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta*(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta*(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #182 ABS Compound 3(--) Min FF1Beta , miniTR                   |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Min_FF1Beta_mm(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Min_FF1Beta_mm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #183  ABS Compound 3(--) Max FF1Beta , miniTR                  |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Max_FF1Beta_mm(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Max_FF1Beta_mm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #184  Compound 3(--) Min FF1Gamma , miniTR                     |
 //--------------------------------------------------------------------  
-double Cmpd3_Min_FF1Gamma_mm(const int &T_NUM)
+double miniTR::m_Cmpd3_Min_FF1Gamma_mm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #185  Compound 3(--) Max FF1Gamma , miniTR                     |
 //--------------------------------------------------------------------  
-double Cmpd3_Max_FF1Gamma_mm(const int &T_NUM)
+double miniTR::m_Cmpd3_Max_FF1Gamma_mm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #186 ABS Compound 3(--) Min FF1Gamma , miniTR                  |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Min_FF1Gamma_mm(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Min_FF1Gamma_mm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #187  ABS Compound 3(--) Max FF1Gamma , miniTR                 |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Max_FF1Gamma_mm(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Max_FF1Gamma_mm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #188  Compound 3(--) Min FBetaGamma , miniTR                   |
 //--------------------------------------------------------------------  
-double Cmpd3_Min_FBetaGamma_mm(const int &T_NUM)
+double miniTR::m_Cmpd3_Min_FBetaGamma_mm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #189  Compound 3(--) Max FBetaGamma , miniTR                   |
 //--------------------------------------------------------------------  
-double Cmpd3_Max_FBetaGamma_mm(const int &T_NUM)
+double miniTR::m_Cmpd3_Max_FBetaGamma_mm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #190 ABS Compound 3(--) Min FBetaGamma , miniTR                |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Min_FBetaGamma_mm(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Min_FBetaGamma_mm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #191  ABS Compound 3(--) Max FBetaGamma , miniTR               |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Max_FBetaGamma_mm(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Max_FBetaGamma_mm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #192  Compound 3(--) Min F1BetaGamma , miniTR                  |
 //--------------------------------------------------------------------  
-double Cmpd3_Min_F1BetaGamma_mm(const int &T_NUM)
+double miniTR::m_Cmpd3_Min_F1BetaGamma_mm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #193  Compound 3(--) Max F1BetaGamma , miniTR                  |
 //--------------------------------------------------------------------  
-double Cmpd3_Max_F1BetaGamma_mm(const int &T_NUM)
+double miniTR::m_Cmpd3_Max_F1BetaGamma_mm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #194 ABS Compound 3(--) Min F1BetaGamma , miniTR               |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Min_F1BetaGamma_mm(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Min_F1BetaGamma_mm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #195  ABS Compound 3(--) Max F1BetaGamma , miniTR              |
 //--------------------------------------------------------------------  
-double Abs_Cmpd3_Max_F1BetaGamma_mm(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Max_F1BetaGamma_mm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #196  Compound 4(*) Min FF1BetaGamma , miniTR                  |
 //--------------------------------------------------------------------  
-double Cmpd4_Min(const int &T_NUM)
+double miniTR::m_Cmpd4_Min(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #197  Compound 4(*) Max FF1BetaGamma , miniTR                  |
 //--------------------------------------------------------------------  
-double Cmpd4_Max(const int &T_NUM)
+double miniTR::m_Cmpd4_Max(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #198 ABS Compound 4(*) Min FF1BetaGamma , miniTR               |
 //--------------------------------------------------------------------  
-double Abs_Cmpd4_Min(const int &T_NUM)
+double miniTR::m_Abs_Cmpd4_Min(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #199 ABS Compound 4(*) Max FF1BetaGamma , miniTR               |
 //--------------------------------------------------------------------  
-double Abs_Cmpd4_Max(const int &T_NUM)
+double miniTR::m_Abs_Cmpd4_Max(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F*arr_mtr[T_NUM].F1*arr_mtr[T_NUM].Beta*arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F*m_arr_mtr[T_NUM].F1*m_arr_mtr[T_NUM].Beta*m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #200  Compound 4(+++) Min FF1BetaGamma , miniTR                |
 //--------------------------------------------------------------------  
-double Cmpd4_Min_ppp(const int &T_NUM)
+double miniTR::m_Cmpd4_Min_ppp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #201  Compound 4(+++) Max FF1BetaGamma , miniTR                |
 //--------------------------------------------------------------------  
-double Cmpd4_Max_ppp(const int &T_NUM)
+double miniTR::m_Cmpd4_Max_ppp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #202 ABS Compound 4(+++) Min FF1BetaGamma , miniTR             |
 //--------------------------------------------------------------------  
-double Abs_Cmpd4_Min_ppp(const int &T_NUM)
+double miniTR::m_Abs_Cmpd4_Min_ppp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #203 ABS Compound 4(+++) Max FF1BetaGamma , miniTR             |
 //--------------------------------------------------------------------  
-double Abs_Cmpd4_Max_ppp(const int &T_NUM)
+double miniTR::m_Abs_Cmpd4_Max_ppp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #204  Compound 4(++-) Min FF1BetaGamma , miniTR                |
 //--------------------------------------------------------------------  
-double Cmpd4_Min_ppm(const int &T_NUM)
+double miniTR::m_Cmpd4_Min_ppm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #205  Compound 4(++-) Max FF1BetaGamma , miniTR                |
 //--------------------------------------------------------------------  
-double Cmpd4_Max_ppm(const int &T_NUM)
+double miniTR::m_Cmpd4_Max_ppm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #206 ABS Compound 4(++-) Min FF1BetaGamma , miniTR             |
 //--------------------------------------------------------------------  
-double Abs_Cmpd4_Min_ppm(const int &T_NUM)
+double miniTR::m_Abs_Cmpd4_Min_ppm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #207 ABS Compound 4(++-) Max FF1BetaGamma , miniTR             |
 //--------------------------------------------------------------------  
-double Abs_Cmpd4_Max_ppm(const int &T_NUM)
+double miniTR::m_Abs_Cmpd4_Max_ppm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #208  Compound 4(+-+) Min FF1BetaGamma , miniTR                |
 //--------------------------------------------------------------------  
-double Cmpd4_Min_pmp(const int &T_NUM)
+double miniTR::m_Cmpd4_Min_pmp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #209  Compound 4(+-+) Max FF1BetaGamma , miniTR                |
 //--------------------------------------------------------------------  
-double Cmpd4_Max_pmp(const int &T_NUM)
+double miniTR::m_Cmpd4_Max_pmp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #210 ABS Compound 4(+-+) Min FF1BetaGamma , miniTR             |
 //--------------------------------------------------------------------  
-double Abs_Cmpd4_Min_pmp(const int &T_NUM)
+double miniTR::m_Abs_Cmpd4_Min_pmp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #211 ABS Compound 4(+-+) Max FF1BetaGamma , miniTR             |
 //--------------------------------------------------------------------  
-double Abs_Cmpd4_Max_pmp(const int &T_NUM)
+double miniTR::m_Abs_Cmpd4_Max_pmp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #212  Compound 4(-++) Min FF1BetaGamma , miniTR                |
 //--------------------------------------------------------------------  
-double Cmpd4_Min_mpp(const int &T_NUM)
+double miniTR::m_Cmpd4_Min_mpp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #213  Compound 4(-++) Max FF1BetaGamma , miniTR                |
 //--------------------------------------------------------------------  
-double Cmpd4_Max_mpp(const int &T_NUM)
+double miniTR::m_Cmpd4_Max_mpp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #214 ABS Compound 4(-++) Min FF1BetaGamma , miniTR             |
 //--------------------------------------------------------------------  
-double Abs_Cmpd4_Min_mpp(const int &T_NUM)
+double miniTR::m_Abs_Cmpd4_Min_mpp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #215 ABS Compound 4(-++) Max FF1BetaGamma , miniTR             |
 //--------------------------------------------------------------------  
-double Abs_Cmpd4_Max_mpp(const int &T_NUM)
+double miniTR::m_Abs_Cmpd4_Max_mpp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #216  Compound 4(---) Min FF1BetaGamma , miniTR                |
 //--------------------------------------------------------------------  
-double Cmpd4_Min_mmm(const int &T_NUM)
+double miniTR::m_Cmpd4_Min_mmm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #217  Compound 4(---) Max FF1BetaGamma , miniTR                |
 //--------------------------------------------------------------------  
-double Cmpd4_Max_mmm(const int &T_NUM)
+double miniTR::m_Cmpd4_Max_mmm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #218 ABS Compound 4(---) Min FF1BetaGamma , miniTR             |
 //--------------------------------------------------------------------  
-double Abs_Cmpd4_Min_mmm(const int &T_NUM)
+double miniTR::m_Abs_Cmpd4_Min_mmm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #219 ABS Compound 4(---) Max FF1BetaGamma , miniTR             |
 //--------------------------------------------------------------------  
-double Abs_Cmpd4_Max_mmm(const int &T_NUM)
+double miniTR::m_Abs_Cmpd4_Max_mmm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #220  Compound 4(--+) Min FF1BetaGamma , miniTR                |
 //--------------------------------------------------------------------  
-double Cmpd4_Min_mmp(const int &T_NUM)
+double miniTR::m_Cmpd4_Min_mmp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #221  Compound 4(--+) Max FF1BetaGamma , miniTR                |
 //--------------------------------------------------------------------  
-double Cmpd4_Max_mmp(const int &T_NUM)
+double miniTR::m_Cmpd4_Max_mmp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #222 ABS Compound 4(--+) Min FF1BetaGamma , miniTR             |
 //--------------------------------------------------------------------  
-double Abs_Cmpd4_Min_mmp(const int &T_NUM)
+double miniTR::m_Abs_Cmpd4_Min_mmp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #223 ABS Compound 4(--+) Max FF1BetaGamma , miniTR             |
 //--------------------------------------------------------------------  
-double Abs_Cmpd4_Max_mmp(const int &T_NUM)
+double miniTR::m_Abs_Cmpd4_Max_mmp(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta+arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta+m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #224  Compound 4(-+-) Min FF1BetaGamma , miniTR                |
 //--------------------------------------------------------------------  
-double Cmpd4_Min_mpm(const int &T_NUM)
+double miniTR::m_Cmpd4_Min_mpm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #225  Compound 4(-+-) Max FF1BetaGamma , miniTR                |
 //--------------------------------------------------------------------  
-double Cmpd4_Max_mpm(const int &T_NUM)
+double miniTR::m_Cmpd4_Max_mpm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #226 ABS Compound 4(-+-) Min FF1BetaGamma , miniTR             |
 //--------------------------------------------------------------------  
-double Abs_Cmpd4_Min_mpm(const int &T_NUM)
+double miniTR::m_Abs_Cmpd4_Min_mpm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #227 ABS Compound 4(-+-) Max FF1BetaGamma , miniTR             |
 //--------------------------------------------------------------------  
-double Abs_Cmpd4_Max_mpm(const int &T_NUM)
+double miniTR::m_Abs_Cmpd4_Max_mpm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F-arr_mtr[T_NUM].F1+arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F-m_arr_mtr[T_NUM].F1+m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #228  Compound 4(+--) Min FF1BetaGamma , miniTR                |
 //--------------------------------------------------------------------  
-double Cmpd4_Min_pmm(const int &T_NUM)
+double miniTR::m_Cmpd4_Min_pmm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #229  Compound 4(+--) Max FF1BetaGamma , miniTR                |
 //--------------------------------------------------------------------  
-double Cmpd4_Max_pmm(const int &T_NUM)
+double miniTR::m_Cmpd4_Max_pmm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*(arr_mtr[T_NUM].B);
-   m_result=MathMax(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*(m_arr_mtr[T_NUM].B);
+   m_result=MathMax(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //--------------------------------------------------------------------
 //|   #230 ABS Compound 4(+--) Min FF1BetaGamma , miniTR             |
 //--------------------------------------------------------------------  
-double Abs_Cmpd4_Min_pmm(const int &T_NUM)
+double miniTR::m_Abs_Cmpd4_Min_pmm(const int &T_NUM)
   {
-   x1=0; x2=0; m_result=0;
+   m_x1=0; m_x2=0; m_result=0;
 
-   x1 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].A);
-   x2 = arr_mtr[T_NUM].F+arr_mtr[T_NUM].F1-arr_mtr[T_NUM].Beta-arr_mtr[T_NUM].Gamma*MathAbs(arr_mtr[T_NUM].B);
-   m_result=MathMin(x1,x2);
+   m_x1 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].A);
+   m_x2 = m_arr_mtr[T_NUM].F+m_arr_mtr[T_NUM].F1-m_arr_mtr[T_NUM].Beta-m_arr_mtr[T_NUM].Gamma*MathAbs(m_arr_mtr[T_NUM].B);
+   m_result=MathMin(m_x1,m_x2);
 
 //Sum NP by Group
-   if(m_result==x1) return(arr_rNP1[T_NUM].NP1_RT);
-   else return(arr_rNP4[T_NUM].NP4_RT);
+   if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
+   else return(m_arr_rNP4[T_NUM].NP4_RT);
   }
 //+------------------------------------------------------------------+
