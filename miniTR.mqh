@@ -45,6 +45,9 @@ private:
    //Group ID array
    ENUM_T_GROUP_ID   m_arr_GroupID[];
 
+   //Sum of NP for every group (23-Groups Count))
+   double            m_arr_SUM_NP_GROUP[][23];
+
    //Statistics T count inside each group
    uint              m_arr_T_Count_in_GRP[];
 
@@ -56,6 +59,12 @@ private:
 
    //MiniTR Count
    int               m_MiniTrCount(void);
+
+   //Calculate miniTR(232) by Num                    
+   double            m_Calc_miniTR(ENUM_miniTR_ID const &mini,const int &t_num);
+
+   //Find Best miniTR
+   void              m_FindBest_miniTR();
 
    //Calculation miniTR(232)
    double            m_Abs_Cmpd4_Max_pmm(const int &T_NUM);
@@ -78,8 +87,8 @@ public:
    //Import miniTR params and RTNP from files
    int               ImportMiniTRParams(const string &Pair,const string &_FName);
 
-   //Calculate miniTR(232) by Num                    
-   double            Calc_miniTR(ENUM_miniTR_ID const &mini,const int &t_num);
+   //Process all miniTRs
+   void              Process_miniTR();
 
   };
 //CONSTRUCTOR  
@@ -115,7 +124,7 @@ bool miniTR::Init(void)
 //+------------------------------------------------------------------+
 //| Calculate miniTR (227 items)                                     |
 //+------------------------------------------------------------------+
-double miniTR::Calc_miniTR(ENUM_miniTR_ID const &mini,const int &t_num)
+double miniTR::m_Calc_miniTR(ENUM_miniTR_ID const &mini,const int &t_num)
   {
    switch(mini)
      {
@@ -694,3 +703,73 @@ void miniTR::m_Check_GroupID()
 
    Print("Check Group Complete.");
   }//END OF Check Group
+//+------------------------------------------------------------------+
+//| Process all miniTRs of a Groups                                  |
+//+------------------------------------------------------------------+
+void miniTR::Process_miniTR()
+  {
+//Start speed measuring
+   uint Start_measure=GetTickCount();
+
+//Result   
+   int res=0;
+   int ArrSize=ArraySize(m_arr_GroupID);
+
+//   ArrayFree(arr_SUM_NP_GROUP);
+
+//Set 0 dimension size to Count of Functions Like MinAB
+   ArrayResize(m_arr_SUM_NP_GROUP,m_minitr_count);
+
+//Always Fill IT!!! Before +=
+   ArrayFill(m_arr_SUM_NP_GROUP,0,ArraySize(m_arr_SUM_NP_GROUP),0);
+
+//Cycle by each T interval for every miniTR (T Count - imported from file)
+   for(int t=0;t<ArrSize;t++)
+     {
+      for(ENUM_miniTR_ID mini=0;mini<m_minitr_count;mini++)
+        {
+         // x - row(227);y - column(23)
+         // Sum NP By Group & miniTR#
+         m_arr_SUM_NP_GROUP[mini][m_arr_GroupID[t]]+=Calc_miniTR(mini,t);
+        }//END OF FOR mini
+     }//END OF FOR t
+
+//Stop speed measuring
+   uint Stop_measuring=GetTickCount()-Start_measure;
+   Print("Processing complete in "+(string)Stop_measuring+" ms");//, Items Count: "+(string)i);
+                                                                 //
+//Find Best miniTR
+   m_FindBest_miniTR();
+  }
+//+------------------------------------------------------------------+
+//| Find Best miniTR for every group                                 |
+//+------------------------------------------------------------------+
+void miniTR::m_FindBest_miniTR()
+  {
+//MiniTRs Count
+   int miniTRCount=GetSizeOf_miniTR_Enum();
+
+   double MaximumNP=-9999999999999;
+
+//Find Best miniTR in each Group  
+   for(int j=0;j<GroupsCount;j++)
+     {
+      //Clear Maximum
+      MaximumNP=0;
+
+      for(int i=0;i<miniTRCount;i++)
+        {
+         if(arr_SUM_NP_GROUP[i][j]>MaximumNP)
+           {
+            //Save Maximum NP
+            MaximumNP=arr_SUM_NP_GROUP[i][j];
+
+            //Save miniTR Index & Best NP for this GroupID
+            arr_minitr[j].minitr=i;
+            arr_minitr[j].BestNP=MaximumNP;
+           }
+        }//END OF i-miniTRs Count (4+)
+     }//END OF J-GROUPS(23)
+   Alert("Find best miniTR Complete.");
+  }
+//+------------------------------------------------------------------+
