@@ -70,12 +70,236 @@ private:
    void              m_FindBest_miniTR();
 
    //Calculation miniTRs:::
-   double            m_MinAB(const int &T_NUM);
-   double            m_MaxAB(const int &T_NUM);
-
-   //Calculation miniTR(232)
-   double            m_Abs_Cmpd4_Max_pmm(const int &T_NUM);
-
+   double            m_Min_AB(const int &T_NUM);                    //2 Simple double m_Min 
+   double            m_Max_AB(const int &T_NUM);                    //3 Simple double m_Max 
+   double            m_Abs_Min_AB(const int &T_NUM);
+   double            m_Abs_Max_AB(const int &T_NUM);
+   double            m_Min_fAB(const int &T_NUM);
+   double            m_Max_fAB(const int &T_NUM);
+   double            m_Abs_Min_fAB(const int &T_NUM);
+   double            m_Abs_Max_fAB(const int &T_NUM);                //10
+   double            m_Min_f1AB(const int &T_NUM);
+   double            m_Max_f1AB(const int &T_NUM);
+   double            m_Abs_Min_f1AB(const int &T_NUM);
+   double            m_Abs_Max_f1AB(const int &T_NUM);
+   double            m_Min_BetaAB(const int &T_NUM);
+   double            m_Max_BetaAB(const int &T_NUM);
+   double            m_Abs_Min_BetaAB(const int &T_NUM);
+   double            m_Abs_Max_BetaAB(const int &T_NUM);
+   double            m_Min_GammaAB(const int &T_NUM);
+   double            m_Max_GammaAB(const int &T_NUM);
+   double            m_Abs_Min_GammaAB(const int &T_NUM);
+   double            m_Abs_Max_GammaAB(const int &T_NUM);
+   //NotTrade  23 Not Trade
+   double            m_Equal_dQ1Q4_C1(const int &T_NUM);
+   double            m_Equal_dQ1Q4_C4(const int &T_NUM);
+   double            m_Equal_dQ1Q4_C14(const int &T_NUM);                 //26
+   double            m_Equal_dQ1Q4_MinAB(const int &T_NUM);
+   double            m_Equal_dQ1Q4_MaxAB(const int &T_NUM);
+   double            m_Zero_dQ1Q4_C1(const int &T_NUM);
+   double            m_Zero_dQ1Q4_C4(const int &T_NUM);
+   double            m_Zero_dQ1Q4_C14(const int &T_NUM);                  //31
+   double            m_Zero_dQ1Q4_MinAB(const int &T_NUM);
+   double            m_Zero_dQ1Q4_MaxAB(const int &T_NUM);
+   double            m_Equal_AB_C1(const int &T_NUM);
+   double            m_Equal_AB_C4(const int &T_NUM);
+   double            m_Equal_AB_C14(const int &T_NUM);                    //36
+   double            m_Equal_AB_MinAB(const int &T_NUM);
+   double            m_Equal_AB_MaxAB(const int &T_NUM);
+   double            m_Zero_AmB_C1(const int &T_NUM);                     //39 A*B==0 C1
+   double            m_Zero_AmB_C4(const int &T_NUM);                     //40 A*B==0 C4
+   double            m_Zero_AmB_C14(const int &T_NUM);                    //41 A*B==0 C14
+   double            m_Zero_AmB_MinAB(const int &T_NUM);                  //42 A*B==0 double m_MinAB
+   double            m_Zero_AmB_MaxAB(const int &T_NUM);                  //43 A*B==0 double m_MaxAB
+   double            m_Cmpd2_Min_FF1(const int &T_NUM);
+   double            m_Cmpd2_Max_FF1(const int &T_NUM);
+   double            m_Abs_Cmpd2_Min_FF1(const int &T_NUM);
+   double            m_Abs_Cmpd2_Max_FF1(const int &T_NUM);
+   double            m_Cmpd2_Min_FBeta(const int &T_NUM);
+   double            m_Cmpd2_Max_FBeta(const int &T_NUM);
+   double            m_Abs_Cmpd2_Min_FBeta(const int &T_NUM);
+   double            m_Abs_Cmpd2_Max_FBeta(const int &T_NUM);
+   double            m_Cmpd2_Min_FGamma(const int &T_NUM);
+   double            m_Cmpd2_Max_FGamma(const int &T_NUM);
+   double            m_Abs_Cmpd2_Min_FGamma(const int &T_NUM);
+   double            m_Abs_Cmpd2_Max_FGamma(const int &T_NUM);
+   double            m_Cmpd2_Min_F1Beta(const int &T_NUM);
+   double            m_Cmpd2_Max_F1Beta(const int &T_NUM);
+   double            m_Abs_Cmpd2_Min_F1Beta(const int &T_NUM);
+   double            m_Abs_Cmpd2_Max_F1Beta(const int &T_NUM);
+   double            m_Cmpd2_Min_F1Gamma(const int &T_NUM);
+   double            m_Cmpd2_Max_F1Gamma(const int &T_NUM);
+   double            m_Abs_Cmpd2_Min_F1Gamma(const int &T_NUM);
+   double            m_Abs_Cmpd2_Max_F1Gamma(const int &T_NUM);
+   double            m_Cmpd2_Min_BetaGamma(const int &T_NUM);
+   double            m_Cmpd2_Max_BetaGamma(const int &T_NUM);
+   double            m_Abs_Cmpd2_Min_BetaGamma(const int &T_NUM);
+   double            m_Abs_Cmpd2_Max_BetaGamma(const int &T_NUM);// 67 Last compound 2 (*)
+   double            m_Cmpd2_Min_FF1_plus(const int &T_NUM);
+   double            m_Cmpd2_Max_FF1_plus(const int &T_NUM);
+   double            m_Abs_Cmpd2_Min_FF1_plus(const int &T_NUM);
+   double            m_Abs_Cmpd2_Max_FF1_plus(const int &T_NUM);
+   double            m_Cmpd2_Min_FBeta_plus(const int &T_NUM);
+   double            m_Cmpd2_Max_FBeta_plus(const int &T_NUM);
+   double            m_Abs_Cmpd2_Min_FBeta_plus(const int &T_NUM);
+   double            m_Abs_Cmpd2_Max_FBeta_plus(const int &T_NUM);
+   double            m_Cmpd2_Min_FGamma_plus(const int &T_NUM);
+   double            m_Cmpd2_Max_FGamma_plus(const int &T_NUM);
+   double            m_Abs_Cmpd2_Min_FGamma_plus(const int &T_NUM);
+   double            m_Abs_Cmpd2_Max_FGamma_plus(const int &T_NUM);
+   double            m_Cmpd2_Min_F1Beta_plus(const int &T_NUM);
+   double            m_Cmpd2_Max_F1Beta_plus(const int &T_NUM);
+   double            m_Abs_Cmpd2_Min_F1Beta_plus(const int &T_NUM);
+   double            m_Abs_Cmpd2_Max_F1Beta_plus(const int &T_NUM);
+   double            m_Cmpd2_Min_F1Gamma_plus(const int &T_NUM);
+   double            m_Cmpd2_Max_F1Gamma_plus(const int &T_NUM);
+   double            m_Abs_Cmpd2_Min_F1Gamma_plus(const int &T_NUM);
+   double            m_Abs_Cmpd2_Max_F1Gamma_plus(const int &T_NUM);
+   double            m_Cmpd2_Min_BetaGamma_plus(const int &T_NUM);
+   double            m_Cmpd2_Max_BetaGamma_plus(const int &T_NUM);
+   double            m_Abs_Cmpd2_Min_BetaGamma_plus(const int &T_NUM);
+   double            m_Abs_Cmpd2_Max_BetaGamma_plus(const int &T_NUM);// 91 Last Compound 2 (+)
+   double            m_Cmpd2_Min_FF1_minus(const int &T_NUM);
+   double            m_Cmpd2_Max_FF1_minus(const int &T_NUM);
+   double            m_Abs_Cmpd2_Min_FF1_minus(const int &T_NUM);
+   double            m_Abs_Cmpd2_Max_FF1_minus(const int &T_NUM);
+   double            m_Cmpd2_Min_FBeta_minus(const int &T_NUM);
+   double            m_Cmpd2_Max_FBeta_minus(const int &T_NUM);
+   double            m_Abs_Cmpd2_Min_FBeta_minus(const int &T_NUM);
+   double            m_Abs_Cmpd2_Max_FBeta_minus(const int &T_NUM);
+   double            m_Cmpd2_Min_FGamma_minus(const int &T_NUM);
+   double            m_Cmpd2_Max_FGamma_minus(const int &T_NUM);
+   double            m_Abs_Cmpd2_Min_FGamma_minus(const int &T_NUM);
+   double            m_Abs_Cmpd2_Max_FGamma_minus(const int &T_NUM);
+   double            m_Cmpd2_Min_F1Beta_minus(const int &T_NUM);
+   double            m_Cmpd2_Max_F1Beta_minus(const int &T_NUM);
+   double            m_Abs_Cmpd2_Min_F1Beta_minus(const int &T_NUM);
+   double            m_Abs_Cmpd2_Max_F1Beta_minus(const int &T_NUM);
+   double            m_Cmpd2_Min_F1Gamma_minus(const int &T_NUM);
+   double            m_Cmpd2_Max_F1Gamma_minus(const int &T_NUM);
+   double            m_Abs_Cmpd2_Min_F1Gamma_minus(const int &T_NUM);
+   double            m_Abs_Cmpd2_Max_F1Gamma_minus(const int &T_NUM);
+   double            m_Cmpd2_Min_BetaGamma_minus(const int &T_NUM);
+   double            m_Cmpd2_Max_BetaGamma_minus(const int &T_NUM);
+   double            m_Abs_Cmpd2_Min_BetaGamma_minus(const int &T_NUM);
+   double            m_Abs_Cmpd2_Max_BetaGamma_minus(const int &T_NUM);// 115 Last Compound 2 (-)
+   double            m_Cmpd3_Min_FF1Beta(const int &T_NUM);
+   double            m_Cmpd3_Max_FF1Beta(const int &T_NUM);
+   double            m_Abs_Cmpd3_Min_FF1Beta(const int &T_NUM);
+   double            m_Abs_Cmpd3_Max_FF1Beta(const int &T_NUM);
+   double            m_Cmpd3_Min_FF1Gamma(const int &T_NUM);
+   double            m_Cmpd3_Max_FF1Gamma(const int &T_NUM);
+   double            m_Abs_Cmpd3_Min_FF1Gamma(const int &T_NUM);
+   double            m_Abs_Cmpd3_Max_FF1Gamma(const int &T_NUM);
+   double            m_Cmpd3_Min_FBetaGamma(const int &T_NUM);
+   double            m_Cmpd3_Max_FBetaGamma(const int &T_NUM);
+   double            m_Abs_Cmpd3_Min_FBetaGamma(const int &T_NUM);
+   double            m_Abs_Cmpd3_Max_FBetaGamma(const int &T_NUM);
+   double            m_Cmpd3_Min_F1BetaGamma(const int &T_NUM);
+   double            m_Cmpd3_Max_F1BetaGamma(const int &T_NUM);
+   double            m_Abs_Cmpd3_Min_F1BetaGamma(const int &T_NUM);
+   double            m_Abs_Cmpd3_Max_F1BetaGamma(const int &T_NUM);//131 last Compound 3 (*)
+   double            m_Cmpd3_Min_FF1Beta_pp(const int &T_NUM);
+   double            m_Cmpd3_Max_FF1Beta_pp(const int &T_NUM);
+   double            m_Abs_Cmpd3_Min_FF1Beta_pp(const int &T_NUM);
+   double            m_Abs_Cmpd3_Max_FF1Beta_pp(const int &T_NUM);
+   double            m_Cmpd3_Min_FF1Gamma_pp(const int &T_NUM);
+   double            m_Cmpd3_Max_FF1Gamma_pp(const int &T_NUM);
+   double            m_Abs_Cmpd3_Min_FF1Gamma_pp(const int &T_NUM);
+   double            m_Abs_Cmpd3_Max_FF1Gamma_pp(const int &T_NUM);
+   double            m_Cmpd3_Min_FBetaGamma_pp(const int &T_NUM);
+   double            m_Cmpd3_Max_FBetaGamma_pp(const int &T_NUM);
+   double            m_Abs_Cmpd3_Min_FBetaGamma_pp(const int &T_NUM);
+   double            m_Abs_Cmpd3_Max_FBetaGamma_pp(const int &T_NUM);
+   double            m_Cmpd3_Min_F1BetaGamma_pp(const int &T_NUM);
+   double            m_Cmpd3_Max_F1BetaGamma_pp(const int &T_NUM);
+   double            m_Abs_Cmpd3_Min_F1BetaGamma_pp(const int &T_NUM);
+   double            m_Abs_Cmpd3_Max_F1BetaGamma_pp(const int &T_NUM);//147 last Compound 3 (++)
+   double            m_Cmpd3_Min_FF1Beta_pm(const int &T_NUM);
+   double            m_Cmpd3_Max_FF1Beta_pm(const int &T_NUM);
+   double            m_Abs_Cmpd3_Min_FF1Beta_pm(const int &T_NUM);
+   double            m_Abs_Cmpd3_Max_FF1Beta_pm(const int &T_NUM);
+   double            m_Cmpd3_Min_FF1Gamma_pm(const int &T_NUM);
+   double            m_Cmpd3_Max_FF1Gamma_pm(const int &T_NUM);
+   double            m_Abs_Cmpd3_Min_FF1Gamma_pm(const int &T_NUM);
+   double            m_Abs_Cmpd3_Max_FF1Gamma_pm(const int &T_NUM);
+   double            m_Cmpd3_Min_FBetaGamma_pm(const int &T_NUM);
+   double            m_Cmpd3_Max_FBetaGamma_pm(const int &T_NUM);
+   double            m_Abs_Cmpd3_Min_FBetaGamma_pm(const int &T_NUM);
+   double            m_Abs_Cmpd3_Max_FBetaGamma_pm(const int &T_NUM);
+   double            m_Cmpd3_Min_F1BetaGamma_pm(const int &T_NUM);
+   double            m_Cmpd3_Max_F1BetaGamma_pm(const int &T_NUM);
+   double            m_Abs_Cmpd3_Min_F1BetaGamma_pm(const int &T_NUM);
+   double            m_Abs_Cmpd3_Max_F1BetaGamma_pm(const int &T_NUM);//163 last Compound 3 (+-)
+   double            m_Cmpd3_Min_FF1Beta_mp(const int &T_NUM);
+   double            m_Cmpd3_Max_FF1Beta_mp(const int &T_NUM);
+   double            m_Abs_Cmpd3_Min_FF1Beta_mp(const int &T_NUM);
+   double            m_Abs_Cmpd3_Max_FF1Beta_mp(const int &T_NUM);
+   double            m_Cmpd3_Min_FF1Gamma_mp(const int &T_NUM);
+   double            m_Cmpd3_Max_FF1Gamma_mp(const int &T_NUM);
+   double            m_Abs_Cmpd3_Min_FF1Gamma_mp(const int &T_NUM);
+   double            m_Abs_Cmpd3_Max_FF1Gamma_mp(const int &T_NUM);
+   double            m_Cmpd3_Min_FBetaGamma_mp(const int &T_NUM);
+   double            m_Cmpd3_Max_FBetaGamma_mp(const int &T_NUM);
+   double            m_Abs_Cmpd3_Min_FBetaGamma_mp(const int &T_NUM);
+   double            m_Abs_Cmpd3_Max_FBetaGamma_mp(const int &T_NUM);
+   double            m_Cmpd3_Min_F1BetaGamma_mp(const int &T_NUM);
+   double            m_Cmpd3_Max_F1BetaGamma_mp(const int &T_NUM);
+   double            m_Abs_Cmpd3_Min_F1BetaGamma_mp(const int &T_NUM);
+   double            m_Abs_Cmpd3_Max_F1BetaGamma_mp(const int &T_NUM);//179 last Compound 3 (-+)
+   double            m_Cmpd3_Min_FF1Beta_mm(const int &T_NUM);
+   double            m_Cmpd3_Max_FF1Beta_mm(const int &T_NUM);
+   double            m_Abs_Cmpd3_Min_FF1Beta_mm(const int &T_NUM);
+   double            m_Abs_Cmpd3_Max_FF1Beta_mm(const int &T_NUM);
+   double            m_Cmpd3_Min_FF1Gamma_mm(const int &T_NUM);
+   double            m_Cmpd3_Max_FF1Gamma_mm(const int &T_NUM);
+   double            m_Abs_Cmpd3_Min_FF1Gamma_mm(const int &T_NUM);
+   double            m_Abs_Cmpd3_Max_FF1Gamma_mm(const int &T_NUM);
+   double            m_Cmpd3_Min_FBetaGamma_mm(const int &T_NUM);
+   double            m_Cmpd3_Max_FBetaGamma_mm(const int &T_NUM);
+   double            m_Abs_Cmpd3_Min_FBetaGamma_mm(const int &T_NUM);
+   double            m_Abs_Cmpd3_Max_FBetaGamma_mm(const int &T_NUM);
+   double            m_Cmpd3_Min_F1BetaGamma_mm(const int &T_NUM);
+   double            m_Cmpd3_Max_F1BetaGamma_mm(const int &T_NUM);
+   double            m_Abs_Cmpd3_Min_F1BetaGamma_mm(const int &T_NUM);
+   double            m_Abs_Cmpd3_Max_F1BetaGamma_mm(const int &T_NUM);//195 last Compound 3 (--)
+   double            m_Cmpd4_Min(const int &T_NUM);
+   double            m_Cmpd4_Max(const int &T_NUM);
+   double            m_Abs_Cmpd4_Min(const int &T_NUM);
+   double            m_Abs_Cmpd4_Max(const int &T_NUM);// Last Compound 4(*)
+   double            m_Cmpd4_Min_ppp(const int &T_NUM);
+   double            m_Cmpd4_Max_ppp(const int &T_NUM);
+   double            m_Abs_Cmpd4_Min_ppp(const int &T_NUM);
+   double            m_Abs_Cmpd4_Max_ppp(const int &T_NUM);// 203 Last Compound 4(+++)
+   double            m_Cmpd4_Min_ppm(const int &T_NUM);
+   double            m_Cmpd4_Max_ppm(const int &T_NUM);
+   double            m_Abs_Cmpd4_Min_ppm(const int &T_NUM);
+   double            m_Abs_Cmpd4_Max_ppm(const int &T_NUM);// Last Compound 4(++-)
+   double            m_Cmpd4_Min_pmp(const int &T_NUM);
+   double            m_Cmpd4_Max_pmp(const int &T_NUM);
+   double            m_Abs_Cmpd4_Min_pmp(const int &T_NUM);
+   double            m_Abs_Cmpd4_Max_pmp(const int &T_NUM);// 211 Last Compound 4 (+-+)
+   double            m_Cmpd4_Min_mpp(const int &T_NUM);
+   double            m_Cmpd4_Max_mpp(const int &T_NUM);
+   double            m_Abs_Cmpd4_Min_mpp(const int &T_NUM);
+   double            m_Abs_Cmpd4_Max_mpp(const int &T_NUM);// Last Compound 4 (-++)
+   double            m_Cmpd4_Min_mmm(const int &T_NUM);
+   double            m_Cmpd4_Max_mmm(const int &T_NUM);
+   double            m_Abs_Cmpd4_Min_mmm(const int &T_NUM);
+   double            m_Abs_Cmpd4_Max_mmm(const int &T_NUM);// 219 Last Compound 4 (---)
+   double            m_Cmpd4_Min_mmp(const int &T_NUM);
+   double            m_Cmpd4_Max_mmp(const int &T_NUM);
+   double            m_Abs_Cmpd4_Min_mmp(const int &T_NUM);
+   double            m_Abs_Cmpd4_Max_mmp(const int &T_NUM);// Last Compound 4 (--+)
+   double            m_Cmpd4_Min_mpm(const int &T_NUM);
+   double            m_Cmpd4_Max_mpm(const int &T_NUM);
+   double            m_Abs_Cmpd4_Min_mpm(const int &T_NUM);
+   double            m_Abs_Cmpd4_Max_mpm(const int &T_NUM);// 227 Last Compound 4 (-+-)
+   double            m_Cmpd4_Min_pmm(const int &T_NUM);
+   double            m_Cmpd4_Max_pmm(const int &T_NUM);
+   double            m_Abs_Cmpd4_Min_pmm(const int &T_NUM);
+   double            m_Abs_Cmpd4_Max_pmm(const int &T_NUM);// Last Compound 4 (+--)
+                                                           //VirtualLast 232 N don`t usebale
 public:
                      miniTR(void);
                     ~miniTR(void);
@@ -193,235 +417,235 @@ double miniTR::m_Calc_miniTR(ENUM_miniTR_ID const &mini,const int &t_num)
      {
       case  C1:return(0);break;//arr_rNP1[t_num].NP1_RT); break;
       case  C4:return(0);break;//(arr_rNP4[t_num].NP4_RT); break;
-      case  Min_AB:return(MinAB(t_num)); break;
-      case  Max_AB:return(MaxAB(t_num)); break;
+      case  Min_AB:return(m_Min_AB(t_num)); break;
+      case  Max_AB:return(m_Max_AB(t_num)); break;
       case  C14:return(0); break;                              // we have not NP14_RT!!!!
-      case  Abs_Min_AB:return(Abs_Min_AB(t_num)); break;
-      case  Abs_Max_AB:return(Abs_Max_AB(t_num)); break;                   //6
-      case  Min_fAB:return(Min_fAB(t_num)); break;
-      case  Max_fAB:return(Max_fAB(t_num)); break;
-      case  Abs_Min_fAB:return(Abs_Min_fAB(t_num)); break;
-      case  Abs_Max_fAB:return(Abs_Max_fAB(t_num)); break;
-      case  Min_f1AB:return(Min_f1AB(t_num)); break;
-      case  Max_f1AB:return(Max_f1AB(t_num)); break;
-      case  Abs_Min_f1AB:return(Abs_Min_f1AB(t_num)); break;
-      case  Abs_Max_f1AB:return(Abs_Max_f1AB(t_num)); break;
-      case  Min_betaAB:return(Min_BetaAB(t_num)); break;
-      case  Max_betaAB:return(Max_BetaAB(t_num)); break;
-      case  Abs_Min_betaAB:return(Abs_Min_BetaAB(t_num)); break;
-      case  Abs_Max_betaAB:return(Abs_Max_BetaAB(t_num)); break;
-      case  Min_gammaAB:return(Min_GammaAB(t_num)); break;
-      case  Max_gammaAB:return(Max_GammaAB(t_num)); break;
-      case  Abs_Min_gammaAB:return(Abs_Min_GammaAB(t_num)); break;
-      case  Abs_Max_gammaAB:return(Abs_Max_GammaAB(t_num)); break;
+      case  Abs_Min_AB:return(m_Abs_Min_AB(t_num)); break;
+      case  Abs_Max_AB:return(m_Abs_Max_AB(t_num)); break;                   //6
+      case  Min_fAB:return(m_Min_fAB(t_num)); break;
+      case  Max_fAB:return(m_Max_fAB(t_num)); break;
+      case  Abs_Min_fAB:return(m_Abs_Min_fAB(t_num)); break;
+      case  Abs_Max_fAB:return(m_Abs_Max_fAB(t_num)); break;
+      case  Min_f1AB:return(m_Min_f1AB(t_num)); break;
+      case  Max_f1AB:return(m_Max_f1AB(t_num)); break;
+      case  Abs_Min_f1AB:return(m_Abs_Min_f1AB(t_num)); break;
+      case  Abs_Max_f1AB:return(m_Abs_Max_f1AB(t_num)); break;
+      case  Min_BetaAB:return(m_Min_BetaAB(t_num)); break;
+      case  Max_BetaAB:return(m_Max_BetaAB(t_num)); break;
+      case  Abs_Min_BetaAB:return(m_Abs_Min_BetaAB(t_num)); break;
+      case  Abs_Max_BetaAB:return(m_Abs_Max_BetaAB(t_num)); break;
+      case  Min_GammaAB:return(m_Min_GammaAB(t_num)); break;
+      case  Max_GammaAB:return(m_Max_GammaAB(t_num)); break;
+      case  Abs_Min_GammaAB:return(m_Abs_Min_GammaAB(t_num)); break;
+      case  Abs_Max_GammaAB:return(m_Abs_Max_GammaAB(t_num)); break;
       case  NotTrade:return(0);break;                                      //23
-      case  Equal_dQ1Q4_C1:return(Equal_dQ1Q4_C1(t_num));break;
-      case  Equal_dQ1Q4_C4:return(Equal_dQ1Q4_C4(t_num));break;
+      case  Equal_dQ1Q4_C1:return(m_Equal_dQ1Q4_C1(t_num));break;
+      case  Equal_dQ1Q4_C4:return(m_Equal_dQ1Q4_C4(t_num));break;
       case  Equal_dQ1Q4_C14:return(0); break;
-      case  Equal_dQ1Q4_MinAB:return(Equal_dQ1Q4_MinAB(t_num));break;
-      case  Equal_dQ1Q4_MaxAB:return(Equal_dQ1Q4_MaxAB(t_num));break;
-      case  Zero_dQ1Q4_C1:return(Zero_dQ1Q4_C1(t_num));break;
-      case  Zero_dQ1Q4_C4:return(Zero_dQ1Q4_C4(t_num));break;
+      case  Equal_dQ1Q4_MinAB:return(m_Equal_dQ1Q4_MinAB(t_num));break;
+      case  Equal_dQ1Q4_MaxAB:return(m_Equal_dQ1Q4_MaxAB(t_num));break;
+      case  Zero_dQ1Q4_C1:return(m_Zero_dQ1Q4_C1(t_num));break;
+      case  Zero_dQ1Q4_C4:return(m_Zero_dQ1Q4_C4(t_num));break;
       case  Zero_dQ1Q4_C14:return(0);
-      case  Zero_dQ1Q4_MinAB:return(Zero_dQ1Q4_MinAB(t_num)); break;
-      case  Zero_dQ1Q4_MaxAB:return(Zero_dQ1Q4_MaxAB(t_num)); break;
-      case  Equal_AB_C1:return(Equal_AB_C1(t_num)); break;
-      case  Equal_AB_C4:return(Equal_AB_C4(t_num)); break;
+      case  Zero_dQ1Q4_MinAB:return(m_Zero_dQ1Q4_MinAB(t_num)); break;
+      case  Zero_dQ1Q4_MaxAB:return(m_Zero_dQ1Q4_MaxAB(t_num)); break;
+      case  Equal_AB_C1:return(m_Equal_AB_C1(t_num)); break;
+      case  Equal_AB_C4:return(m_Equal_AB_C4(t_num)); break;
       case  Equal_AB_C14:return(0); break;
-      case  Equal_AB_MinAB:return(Equal_AB_MinAB(t_num)); break;
-      case  Equal_AB_MaxAB:return(Equal_AB_MaxAB(t_num)); break;
-      case  Zero_AmB_C1:return(Zero_AmB_C1(t_num)); break;
-      case  Zero_AmB_C4:return(Zero_AmB_C4(t_num)); break;
+      case  Equal_AB_MinAB:return(m_Equal_AB_MinAB(t_num)); break;
+      case  Equal_AB_MaxAB:return(m_Equal_AB_MaxAB(t_num)); break;
+      case  Zero_AmB_C1:return(m_Zero_AmB_C1(t_num)); break;
+      case  Zero_AmB_C4:return(m_Zero_AmB_C4(t_num)); break;
       case  Zero_AmB_C14:return(0);break;
-      case  Zero_AmB_MinAB:return(Zero_AmB_MinAB(t_num)); break;
-      case  Zero_AmB_MaxAB:return(Zero_AmB_MaxAB(t_num)); break;           //43
-      case  Cmpd2_Min_FF1:return(Cmpd2_Min_FF1(t_num)); break;
-      case  Cmpd2_Max_FF1:return(Cmpd2_Max_FF1(t_num)); break;
-      case  Abs_Cmpd2_Min_FF1:return(Abs_Cmpd2_Min_FF1(t_num)); break;
-      case  Abs_Cmpd2_Max_FF1:return(Abs_Cmpd2_Max_FF1(t_num)); break;
-      case  Cmpd2_Min_FBeta:return(Cmpd2_Min_FBeta(t_num)); break;
-      case  Cmpd2_Max_FBeta:return(Cmpd2_Max_FBeta(t_num)); break;
-      case  Abs_Cmpd2_Min_FBeta:return(Abs_Cmpd2_Min_FBeta(t_num)); break;
-      case  Abs_Cmpd2_Max_FBeta:return(Abs_Cmpd2_Max_FBeta(t_num)); break;
-      case  Cmpd2_Min_FGamma:return(Cmpd2_Min_FGamma(t_num)); break;
-      case  Cmpd2_Max_FGamma:return(Cmpd2_Max_FGamma(t_num)); break;
-      case  Abs_Cmpd2_Min_FGamma:return(Abs_Cmpd2_Min_FGamma(t_num)); break;
-      case  Abs_Cmpd2_Max_FGamma:return(Abs_Cmpd2_Max_FGamma(t_num)); break;
-      case  Cmpd2_Min_F1Beta:return(Cmpd2_Min_F1Beta(t_num)); break;
-      case  Cmpd2_Max_F1Beta:return(Cmpd2_Max_F1Beta(t_num)); break;
-      case  Abs_Cmpd2_Min_F1Beta:return(Abs_Cmpd2_Min_F1Beta(t_num)); break;
-      case  Abs_Cmpd2_Max_F1Beta:return(Abs_Cmpd2_Max_F1Beta(t_num)); break;
-      case  Cmpd2_Min_F1Gamma:return(Cmpd2_Min_F1Gamma(t_num)); break;
-      case  Cmpd2_Max_F1Gamma:return(Cmpd2_Max_F1Gamma(t_num)); break;
-      case  Abs_Cmpd2_Min_F1Gamma:return(Abs_Cmpd2_Min_F1Gamma(t_num)); break;
-      case  Abs_Cmpd2_Max_F1Gamma:return(Abs_Cmpd2_Max_F1Gamma(t_num)); break;
-      case  Cmpd2_Min_BetaGamma:return(Cmpd2_Min_BetaGamma(t_num)); break;
-      case  Cmpd2_Max_BetaGamma:return(Cmpd2_Max_BetaGamma(t_num)); break;
-      case  Abs_Cmpd2_Min_BetaGamma:return(Abs_Cmpd2_Min_BetaGamma(t_num)); break;
-      case  Abs_Cmpd2_Max_BetaGamma:return(Abs_Cmpd2_Max_BetaGamma(t_num)); break;  //67
-      case  Cmpd2_Min_FF1_plus:return(Cmpd2_Min_FF1_plus(t_num)); break;
-      case  Cmpd2_Max_FF1_plus:return(Cmpd2_Max_FF1_plus(t_num)); break;
-      case  Abs_Cmpd2_Min_FF1_plus:return(Abs_Cmpd2_Min_FF1_plus(t_num)); break;
-      case  Abs_Cmpd2_Max_FF1_plus:return(Abs_Cmpd2_Max_FF1_plus(t_num)); break;
-      case  Cmpd2_Min_FBeta_plus:return(Cmpd2_Min_FBeta_plus(t_num)); break;
-      case  Cmpd2_Max_FBeta_plus:return(Cmpd2_Max_FBeta_plus(t_num)); break;
-      case  Abs_Cmpd2_Min_FBeta_plus:return(Abs_Cmpd2_Min_FBeta_plus(t_num)); break;
-      case  Abs_Cmpd2_Max_FBeta_plus:return(Abs_Cmpd2_Max_FBeta_plus(t_num)); break;
-      case  Cmpd2_Min_FGamma_plus:return(Cmpd2_Min_FGamma_plus(t_num)); break;
-      case  Cmpd2_Max_FGamma_plus:return(Cmpd2_Max_FGamma_plus(t_num)); break;
-      case  Abs_Cmpd2_Min_FGamma_plus:return(Abs_Cmpd2_Min_FGamma_plus(t_num)); break;
-      case  Abs_Cmpd2_Max_FGamma_plus:return(Abs_Cmpd2_Max_FGamma_plus(t_num)); break;
-      case  Cmpd2_Min_F1Beta_plus:return(Cmpd2_Min_F1Beta_plus(t_num)); break;
-      case  Cmpd2_Max_F1Beta_plus:return(Cmpd2_Max_F1Beta_plus(t_num)); break;
-      case  Abs_Cmpd2_Min_F1Beta_plus:return(Abs_Cmpd2_Min_F1Beta_plus(t_num)); break;
-      case  Abs_Cmpd2_Max_F1Beta_plus:return(Abs_Cmpd2_Max_F1Beta_plus(t_num)); break;
-      case  Cmpd2_Min_F1Gamma_plus:return(Cmpd2_Min_F1Gamma_plus(t_num)); break;
-      case  Cmpd2_Max_F1Gamma_plus:return(Cmpd2_Max_F1Gamma_plus(t_num)); break;
-      case  Abs_Cmpd2_Min_F1Gamma_plus:return(Abs_Cmpd2_Min_F1Gamma_plus(t_num)); break;
-      case  Abs_Cmpd2_Max_F1Gamma_plus:return(Abs_Cmpd2_Max_F1Gamma_plus(t_num)); break;
-      case  Cmpd2_Min_BetaGamma_plus:return(Cmpd2_Min_BetaGamma_plus(t_num)); break;
-      case  Cmpd2_Max_BetaGamma_plus:return(Cmpd2_Max_BetaGamma_plus(t_num)); break;
-      case  Abs_Cmpd2_Min_BetaGamma_plus:return(Abs_Cmpd2_Min_BetaGamma_plus(t_num)); break;
-      case  Abs_Cmpd2_Max_BetaGamma_plus:return(Abs_Cmpd2_Max_BetaGamma_plus(t_num)); break;  //91
-      case  Cmpd2_Min_FF1_minus:return(Cmpd2_Min_FF1_minus(t_num)); break;
-      case  Cmpd2_Max_FF1_minus:return(Cmpd2_Max_FF1_minus(t_num)); break;
-      case  Abs_Cmpd2_Min_FF1_minus:return(Abs_Cmpd2_Min_FF1_minus(t_num)); break;
-      case  Abs_Cmpd2_Max_FF1_minus:return(Abs_Cmpd2_Max_FF1_minus(t_num)); break;
-      case  Cmpd2_Min_FBeta_minus:return(Cmpd2_Min_FBeta_minus(t_num)); break;
-      case  Cmpd2_Max_FBeta_minus:return(Cmpd2_Max_FBeta_minus(t_num)); break;
-      case  Abs_Cmpd2_Min_FBeta_minus:return(Abs_Cmpd2_Min_FBeta_minus(t_num)); break;
-      case  Abs_Cmpd2_Max_FBeta_minus:return(Abs_Cmpd2_Max_FBeta_minus(t_num)); break;
-      case  Cmpd2_Min_FGamma_minus:return(Cmpd2_Min_FGamma_minus(t_num)); break;
-      case  Cmpd2_Max_FGamma_minus:return(Cmpd2_Max_FGamma_minus(t_num)); break;
-      case  Abs_Cmpd2_Min_FGamma_minus:return(Abs_Cmpd2_Min_FGamma_minus(t_num)); break;
-      case  Abs_Cmpd2_Max_FGamma_minus:return(Abs_Cmpd2_Max_FGamma_minus(t_num)); break;
-      case  Cmpd2_Min_F1Beta_minus:return(Cmpd2_Min_F1Beta_minus(t_num)); break;
-      case  Cmpd2_Max_F1Beta_minus:return(Cmpd2_Max_F1Beta_minus(t_num)); break;
-      case  Abs_Cmpd2_Min_F1Beta_minus:return(Abs_Cmpd2_Min_F1Beta_minus(t_num)); break;
-      case  Abs_Cmpd2_Max_F1Beta_minus:return(Abs_Cmpd2_Max_F1Beta_minus(t_num)); break;
-      case  Cmpd2_Min_F1Gamma_minus:return(Cmpd2_Min_F1Gamma_minus(t_num)); break;
-      case  Cmpd2_Max_F1Gamma_minus:return(Cmpd2_Max_F1Gamma_minus(t_num)); break;
-      case  Abs_Cmpd2_Min_F1Gamma_minus:return(Abs_Cmpd2_Min_F1Gamma_minus(t_num)); break;
-      case  Abs_Cmpd2_Max_F1Gamma_minus:return(Abs_Cmpd2_Max_F1Gamma_minus(t_num)); break;
-      case  Cmpd2_Min_BetaGamma_minus:return(Cmpd2_Min_BetaGamma_minus(t_num)); break;
-      case  Cmpd2_Max_BetaGamma_minus:return(Cmpd2_Max_BetaGamma_minus(t_num)); break;
-      case  Abs_Cmpd2_Min_BetaGamma_minus:return(Abs_Cmpd2_Min_BetaGamma_minus(t_num)); break;
-      case  Abs_Cmpd2_Max_BetaGamma_minus:return(Abs_Cmpd2_Max_BetaGamma_minus(t_num)); break;  //115
-      case  Cmpd3_Min_FF1Beta:return(Cmpd3_Min_FF1Beta(t_num)); break;
-      case  Cmpd3_Max_FF1Beta:return(Cmpd3_Max_FF1Beta(t_num)); break;
-      case  Abs_Cmpd3_Min_FF1Beta:return(Abs_Cmpd3_Min_FF1Beta(t_num)); break;
-      case  Abs_Cmpd3_Max_FF1Beta:return(Abs_Cmpd3_Max_FF1Beta(t_num)); break;
-      case  Cmpd3_Min_FF1Gamma:return(Cmpd3_Min_FF1Gamma(t_num)); break;
-      case  Cmpd3_Max_FF1Gamma:return(Cmpd3_Max_FF1Gamma(t_num)); break;
-      case  Abs_Cmpd3_Min_FF1Gamma:return(Abs_Cmpd3_Min_FF1Gamma(t_num)); break;
-      case  Abs_Cmpd3_Max_FF1Gamma:return(Abs_Cmpd3_Max_FF1Gamma(t_num)); break;
-      case  Cmpd3_Min_FBetaGamma:return(Cmpd3_Min_FBetaGamma(t_num)); break;
-      case  Cmpd3_Max_FBetaGamma:return(Cmpd3_Max_FBetaGamma(t_num)); break;
-      case  Abs_Cmpd3_Min_FBetaGamma:return(Abs_Cmpd3_Min_FBetaGamma(t_num)); break;
-      case  Abs_Cmpd3_Max_FBetaGamma:return(Abs_Cmpd3_Max_FBetaGamma(t_num)); break;
-      case  Cmpd3_Min_F1BetaGamma:return(Cmpd3_Min_F1BetaGamma(t_num)); break;
-      case  Cmpd3_Max_F1BetaGamma:return(Cmpd3_Max_F1BetaGamma(t_num)); break;
-      case  Abs_Cmpd3_Min_F1BetaGamma:return(Abs_Cmpd3_Min_F1BetaGamma(t_num)); break;
-      case  Abs_Cmpd3_Max_F1BetaGamma:return(Abs_Cmpd3_Max_F1BetaGamma(t_num)); break;          //131
-      case  Cmpd3_Min_FF1Beta_pp:return(Cmpd3_Min_FF1Beta_pp(t_num)); break;
-      case  Cmpd3_Max_FF1Beta_pp:return(Cmpd3_Max_FF1Beta_pp(t_num)); break;
-      case  Abs_Cmpd3_Min_FF1Beta_pp:return(Abs_Cmpd3_Min_FF1Beta_pp(t_num)); break;
-      case  Abs_Cmpd3_Max_FF1Beta_pp:return(Abs_Cmpd3_Max_FF1Beta_pp(t_num)); break;
-      case  Cmpd3_Min_FF1Gamma_pp:return(Cmpd3_Min_FF1Gamma_pp(t_num)); break;
-      case  Cmpd3_Max_FF1Gamma_pp:return(Cmpd3_Max_FF1Gamma_pp(t_num)); break;
-      case  Abs_Cmpd3_Min_FF1Gamma_pp:return(Abs_Cmpd3_Min_FF1Gamma_pp(t_num)); break;
-      case  Abs_Cmpd3_Max_FF1Gamma_pp:return(Abs_Cmpd3_Max_FF1Gamma_pp(t_num)); break;
-      case  Cmpd3_Min_FBetaGamma_pp:return(Cmpd3_Min_FBetaGamma_pp(t_num)); break;
-      case  Cmpd3_Max_FBetaGamma_pp:return(Cmpd3_Max_FBetaGamma_pp(t_num)); break;
-      case  Abs_Cmpd3_Min_FBetaGamma_pp:return(Abs_Cmpd3_Min_FBetaGamma_pp(t_num)); break;
-      case  Abs_Cmpd3_Max_FBetaGamma_pp:return(Abs_Cmpd3_Max_FBetaGamma_pp(t_num)); break;
-      case  Cmpd3_Min_F1BetaGamma_pp:return(Cmpd3_Min_F1BetaGamma_pp(t_num)); break;
-      case  Cmpd3_Max_F1BetaGamma_pp:return(Cmpd3_Max_F1BetaGamma_pp(t_num)); break;
-      case  Abs_Cmpd3_Min_F1BetaGamma_pp:return(Abs_Cmpd3_Min_F1BetaGamma_pp(t_num)); break;
-      case  Abs_Cmpd3_Max_F1BetaGamma_pp:return(Abs_Cmpd3_Max_F1BetaGamma_pp(t_num)); break;          //147
-      case  Cmpd3_Min_FF1Beta_pm:return(Cmpd3_Min_FF1Beta_pm(t_num)); break;
-      case  Cmpd3_Max_FF1Beta_pm:return(Cmpd3_Max_FF1Beta_pm(t_num)); break;
-      case  Abs_Cmpd3_Min_FF1Beta_pm:return(Abs_Cmpd3_Min_FF1Beta_pm(t_num)); break;
-      case  Abs_Cmpd3_Max_FF1Beta_pm:return(Abs_Cmpd3_Max_FF1Beta_pm(t_num)); break;
-      case  Cmpd3_Min_FF1Gamma_pm:return(Cmpd3_Min_FF1Gamma_pm(t_num)); break;
-      case  Cmpd3_Max_FF1Gamma_pm:return(Cmpd3_Max_FF1Gamma_pm(t_num)); break;
-      case  Abs_Cmpd3_Min_FF1Gamma_pm:return(Abs_Cmpd3_Min_FF1Gamma_pm(t_num)); break;
-      case  Abs_Cmpd3_Max_FF1Gamma_pm:return(Abs_Cmpd3_Max_FF1Gamma_pm(t_num)); break;
-      case  Cmpd3_Min_FBetaGamma_pm:return(Cmpd3_Min_FBetaGamma_pm(t_num)); break;
-      case  Cmpd3_Max_FBetaGamma_pm:return(Cmpd3_Max_FBetaGamma_pm(t_num)); break;
-      case  Abs_Cmpd3_Min_FBetaGamma_pm:return(Abs_Cmpd3_Min_FBetaGamma_pm(t_num)); break;
-      case  Abs_Cmpd3_Max_FBetaGamma_pm:return(Abs_Cmpd3_Max_FBetaGamma_pm(t_num)); break;
-      case  Cmpd3_Min_F1BetaGamma_pm:return(Cmpd3_Min_F1BetaGamma_pm(t_num)); break;
-      case  Cmpd3_Max_F1BetaGamma_pm:return(Cmpd3_Max_F1BetaGamma_pm(t_num)); break;
-      case  Abs_Cmpd3_Min_F1BetaGamma_pm:return(Abs_Cmpd3_Min_F1BetaGamma_pm(t_num)); break;
-      case  Abs_Cmpd3_Max_F1BetaGamma_pm:return(Abs_Cmpd3_Max_F1BetaGamma_pm(t_num)); break;          //163
-      case  Cmpd3_Min_FF1Beta_mp:return(Cmpd3_Min_FF1Beta_mp(t_num)); break;
-      case  Cmpd3_Max_FF1Beta_mp:return(Cmpd3_Max_FF1Beta_mp(t_num)); break;
-      case  Abs_Cmpd3_Min_FF1Beta_mp:return(Abs_Cmpd3_Min_FF1Beta_mp(t_num)); break;
-      case  Abs_Cmpd3_Max_FF1Beta_mp:return(Abs_Cmpd3_Max_FF1Beta_mp(t_num)); break;
-      case  Cmpd3_Min_FF1Gamma_mp:return(Cmpd3_Min_FF1Gamma_mp(t_num)); break;
-      case  Cmpd3_Max_FF1Gamma_mp:return(Cmpd3_Max_FF1Gamma_mp(t_num)); break;
-      case  Abs_Cmpd3_Min_FF1Gamma_mp:return(Abs_Cmpd3_Min_FF1Gamma_mp(t_num)); break;
-      case  Abs_Cmpd3_Max_FF1Gamma_mp:return(Abs_Cmpd3_Max_FF1Gamma_mp(t_num)); break;
-      case  Cmpd3_Min_FBetaGamma_mp:return(Cmpd3_Min_FBetaGamma_mp(t_num)); break;
-      case  Cmpd3_Max_FBetaGamma_mp:return(Cmpd3_Max_FBetaGamma_mp(t_num)); break;
-      case  Abs_Cmpd3_Min_FBetaGamma_mp:return(Abs_Cmpd3_Min_FBetaGamma_mp(t_num)); break;
-      case  Abs_Cmpd3_Max_FBetaGamma_mp:return(Abs_Cmpd3_Max_FBetaGamma_mp(t_num)); break;
-      case  Cmpd3_Min_F1BetaGamma_mp:return(Cmpd3_Min_F1BetaGamma_mp(t_num)); break;
-      case  Cmpd3_Max_F1BetaGamma_mp:return(Cmpd3_Max_F1BetaGamma_mp(t_num)); break;
-      case  Abs_Cmpd3_Min_F1BetaGamma_mp:return(Abs_Cmpd3_Min_F1BetaGamma_mp(t_num)); break;
-      case  Abs_Cmpd3_Max_F1BetaGamma_mp:return(Abs_Cmpd3_Max_F1BetaGamma_mp(t_num)); break;          //179
-      case  Cmpd3_Min_FF1Beta_mm:return(Cmpd3_Min_FF1Beta_mm(t_num)); break;
-      case  Cmpd3_Max_FF1Beta_mm:return(Cmpd3_Max_FF1Beta_mm(t_num)); break;
-      case  Abs_Cmpd3_Min_FF1Beta_mm:return(Abs_Cmpd3_Min_FF1Beta_mm(t_num)); break;
-      case  Abs_Cmpd3_Max_FF1Beta_mm:return(Abs_Cmpd3_Max_FF1Beta_mm(t_num)); break;
-      case  Cmpd3_Min_FF1Gamma_mm:return(Cmpd3_Min_FF1Gamma_mm(t_num)); break;
-      case  Cmpd3_Max_FF1Gamma_mm:return(Cmpd3_Max_FF1Gamma_mm(t_num)); break;
-      case  Abs_Cmpd3_Min_FF1Gamma_mm:return(Abs_Cmpd3_Min_FF1Gamma_mm(t_num)); break;
-      case  Abs_Cmpd3_Max_FF1Gamma_mm:return(Abs_Cmpd3_Max_FF1Gamma_mm(t_num)); break;
-      case  Cmpd3_Min_FBetaGamma_mm:return(Cmpd3_Min_FBetaGamma_mm(t_num)); break;
-      case  Cmpd3_Max_FBetaGamma_mm:return(Cmpd3_Max_FBetaGamma_mm(t_num)); break;
-      case  Abs_Cmpd3_Min_FBetaGamma_mm:return(Abs_Cmpd3_Min_FBetaGamma_mm(t_num)); break;
-      case  Abs_Cmpd3_Max_FBetaGamma_mm:return(Abs_Cmpd3_Max_FBetaGamma_mm(t_num)); break;
-      case  Cmpd3_Min_F1BetaGamma_mm:return(Cmpd3_Min_F1BetaGamma_mm(t_num)); break;
-      case  Cmpd3_Max_F1BetaGamma_mm:return(Cmpd3_Max_F1BetaGamma_mm(t_num)); break;
-      case  Abs_Cmpd3_Min_F1BetaGamma_mm:return(Abs_Cmpd3_Min_F1BetaGamma_mm(t_num)); break;
-      case  Abs_Cmpd3_Max_F1BetaGamma_mm:return(Abs_Cmpd3_Max_F1BetaGamma_mm(t_num)); break;          //195
-      case  Cmpd4_Min:return(Cmpd4_Min(t_num));break;
-      case  Cmpd4_Max:return(Cmpd4_Max(t_num));break;
-      case  Abs_Cmpd4_Min:return(Abs_Cmpd4_Min(t_num));break;
-      case  Abs_Cmpd4_Max:return(Abs_Cmpd4_Max(t_num));break;                             //199
-      case  Cmpd4_Min_ppp:return(Cmpd4_Min_ppp(t_num));break;
-      case  Cmpd4_Max_ppp:return(Cmpd4_Max_ppp(t_num));break;
-      case  Abs_Cmpd4_Min_ppp:return(Abs_Cmpd4_Min_ppp(t_num));break;
-      case  Abs_Cmpd4_Max_ppp:return(Abs_Cmpd4_Max_ppp(t_num));break;                     //203
-      case  Cmpd4_Min_ppm:return(Cmpd4_Min_ppm(t_num));break;
-      case  Cmpd4_Max_ppm:return(Cmpd4_Max_ppm(t_num));break;
-      case  Abs_Cmpd4_Min_ppm:return(Abs_Cmpd4_Min_ppm(t_num));break;
-      case  Abs_Cmpd4_Max_ppm:return(Abs_Cmpd4_Max_ppm(t_num));break;                     //207
-      case  Cmpd4_Min_pmp:return(Cmpd4_Min_pmp(t_num));break;
-      case  Cmpd4_Max_pmp:return(Cmpd4_Max_pmp(t_num));break;
-      case  Abs_Cmpd4_Min_pmp:return(Abs_Cmpd4_Min_pmp(t_num));break;
-      case  Abs_Cmpd4_Max_pmp:return(Abs_Cmpd4_Max_pmp(t_num));break;                     //211
-      case  Cmpd4_Min_mpp:return(Cmpd4_Min_mpp(t_num));break;
-      case  Cmpd4_Max_mpp:return(Cmpd4_Max_mpp(t_num));break;
-      case  Abs_Cmpd4_Min_mpp:return(Abs_Cmpd4_Min_mpp(t_num));break;
-      case  Abs_Cmpd4_Max_mpp:return(Abs_Cmpd4_Max_mpp(t_num));break;                     //215
-      case  Cmpd4_Min_mmm:return(Cmpd4_Min_mmm(t_num));break;
-      case  Cmpd4_Max_mmm:return(Cmpd4_Max_mmm(t_num));break;
-      case  Abs_Cmpd4_Min_mmm:return(Abs_Cmpd4_Min_mmm(t_num));break;
-      case  Abs_Cmpd4_Max_mmm:return(Abs_Cmpd4_Max_mmm(t_num));break;                     //219
-      case  Cmpd4_Min_mmp:return(Cmpd4_Min_mmp(t_num));break;
-      case  Cmpd4_Max_mmp:return(Cmpd4_Max_mmp(t_num));break;
-      case  Abs_Cmpd4_Min_mmp:return(Abs_Cmpd4_Min_mmp(t_num));break;
-      case  Abs_Cmpd4_Max_mmp:return(Abs_Cmpd4_Max_mmp(t_num));break;                     //223
-      case  Cmpd4_Min_mpm:return(Cmpd4_Min_mpm(t_num));break;
-      case  Cmpd4_Max_mpm:return(Cmpd4_Max_mpm(t_num));break;
-      case  Abs_Cmpd4_Min_mpm:return(Abs_Cmpd4_Min_mpm(t_num));break;
-      case  Abs_Cmpd4_Max_mpm:return(Abs_Cmpd4_Max_mpm(t_num));break;                     //227
-      case  Cmpd4_Min_pmm:return(Cmpd4_Min_pmm(t_num));break;
-      case  Cmpd4_Max_pmm:return(Cmpd4_Max_pmm(t_num));break;
-      case  Abs_Cmpd4_Min_pmm:return(Abs_Cmpd4_Min_pmm(t_num));break;
+      case  Zero_AmB_MinAB:return(m_Zero_AmB_MinAB(t_num)); break;
+      case  Zero_AmB_MaxAB:return(m_Zero_AmB_MaxAB(t_num)); break;           //43
+      case  Cmpd2_Min_FF1:return(m_Cmpd2_Min_FF1(t_num)); break;
+      case  Cmpd2_Max_FF1:return(m_Cmpd2_Max_FF1(t_num)); break;
+      case  Abs_Cmpd2_Min_FF1:return(m_Abs_Cmpd2_Min_FF1(t_num)); break;
+      case  Abs_Cmpd2_Max_FF1:return(m_Abs_Cmpd2_Max_FF1(t_num)); break;
+      case  Cmpd2_Min_FBeta:return(m_Cmpd2_Min_FBeta(t_num)); break;
+      case  Cmpd2_Max_FBeta:return(m_Cmpd2_Max_FBeta(t_num)); break;
+      case  Abs_Cmpd2_Min_FBeta:return(m_Abs_Cmpd2_Min_FBeta(t_num)); break;
+      case  Abs_Cmpd2_Max_FBeta:return(m_Abs_Cmpd2_Max_FBeta(t_num)); break;
+      case  Cmpd2_Min_FGamma:return(m_Cmpd2_Min_FGamma(t_num)); break;
+      case  Cmpd2_Max_FGamma:return(m_Cmpd2_Max_FGamma(t_num)); break;
+      case  Abs_Cmpd2_Min_FGamma:return(m_Abs_Cmpd2_Min_FGamma(t_num)); break;
+      case  Abs_Cmpd2_Max_FGamma:return(m_Abs_Cmpd2_Max_FGamma(t_num)); break;
+      case  Cmpd2_Min_F1Beta:return(m_Cmpd2_Min_F1Beta(t_num)); break;
+      case  Cmpd2_Max_F1Beta:return(m_Cmpd2_Max_F1Beta(t_num)); break;
+      case  Abs_Cmpd2_Min_F1Beta:return(m_Abs_Cmpd2_Min_F1Beta(t_num)); break;
+      case  Abs_Cmpd2_Max_F1Beta:return(m_Abs_Cmpd2_Max_F1Beta(t_num)); break;
+      case  Cmpd2_Min_F1Gamma:return(m_Cmpd2_Min_F1Gamma(t_num)); break;
+      case  Cmpd2_Max_F1Gamma:return(m_Cmpd2_Max_F1Gamma(t_num)); break;
+      case  Abs_Cmpd2_Min_F1Gamma:return(m_Abs_Cmpd2_Min_F1Gamma(t_num)); break;
+      case  Abs_Cmpd2_Max_F1Gamma:return(m_Abs_Cmpd2_Max_F1Gamma(t_num)); break;
+      case  Cmpd2_Min_BetaGamma:return(m_Cmpd2_Min_BetaGamma(t_num)); break;
+      case  Cmpd2_Max_BetaGamma:return(m_Cmpd2_Max_BetaGamma(t_num)); break;
+      case  Abs_Cmpd2_Min_BetaGamma:return(m_Abs_Cmpd2_Min_BetaGamma(t_num)); break;
+      case  Abs_Cmpd2_Max_BetaGamma:return(m_Abs_Cmpd2_Max_BetaGamma(t_num)); break;  //67
+      case  Cmpd2_Min_FF1_plus:return(m_Cmpd2_Min_FF1_plus(t_num)); break;
+      case  Cmpd2_Max_FF1_plus:return(m_Cmpd2_Max_FF1_plus(t_num)); break;
+      case  Abs_Cmpd2_Min_FF1_plus:return(m_Abs_Cmpd2_Min_FF1_plus(t_num)); break;
+      case  Abs_Cmpd2_Max_FF1_plus:return(m_Abs_Cmpd2_Max_FF1_plus(t_num)); break;
+      case  Cmpd2_Min_FBeta_plus:return(m_Cmpd2_Min_FBeta_plus(t_num)); break;
+      case  Cmpd2_Max_FBeta_plus:return(m_Cmpd2_Max_FBeta_plus(t_num)); break;
+      case  Abs_Cmpd2_Min_FBeta_plus:return(m_Abs_Cmpd2_Min_FBeta_plus(t_num)); break;
+      case  Abs_Cmpd2_Max_FBeta_plus:return(m_Abs_Cmpd2_Max_FBeta_plus(t_num)); break;
+      case  Cmpd2_Min_FGamma_plus:return(m_Cmpd2_Min_FGamma_plus(t_num)); break;
+      case  Cmpd2_Max_FGamma_plus:return(m_Cmpd2_Max_FGamma_plus(t_num)); break;
+      case  Abs_Cmpd2_Min_FGamma_plus:return(m_Abs_Cmpd2_Min_FGamma_plus(t_num)); break;
+      case  Abs_Cmpd2_Max_FGamma_plus:return(m_Abs_Cmpd2_Max_FGamma_plus(t_num)); break;
+      case  Cmpd2_Min_F1Beta_plus:return(m_Cmpd2_Min_F1Beta_plus(t_num)); break;
+      case  Cmpd2_Max_F1Beta_plus:return(m_Cmpd2_Max_F1Beta_plus(t_num)); break;
+      case  Abs_Cmpd2_Min_F1Beta_plus:return(m_Abs_Cmpd2_Min_F1Beta_plus(t_num)); break;
+      case  Abs_Cmpd2_Max_F1Beta_plus:return(m_Abs_Cmpd2_Max_F1Beta_plus(t_num)); break;
+      case  Cmpd2_Min_F1Gamma_plus:return(m_Cmpd2_Min_F1Gamma_plus(t_num)); break;
+      case  Cmpd2_Max_F1Gamma_plus:return(m_Cmpd2_Max_F1Gamma_plus(t_num)); break;
+      case  Abs_Cmpd2_Min_F1Gamma_plus:return(m_Abs_Cmpd2_Min_F1Gamma_plus(t_num)); break;
+      case  Abs_Cmpd2_Max_F1Gamma_plus:return(m_Abs_Cmpd2_Max_F1Gamma_plus(t_num)); break;
+      case  Cmpd2_Min_BetaGamma_plus:return(m_Cmpd2_Min_BetaGamma_plus(t_num)); break;
+      case  Cmpd2_Max_BetaGamma_plus:return(m_Cmpd2_Max_BetaGamma_plus(t_num)); break;
+      case  Abs_Cmpd2_Min_BetaGamma_plus:return(m_Abs_Cmpd2_Min_BetaGamma_plus(t_num)); break;
+      case  Abs_Cmpd2_Max_BetaGamma_plus:return(m_Abs_Cmpd2_Max_BetaGamma_plus(t_num)); break;  //91
+      case  Cmpd2_Min_FF1_minus:return(m_Cmpd2_Min_FF1_minus(t_num)); break;
+      case  Cmpd2_Max_FF1_minus:return(m_Cmpd2_Max_FF1_minus(t_num)); break;
+      case  Abs_Cmpd2_Min_FF1_minus:return(m_Abs_Cmpd2_Min_FF1_minus(t_num)); break;
+      case  Abs_Cmpd2_Max_FF1_minus:return(m_Abs_Cmpd2_Max_FF1_minus(t_num)); break;
+      case  Cmpd2_Min_FBeta_minus:return(m_Cmpd2_Min_FBeta_minus(t_num)); break;
+      case  Cmpd2_Max_FBeta_minus:return(m_Cmpd2_Max_FBeta_minus(t_num)); break;
+      case  Abs_Cmpd2_Min_FBeta_minus:return(m_Abs_Cmpd2_Min_FBeta_minus(t_num)); break;
+      case  Abs_Cmpd2_Max_FBeta_minus:return(m_Abs_Cmpd2_Max_FBeta_minus(t_num)); break;
+      case  Cmpd2_Min_FGamma_minus:return(m_Cmpd2_Min_FGamma_minus(t_num)); break;
+      case  Cmpd2_Max_FGamma_minus:return(m_Cmpd2_Max_FGamma_minus(t_num)); break;
+      case  Abs_Cmpd2_Min_FGamma_minus:return(m_Abs_Cmpd2_Min_FGamma_minus(t_num)); break;
+      case  Abs_Cmpd2_Max_FGamma_minus:return(m_Abs_Cmpd2_Max_FGamma_minus(t_num)); break;
+      case  Cmpd2_Min_F1Beta_minus:return(m_Cmpd2_Min_F1Beta_minus(t_num)); break;
+      case  Cmpd2_Max_F1Beta_minus:return(m_Cmpd2_Max_F1Beta_minus(t_num)); break;
+      case  Abs_Cmpd2_Min_F1Beta_minus:return(m_Abs_Cmpd2_Min_F1Beta_minus(t_num)); break;
+      case  Abs_Cmpd2_Max_F1Beta_minus:return(m_Abs_Cmpd2_Max_F1Beta_minus(t_num)); break;
+      case  Cmpd2_Min_F1Gamma_minus:return(m_Cmpd2_Min_F1Gamma_minus(t_num)); break;
+      case  Cmpd2_Max_F1Gamma_minus:return(m_Cmpd2_Max_F1Gamma_minus(t_num)); break;
+      case  Abs_Cmpd2_Min_F1Gamma_minus:return(m_Abs_Cmpd2_Min_F1Gamma_minus(t_num)); break;
+      case  Abs_Cmpd2_Max_F1Gamma_minus:return(m_Abs_Cmpd2_Max_F1Gamma_minus(t_num)); break;
+      case  Cmpd2_Min_BetaGamma_minus:return(m_Cmpd2_Min_BetaGamma_minus(t_num)); break;
+      case  Cmpd2_Max_BetaGamma_minus:return(m_Cmpd2_Max_BetaGamma_minus(t_num)); break;
+      case  Abs_Cmpd2_Min_BetaGamma_minus:return(m_Abs_Cmpd2_Min_BetaGamma_minus(t_num)); break;
+      case  Abs_Cmpd2_Max_BetaGamma_minus:return(m_Abs_Cmpd2_Max_BetaGamma_minus(t_num)); break;  //115
+      case  Cmpd3_Min_FF1Beta:return(m_Cmpd3_Min_FF1Beta(t_num)); break;
+      case  Cmpd3_Max_FF1Beta:return(m_Cmpd3_Max_FF1Beta(t_num)); break;
+      case  Abs_Cmpd3_Min_FF1Beta:return(m_Abs_Cmpd3_Min_FF1Beta(t_num)); break;
+      case  Abs_Cmpd3_Max_FF1Beta:return(m_Abs_Cmpd3_Max_FF1Beta(t_num)); break;
+      case  Cmpd3_Min_FF1Gamma:return(m_Cmpd3_Min_FF1Gamma(t_num)); break;
+      case  Cmpd3_Max_FF1Gamma:return(m_Cmpd3_Max_FF1Gamma(t_num)); break;
+      case  Abs_Cmpd3_Min_FF1Gamma:return(m_Abs_Cmpd3_Min_FF1Gamma(t_num)); break;
+      case  Abs_Cmpd3_Max_FF1Gamma:return(m_Abs_Cmpd3_Max_FF1Gamma(t_num)); break;
+      case  Cmpd3_Min_FBetaGamma:return(m_Cmpd3_Min_FBetaGamma(t_num)); break;
+      case  Cmpd3_Max_FBetaGamma:return(m_Cmpd3_Max_FBetaGamma(t_num)); break;
+      case  Abs_Cmpd3_Min_FBetaGamma:return(m_Abs_Cmpd3_Min_FBetaGamma(t_num)); break;
+      case  Abs_Cmpd3_Max_FBetaGamma:return(m_Abs_Cmpd3_Max_FBetaGamma(t_num)); break;
+      case  Cmpd3_Min_F1BetaGamma:return(m_Cmpd3_Min_F1BetaGamma(t_num)); break;
+      case  Cmpd3_Max_F1BetaGamma:return(m_Cmpd3_Max_F1BetaGamma(t_num)); break;
+      case  Abs_Cmpd3_Min_F1BetaGamma:return(m_Abs_Cmpd3_Min_F1BetaGamma(t_num)); break;
+      case  Abs_Cmpd3_Max_F1BetaGamma:return(m_Abs_Cmpd3_Max_F1BetaGamma(t_num)); break;          //131
+      case  Cmpd3_Min_FF1Beta_pp:return(m_Cmpd3_Min_FF1Beta_pp(t_num)); break;
+      case  Cmpd3_Max_FF1Beta_pp:return(m_Cmpd3_Max_FF1Beta_pp(t_num)); break;
+      case  Abs_Cmpd3_Min_FF1Beta_pp:return(m_Abs_Cmpd3_Min_FF1Beta_pp(t_num)); break;
+      case  Abs_Cmpd3_Max_FF1Beta_pp:return(m_Abs_Cmpd3_Max_FF1Beta_pp(t_num)); break;
+      case  Cmpd3_Min_FF1Gamma_pp:return(m_Cmpd3_Min_FF1Gamma_pp(t_num)); break;
+      case  Cmpd3_Max_FF1Gamma_pp:return(m_Cmpd3_Max_FF1Gamma_pp(t_num)); break;
+      case  Abs_Cmpd3_Min_FF1Gamma_pp:return(m_Abs_Cmpd3_Min_FF1Gamma_pp(t_num)); break;
+      case  Abs_Cmpd3_Max_FF1Gamma_pp:return(m_Abs_Cmpd3_Max_FF1Gamma_pp(t_num)); break;
+      case  Cmpd3_Min_FBetaGamma_pp:return(m_Cmpd3_Min_FBetaGamma_pp(t_num)); break;
+      case  Cmpd3_Max_FBetaGamma_pp:return(m_Cmpd3_Max_FBetaGamma_pp(t_num)); break;
+      case  Abs_Cmpd3_Min_FBetaGamma_pp:return(m_Abs_Cmpd3_Min_FBetaGamma_pp(t_num)); break;
+      case  Abs_Cmpd3_Max_FBetaGamma_pp:return(m_Abs_Cmpd3_Max_FBetaGamma_pp(t_num)); break;
+      case  Cmpd3_Min_F1BetaGamma_pp:return(m_Cmpd3_Min_F1BetaGamma_pp(t_num)); break;
+      case  Cmpd3_Max_F1BetaGamma_pp:return(m_Cmpd3_Max_F1BetaGamma_pp(t_num)); break;
+      case  Abs_Cmpd3_Min_F1BetaGamma_pp:return(m_Abs_Cmpd3_Min_F1BetaGamma_pp(t_num)); break;
+      case  Abs_Cmpd3_Max_F1BetaGamma_pp:return(m_Abs_Cmpd3_Max_F1BetaGamma_pp(t_num)); break;          //147
+      case  Cmpd3_Min_FF1Beta_pm:return(m_Cmpd3_Min_FF1Beta_pm(t_num)); break;
+      case  Cmpd3_Max_FF1Beta_pm:return(m_Cmpd3_Max_FF1Beta_pm(t_num)); break;
+      case  Abs_Cmpd3_Min_FF1Beta_pm:return(m_Abs_Cmpd3_Min_FF1Beta_pm(t_num)); break;
+      case  Abs_Cmpd3_Max_FF1Beta_pm:return(m_Abs_Cmpd3_Max_FF1Beta_pm(t_num)); break;
+      case  Cmpd3_Min_FF1Gamma_pm:return(m_Cmpd3_Min_FF1Gamma_pm(t_num)); break;
+      case  Cmpd3_Max_FF1Gamma_pm:return(m_Cmpd3_Max_FF1Gamma_pm(t_num)); break;
+      case  Abs_Cmpd3_Min_FF1Gamma_pm:return(m_Abs_Cmpd3_Min_FF1Gamma_pm(t_num)); break;
+      case  Abs_Cmpd3_Max_FF1Gamma_pm:return(m_Abs_Cmpd3_Max_FF1Gamma_pm(t_num)); break;
+      case  Cmpd3_Min_FBetaGamma_pm:return(m_Cmpd3_Min_FBetaGamma_pm(t_num)); break;
+      case  Cmpd3_Max_FBetaGamma_pm:return(m_Cmpd3_Max_FBetaGamma_pm(t_num)); break;
+      case  Abs_Cmpd3_Min_FBetaGamma_pm:return(m_Abs_Cmpd3_Min_FBetaGamma_pm(t_num)); break;
+      case  Abs_Cmpd3_Max_FBetaGamma_pm:return(m_Abs_Cmpd3_Max_FBetaGamma_pm(t_num)); break;
+      case  Cmpd3_Min_F1BetaGamma_pm:return(m_Cmpd3_Min_F1BetaGamma_pm(t_num)); break;
+      case  Cmpd3_Max_F1BetaGamma_pm:return(m_Cmpd3_Max_F1BetaGamma_pm(t_num)); break;
+      case  Abs_Cmpd3_Min_F1BetaGamma_pm:return(m_Abs_Cmpd3_Min_F1BetaGamma_pm(t_num)); break;
+      case  Abs_Cmpd3_Max_F1BetaGamma_pm:return(m_Abs_Cmpd3_Max_F1BetaGamma_pm(t_num)); break;          //163
+      case  Cmpd3_Min_FF1Beta_mp:return(m_Cmpd3_Min_FF1Beta_mp(t_num)); break;
+      case  Cmpd3_Max_FF1Beta_mp:return(m_Cmpd3_Max_FF1Beta_mp(t_num)); break;
+      case  Abs_Cmpd3_Min_FF1Beta_mp:return(m_Abs_Cmpd3_Min_FF1Beta_mp(t_num)); break;
+      case  Abs_Cmpd3_Max_FF1Beta_mp:return(m_Abs_Cmpd3_Max_FF1Beta_mp(t_num)); break;
+      case  Cmpd3_Min_FF1Gamma_mp:return(m_Cmpd3_Min_FF1Gamma_mp(t_num)); break;
+      case  Cmpd3_Max_FF1Gamma_mp:return(m_Cmpd3_Max_FF1Gamma_mp(t_num)); break;
+      case  Abs_Cmpd3_Min_FF1Gamma_mp:return(m_Abs_Cmpd3_Min_FF1Gamma_mp(t_num)); break;
+      case  Abs_Cmpd3_Max_FF1Gamma_mp:return(m_Abs_Cmpd3_Max_FF1Gamma_mp(t_num)); break;
+      case  Cmpd3_Min_FBetaGamma_mp:return(m_Cmpd3_Min_FBetaGamma_mp(t_num)); break;
+      case  Cmpd3_Max_FBetaGamma_mp:return(m_Cmpd3_Max_FBetaGamma_mp(t_num)); break;
+      case  Abs_Cmpd3_Min_FBetaGamma_mp:return(m_Abs_Cmpd3_Min_FBetaGamma_mp(t_num)); break;
+      case  Abs_Cmpd3_Max_FBetaGamma_mp:return(m_Abs_Cmpd3_Max_FBetaGamma_mp(t_num)); break;
+      case  Cmpd3_Min_F1BetaGamma_mp:return(m_Cmpd3_Min_F1BetaGamma_mp(t_num)); break;
+      case  Cmpd3_Max_F1BetaGamma_mp:return(m_Cmpd3_Max_F1BetaGamma_mp(t_num)); break;
+      case  Abs_Cmpd3_Min_F1BetaGamma_mp:return(m_Abs_Cmpd3_Min_F1BetaGamma_mp(t_num)); break;
+      case  Abs_Cmpd3_Max_F1BetaGamma_mp:return(m_Abs_Cmpd3_Max_F1BetaGamma_mp(t_num)); break;          //179
+      case  Cmpd3_Min_FF1Beta_mm:return(m_Cmpd3_Min_FF1Beta_mm(t_num)); break;
+      case  Cmpd3_Max_FF1Beta_mm:return(m_Cmpd3_Max_FF1Beta_mm(t_num)); break;
+      case  Abs_Cmpd3_Min_FF1Beta_mm:return(m_Abs_Cmpd3_Min_FF1Beta_mm(t_num)); break;
+      case  Abs_Cmpd3_Max_FF1Beta_mm:return(m_Abs_Cmpd3_Max_FF1Beta_mm(t_num)); break;
+      case  Cmpd3_Min_FF1Gamma_mm:return(m_Cmpd3_Min_FF1Gamma_mm(t_num)); break;
+      case  Cmpd3_Max_FF1Gamma_mm:return(m_Cmpd3_Max_FF1Gamma_mm(t_num)); break;
+      case  Abs_Cmpd3_Min_FF1Gamma_mm:return(m_Abs_Cmpd3_Min_FF1Gamma_mm(t_num)); break;
+      case  Abs_Cmpd3_Max_FF1Gamma_mm:return(m_Abs_Cmpd3_Max_FF1Gamma_mm(t_num)); break;
+      case  Cmpd3_Min_FBetaGamma_mm:return(m_Cmpd3_Min_FBetaGamma_mm(t_num)); break;
+      case  Cmpd3_Max_FBetaGamma_mm:return(m_Cmpd3_Max_FBetaGamma_mm(t_num)); break;
+      case  Abs_Cmpd3_Min_FBetaGamma_mm:return(m_Abs_Cmpd3_Min_FBetaGamma_mm(t_num)); break;
+      case  Abs_Cmpd3_Max_FBetaGamma_mm:return(m_Abs_Cmpd3_Max_FBetaGamma_mm(t_num)); break;
+      case  Cmpd3_Min_F1BetaGamma_mm:return(m_Cmpd3_Min_F1BetaGamma_mm(t_num)); break;
+      case  Cmpd3_Max_F1BetaGamma_mm:return(m_Cmpd3_Max_F1BetaGamma_mm(t_num)); break;
+      case  Abs_Cmpd3_Min_F1BetaGamma_mm:return(m_Abs_Cmpd3_Min_F1BetaGamma_mm(t_num)); break;
+      case  Abs_Cmpd3_Max_F1BetaGamma_mm:return(m_Abs_Cmpd3_Max_F1BetaGamma_mm(t_num)); break;          //195
+      case  Cmpd4_Min:return(m_Cmpd4_Min(t_num));break;
+      case  Cmpd4_Max:return(m_Cmpd4_Max(t_num));break;
+      case  Abs_Cmpd4_Min:return(m_Abs_Cmpd4_Min(t_num));break;
+      case  Abs_Cmpd4_Max:return(m_Abs_Cmpd4_Max(t_num));break;                             //199
+      case  Cmpd4_Min_ppp:return(m_Cmpd4_Min_ppp(t_num));break;
+      case  Cmpd4_Max_ppp:return(m_Cmpd4_Max_ppp(t_num));break;
+      case  Abs_Cmpd4_Min_ppp:return(m_Abs_Cmpd4_Min_ppp(t_num));break;
+      case  Abs_Cmpd4_Max_ppp:return(m_Abs_Cmpd4_Max_ppp(t_num));break;                     //203
+      case  Cmpd4_Min_ppm:return(m_Cmpd4_Min_ppm(t_num));break;
+      case  Cmpd4_Max_ppm:return(m_Cmpd4_Max_ppm(t_num));break;
+      case  Abs_Cmpd4_Min_ppm:return(m_Abs_Cmpd4_Min_ppm(t_num));break;
+      case  Abs_Cmpd4_Max_ppm:return(m_Abs_Cmpd4_Max_ppm(t_num));break;                     //207
+      case  Cmpd4_Min_pmp:return(m_Cmpd4_Min_pmp(t_num));break;
+      case  Cmpd4_Max_pmp:return(m_Cmpd4_Max_pmp(t_num));break;
+      case  Abs_Cmpd4_Min_pmp:return(m_Abs_Cmpd4_Min_pmp(t_num));break;
+      case  Abs_Cmpd4_Max_pmp:return(m_Abs_Cmpd4_Max_pmp(t_num));break;                     //211
+      case  Cmpd4_Min_mpp:return(m_Cmpd4_Min_mpp(t_num));break;
+      case  Cmpd4_Max_mpp:return(m_Cmpd4_Max_mpp(t_num));break;
+      case  Abs_Cmpd4_Min_mpp:return(m_Abs_Cmpd4_Min_mpp(t_num));break;
+      case  Abs_Cmpd4_Max_mpp:return(m_Abs_Cmpd4_Max_mpp(t_num));break;                     //215
+      case  Cmpd4_Min_mmm:return(m_Cmpd4_Min_mmm(t_num));break;
+      case  Cmpd4_Max_mmm:return(m_Cmpd4_Max_mmm(t_num));break;
+      case  Abs_Cmpd4_Min_mmm:return(m_Abs_Cmpd4_Min_mmm(t_num));break;
+      case  Abs_Cmpd4_Max_mmm:return(m_Abs_Cmpd4_Max_mmm(t_num));break;                     //219
+      case  Cmpd4_Min_mmp:return(m_Cmpd4_Min_mmp(t_num));break;
+      case  Cmpd4_Max_mmp:return(m_Cmpd4_Max_mmp(t_num));break;
+      case  Abs_Cmpd4_Min_mmp:return(m_Abs_Cmpd4_Min_mmp(t_num));break;
+      case  Abs_Cmpd4_Max_mmp:return(m_Abs_Cmpd4_Max_mmp(t_num));break;                     //223
+      case  Cmpd4_Min_mpm:return(m_Cmpd4_Min_mpm(t_num));break;
+      case  Cmpd4_Max_mpm:return(m_Cmpd4_Max_mpm(t_num));break;
+      case  Abs_Cmpd4_Min_mpm:return(m_Abs_Cmpd4_Min_mpm(t_num));break;
+      case  Abs_Cmpd4_Max_mpm:return(m_Abs_Cmpd4_Max_mpm(t_num));break;                     //227
+      case  Cmpd4_Min_pmm:return(m_Cmpd4_Min_pmm(t_num));break;
+      case  Cmpd4_Max_pmm:return(m_Cmpd4_Max_pmm(t_num));break;
+      case  Abs_Cmpd4_Min_pmm:return(m_Abs_Cmpd4_Min_pmm(t_num));break;
       case  Abs_Cmpd4_Max_pmm:return(m_Abs_Cmpd4_Max_pmm(t_num));break;                     //231
       case  VirtualLast:return(0);break;                                                  //Virtual 232                 
       default:return(0); break;                                // DEFAULT
@@ -974,7 +1198,7 @@ double miniTR::m_Abs_Cmpd4_Max_pmm(const int &T_NUM)
 //+------------------------------------------------------------------+
 //|   #2 MinAB, miniTR                                               |
 //+------------------------------------------------------------------+  
-double miniTR::m_MinAB(const int &T_NUM)
+double miniTR::m_Min_AB(const int &T_NUM)
   {
    m_result=0;
    m_result=MathMin(m_arr_mtr[T_NUM].A,m_arr_mtr[T_NUM].B);
@@ -986,7 +1210,7 @@ double miniTR::m_MinAB(const int &T_NUM)
 //+------------------------------------------------------------------+
 //|   #3  MaxAB, miniTR                                              |
 //+------------------------------------------------------------------+  
-double miniTR::m_MaxAB(const int &T_NUM)
+double miniTR::m_Max_AB(const int &T_NUM)
   {
    m_result=0;
    m_result=MathMax(m_arr_mtr[T_NUM].A,m_arr_mtr[T_NUM].B);
@@ -2875,7 +3099,7 @@ double miniTR::m_Abs_Cmpd3_Min_FF1Gamma_pp(const int &T_NUM)
 //--------------------------------------------------------------------
 //|   #139  ABS Compound 3(++) Max FF1Gamma , miniTR                 |
 //--------------------------------------------------------------------  
-double miniTR::m_miniTR::m_Abs_Cmpd3_Max_FF1Gamma_pp(const int &T_NUM)
+double miniTR::m_Abs_Cmpd3_Max_FF1Gamma_pp(const int &T_NUM)
   {
    m_x1=0; m_x2=0; m_result=0;
 
