@@ -31,8 +31,14 @@ private:
    //Groups Count
    int               m_groups_count;
 
+   //Current Group
+   ENUM_T_GROUP_ID   m_current_GroupID;
+
    //miniTR Count
    int               m_minitr_count;
+
+   //MinMax Only Search for Best miniTR
+   bool              m_minmax_Only;
 
    //miniTR Params
    STRUCT_miniTR     m_arr_mtr[];
@@ -304,7 +310,7 @@ public:
                      miniTR(void);
                     ~miniTR(void);
    //Init
-   bool              Init(void);
+   bool              Init(const bool &MinMaxOnly);
 
    //Groups Count
    int             GroupsCount(void) const    {return(m_groups_count);}
@@ -330,6 +336,12 @@ public:
    //Export result matrix to csv (Group and miniTRs)
    void              ExportMatrix_CSV(const bool m_csv_separator);
 
+   //Check Current GroupID
+   ENUM_T_GROUP_ID   CurrentCheckGroupID(STRUCT_miniTR const &mtr);
+
+   //Calculate Ck signal for current Group
+   ENUM_CK_SIGNALS   CalculateCk(STRUCT_miniTR const &mtr,ENUM_miniTR_ID const &miniTRID);
+
   };
 //+------------------------------------------------------------------+
 //|  CONSTRUCTOR                                                     |
@@ -346,6 +358,7 @@ miniTR::miniTR(void)
    m_FName_rNP4="rNP4";
    m_FName_rNP14="rNP14";
    m_T_Count=0;
+   m_current_GroupID=0;
   }
 //+------------------------------------------------------------------+
 //|  DESTRUCTOR                                                      |
@@ -357,10 +370,11 @@ miniTR::~miniTR(void)
 //+------------------------------------------------------------------+
 //| INIT                                                             |
 //+------------------------------------------------------------------+
-bool miniTR::Init(void)
+bool miniTR::Init(const bool &MinMaxOnly)
   {
    m_groups_count=m_GroupsCount();
    m_minitr_count=m_MiniTrCount();
+   m_minmax_Only = MinMaxOnly;
    return(true);
   }
 //+------------------------------------------------------------------+
@@ -413,13 +427,21 @@ void miniTR::PrintStatistics(void)
 //+------------------------------------------------------------------+
 double miniTR::m_Calc_miniTR(ENUM_miniTR_ID const &mini,const int &t_num)
   {
+
+//Check if MinMax Only
+   if(m_minmax_Only)
+     {
+      if(mini==Min_AB) return(m_Min_AB(t_num));
+      if(mini==Max_AB) return(m_Max_AB(t_num));
+     }
+
    switch(mini)
      {
-      case  C1:return(0);break;//arr_rNP1[t_num].NP1_RT); break;
-      case  C4:return(0);break;//(arr_rNP4[t_num].NP4_RT); break;
+      case  C1:return(-1);break;//arr_rNP1[t_num].NP1_RT); break;
+      case  C4:return(-1);break;//(arr_rNP4[t_num].NP4_RT); break;
       case  Min_AB:return(m_Min_AB(t_num)); break;
       case  Max_AB:return(m_Max_AB(t_num)); break;
-      case  C14:return(0); break;                              // we have not NP14_RT!!!!
+      case  C14:return(-1); break;                              // we have not NP14_RT!!!!
       case  Abs_Min_AB:return(m_Abs_Min_AB(t_num)); break;
       case  Abs_Max_AB:return(m_Abs_Max_AB(t_num)); break;                   //6
       case  Min_fAB:return(m_Min_fAB(t_num)); break;
@@ -438,25 +460,25 @@ double miniTR::m_Calc_miniTR(ENUM_miniTR_ID const &mini,const int &t_num)
       case  Max_GammaAB:return(m_Max_GammaAB(t_num)); break;
       case  Abs_Min_GammaAB:return(m_Abs_Min_GammaAB(t_num)); break;
       case  Abs_Max_GammaAB:return(m_Abs_Max_GammaAB(t_num)); break;
-      case  NotTrade:return(0);break;                                      //23
+      case  NotTrade:return(-1);break;                                      //23
       case  Equal_dQ1Q4_C1:return(m_Equal_dQ1Q4_C1(t_num));break;
       case  Equal_dQ1Q4_C4:return(m_Equal_dQ1Q4_C4(t_num));break;
-      case  Equal_dQ1Q4_C14:return(0); break;
+      case  Equal_dQ1Q4_C14:return(-1); break;
       case  Equal_dQ1Q4_MinAB:return(m_Equal_dQ1Q4_MinAB(t_num));break;
       case  Equal_dQ1Q4_MaxAB:return(m_Equal_dQ1Q4_MaxAB(t_num));break;
       case  Zero_dQ1Q4_C1:return(m_Zero_dQ1Q4_C1(t_num));break;
       case  Zero_dQ1Q4_C4:return(m_Zero_dQ1Q4_C4(t_num));break;
-      case  Zero_dQ1Q4_C14:return(0);
+      case  Zero_dQ1Q4_C14:return(-1);
       case  Zero_dQ1Q4_MinAB:return(m_Zero_dQ1Q4_MinAB(t_num)); break;
       case  Zero_dQ1Q4_MaxAB:return(m_Zero_dQ1Q4_MaxAB(t_num)); break;
       case  Equal_AB_C1:return(m_Equal_AB_C1(t_num)); break;
       case  Equal_AB_C4:return(m_Equal_AB_C4(t_num)); break;
-      case  Equal_AB_C14:return(0); break;
+      case  Equal_AB_C14:return(-1); break;
       case  Equal_AB_MinAB:return(m_Equal_AB_MinAB(t_num)); break;
       case  Equal_AB_MaxAB:return(m_Equal_AB_MaxAB(t_num)); break;
       case  Zero_AmB_C1:return(m_Zero_AmB_C1(t_num)); break;
       case  Zero_AmB_C4:return(m_Zero_AmB_C4(t_num)); break;
-      case  Zero_AmB_C14:return(0);break;
+      case  Zero_AmB_C14:return(-1);break;
       case  Zero_AmB_MinAB:return(m_Zero_AmB_MinAB(t_num)); break;
       case  Zero_AmB_MaxAB:return(m_Zero_AmB_MaxAB(t_num)); break;           //43
       case  Cmpd2_Min_FF1:return(m_Cmpd2_Min_FF1(t_num)); break;
@@ -647,8 +669,8 @@ double miniTR::m_Calc_miniTR(ENUM_miniTR_ID const &mini,const int &t_num)
       case  Cmpd4_Max_pmm:return(m_Cmpd4_Max_pmm(t_num));break;
       case  Abs_Cmpd4_Min_pmm:return(m_Abs_Cmpd4_Min_pmm(t_num));break;
       case  Abs_Cmpd4_Max_pmm:return(m_Abs_Cmpd4_Max_pmm(t_num));break;                     //231
-      case  VirtualLast:return(0);break;                                                  //Virtual 232                 
-      default:return(0); break;                                // DEFAULT
+      case  VirtualLast:return(-1);break;                                                  //Virtual 232                 
+      default:return(-1); break;                                // DEFAULT
      }
   }
 //+------------------------------------------------------------------+
@@ -663,7 +685,7 @@ int miniTR::ImportMiniTRParams(const string &Pair,const string &_FName)
 //   string fname="//"+AccountInfoString(ACCOUNT_SERVER)+"_"+Symbol()+"_miniTR";
 //Check miniTR file
 
-   string s=_FName+Pair+"_";
+   string s=_FName+"_"+Pair+"_";
 
    int  fh_miniTR=FileOpen(s+m_FName_miniTR,FILE_READ|FILE_WRITE|FILE_BIN|FILE_COMMON);
    if(fh_miniTR==INVALID_HANDLE)
@@ -976,6 +998,151 @@ void miniTR::m_Check_GroupID()
    Print("Check Group Complete.");
   }//END OF Check Group
 //+------------------------------------------------------------------+
+//|Check GroupID of one T interval                                   |
+//+------------------------------------------------------------------+
+ENUM_T_GROUP_ID miniTR::CurrentCheckGroupID(const STRUCT_miniTR &mtr)
+  {
+//If Unknown - > Set it to Unknown
+   m_current_GroupID=Unknown;
+
+//0 SS SleepMarket
+   if((mtr.dQ1==0) && (mtr.dQ4==0))
+     {m_current_GroupID=NOTRADE; return(NOTRADE);}
+
+//2 FS Singularity      
+   if(((mtr.dQ1*mtr.dQ4)==0) && ((mtr.dQ1+mtr.dQ4)!=0))
+     {m_current_GroupID=FSingul; return(FSingul);}
+
+//3 F1S Singularity      
+   if(((mtr.dQ1-mtr.dQ4)==0) && ((mtr.dQ1+mtr.dQ4)!=0))
+     {m_current_GroupID=F1Singul; return(F1Singul);}
+
+//4 Beta Singularity
+   if(((mtr.dQ1*mtr.dQ4)==0) && ((mtr.dQ4-mtr.dQ1)!=0))
+     {m_current_GroupID=BetaSingul; return(BetaSingul);}
+
+//5 Gamma Singularity
+   if(mtr.dQ14==0)
+     {m_current_GroupID=GammaSingul; return(GammaSingul);}
+
+//2 Hybrid Singularity, not to Detect!
+//      if(m_current_GroupID)
+
+//6 PPpp
+   if((mtr.F==1) && (mtr.F1==1) && (mtr.Beta==1) && (mtr.Gamma==1))
+     {
+      m_current_GroupID=PP_pp;
+      return(PP_pp);
+     }
+
+//7 PPmm
+   if((mtr.F==1) && (mtr.F1==1) && (mtr.Beta==-1) && (mtr.Gamma==-1))
+     {
+      m_current_GroupID=PP_mm;
+      return(PP_mm);
+     }
+
+//8 PPpm
+   if((mtr.F==1) && (mtr.F1==1) && (mtr.Beta==1) && (mtr.Gamma==-1))
+     {
+      m_current_GroupID=PP_pm;
+      return(PP_pm);
+     }
+
+//9 PPmp
+   if((mtr.F==1) && (mtr.F1==1) && (mtr.Beta==-1) && (mtr.Gamma==1))
+     {
+      m_current_GroupID=PP_mp;
+      return(PP_mp);
+     }
+
+//10 MMpp
+   if((mtr.F==-1) && (mtr.F1==-1) && (mtr.Beta==1) && (mtr.Gamma==1))
+     {
+      m_current_GroupID=MM_pp;
+      return(MM_pp);
+     }
+
+//11 MMmm
+   if((mtr.F==-1) && (mtr.F1==-1) && (mtr.Beta==-1) && (mtr.Gamma==-1))
+     {
+      m_current_GroupID=MM_mm;
+      return(MM_mm);
+     }
+
+//12 MMpm
+   if((mtr.F==-1) && (mtr.F1==-1) && (mtr.Beta==1) && (mtr.Gamma==-1))
+     {
+      m_current_GroupID=MM_pm;
+      return(MM_pm);
+     }
+
+//13 MMmp
+   if((mtr.F==-1) && (mtr.F1==-1) && (mtr.Beta==-1) && (mtr.Gamma==1))
+     {
+      m_current_GroupID=MM_mp;
+      return(MM_mp);
+     }
+
+//14 PMpp
+   if((mtr.F==1) && (mtr.F1==-1) && (mtr.Beta==1) && (mtr.Gamma==1))
+     {
+      m_current_GroupID=PM_pp;
+      return(PM_pp);
+     }
+
+//15 PMmm
+   if((mtr.F==1) && (mtr.F1==-1) && (mtr.Beta==-1) && (mtr.Gamma==-1))
+     {
+      m_current_GroupID=PM_mm;
+      return(PM_mm);
+     }
+
+//16 PMpm
+   if((mtr.F==1) && (mtr.F1==-1) && (mtr.Beta==1) && (mtr.Gamma==-1))
+     {
+      m_current_GroupID=PM_pm;
+      return(PM_pm);
+     }
+
+//17 PMmp
+   if((mtr.F==1) && (mtr.F1==-1) && (mtr.Beta==-1) && (mtr.Gamma==1))
+     {
+      m_current_GroupID=PM_mp;
+      return(PM_mp);
+     }
+
+//18 MPpp
+   if((mtr.F==-1) && (mtr.F1==1) && (mtr.Beta==1) && (mtr.Gamma==1))
+     {
+      m_current_GroupID=MP_pp;
+      return(MP_pp);
+     }
+
+//19 MPmm
+   if((mtr.F==-1) && (mtr.F1==1) && (mtr.Beta==-1) && (mtr.Gamma==-1))
+     {
+      m_current_GroupID=MP_mm;
+      return(MP_mm);
+     }
+
+//20 MPpm
+   if((mtr.F==-1) && (mtr.F1==1) && (mtr.Beta==1) && (mtr.Gamma==-1))
+     {
+      m_current_GroupID=MP_pm;
+      return(MP_pm);
+     }
+
+//21 MPmp
+   if((mtr.F==-1) && (mtr.F1==1) && (mtr.Beta==-1) && (mtr.Gamma==1))
+     {
+      m_current_GroupID=MP_mp;
+      return(MP_mp);
+     }
+//If no
+   return(Unknown);
+  }//END OF Check Group    
+//+------------------------------------------------------------------+
 //| Process all miniTRs of a Groups                                  |
 //+------------------------------------------------------------------+
 void miniTR::Process_miniTR()
@@ -1039,7 +1206,7 @@ void miniTR::m_FindBest_miniTR()
            }
         }//END OF i-miniTRs Count (4+)
      }//END OF J-GROUPS(23)
-   Alert("Find best miniTR Complete.");
+   Print("Find best miniTR Complete.");
   }
 //+------------------------------------------------------------------+
 //| Export miniTR to Bin (23 uchars)                                 |
@@ -4475,5 +4642,30 @@ double miniTR::m_Abs_Cmpd4_Min_pmm(const int &T_NUM)
 //Sum NP by Group
    if(m_result==m_x1) return(m_arr_rNP1[T_NUM].NP1_RT);
    else return(m_arr_rNP4[T_NUM].NP4_RT);
+  }
+//+------------------------------------------------------------------+
+//--------------------------------------------------------------------
+//|   Calculate Ck signal for current Group                          |
+//-------------------------------------------------------------------- 
+ENUM_CK_SIGNALS  miniTR::CalculateCk(const STRUCT_miniTR &mtr,const ENUM_miniTR_ID &miniTRID)
+  {
+//Resize Arr
+   ArrayResize(m_arr_rNP1,1,10);
+   ArrayResize(m_arr_rNP4,1,10);
+   ArrayResize(m_arr_mtr,1,10);
+
+//Plomb Signals directly to ARR
+   m_arr_rNP1[0].NP1_RT=CkBuy1;
+   m_arr_rNP4[0].NP4_RT=CkSell4;
+
+//Save struct to Zero array
+   m_arr_mtr[0]=mtr;
+
+   int t=0;
+
+//Calculate Current Ck
+   double res=m_Calc_miniTR(miniTRID,t);
+
+   return((ENUM_CK_SIGNALS)res);
   }
 //+------------------------------------------------------------------+
