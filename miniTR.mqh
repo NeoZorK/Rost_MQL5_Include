@@ -96,6 +96,9 @@ public:
    //Print Statistics
    void              PrintStatistics();
 
+   //Export result matrix to csv (Group and miniTRs)
+   void              ExportMatrix_CSV(const bool m_csv_separator);
+
   };
 //+------------------------------------------------------------------+
 //|  CONSTRUCTOR                                                     |
@@ -135,7 +138,7 @@ bool miniTR::Init(void)
 void miniTR::PrintStatistics(void)
   {
    Print("_______________________Processing Statistics_________________________");
-   
+
 //Print Best NP with Index  
    for(ENUM_T_GROUP_ID i=NOTRADE;i<Unknown;i++)
       Print(IntegerToString(i)+" | "
@@ -847,5 +850,119 @@ void miniTR::ExportMiniTR_ToBin()
 
 //Close File
    FileClose(file_h1);
+  }
+//+------------------------------------------------------------------+
+//| Export Matrix to CSV                                             |
+//+------------------------------------------------------------------+  
+void miniTR::ExportMatrix_CSV(const bool m_csv_separator)
+  {
+/*
+Each Cell consist Best miniTR
+Columns Groups (23),Rows T(n)
+T1    min   max   ...   n23
+T2    min   min   ...   n23
+Tn    max   max   ...   n23
+*/
+//Choose CSV Separator
+   string SP="";
+   if(m_csv_separator) SP=MacSeparator;
+   else SP=WindowsSeparator;
+
+//Get Info:
+   string G_Company=AccountInfoString(ACCOUNT_COMPANY);
+   string G_Server=AccountInfoString(ACCOUNT_SERVER);
+   long G_AccountNumber=AccountInfoInteger(ACCOUNT_LOGIN);
+   string G_AccountOwner=AccountInfoString(ACCOUNT_NAME);
+   long G_AccountLeverage=AccountInfoInteger(ACCOUNT_LEVERAGE);
+
+//Init filename
+   string fname="//"+G_Server+"_"+Symbol()+"_mtrx.csv";
+//If exist, del file
+   if(FileIsExist(fname,FILE_READ|FILE_WRITE|FILE_COMMON|FILE_CSV|FILE_ANSI))
+     {
+      FileDelete(fname,FILE_READ|FILE_WRITE|FILE_COMMON|FILE_CSV|FILE_ANSI);
+     }
+
+//Create handle
+   int file_handle=FileOpen(fname,FILE_READ|FILE_WRITE|FILE_COMMON|FILE_CSV|FILE_ANSI);
+//Check if can`t create     
+   if(file_handle==INVALID_HANDLE)
+     {
+      Print(__FUNCTION__+"Err:",GetLastError()," on FileOpen");
+      return;
+     }
+
+//0  Output HEADER string
+   string s="Company: "+G_Company+"\r\n";
+   s+=" Server: "+G_Server+"\r\n";
+   s+=" Account: "+IntegerToString(G_AccountNumber)+"\r\n";
+   s+=" Owner: "+G_AccountOwner+"\r\n";
+   s+=" Leverage: "+IntegerToString(G_AccountLeverage)+"\r\n";
+   s+=Symbol()+"\r\n";
+   s+=" Total T-count: "+IntegerToString(T_Count)+"\r\n";
+   s+="Groups Count:  "+IntegerToString(GroupsCount)+"\r\n";
+
+//Left side of the Header 1
+   s+="   T"+SP+"   NP1"+SP+"   NP4"+SP+"    dQ1"+SP+"   dQ4"+SP+"   Group"+SP+" StartDate"+SP;
+
+//1  Header Row - Groups Names
+   for(ENUM_T_GROUP_ID i=NOTRADE;i<Unknown;i++)
+      s+=EnumToString(i)+"          "+SP;
+
+//Next Row
+   s+="\r\n";
+
+//Left side of the Header 3
+   s+="Best NP GROUP SUM:"+SP+SP+SP+SP+SP+SP+SP;
+
+//3  Third Header Row - Best NP  for each group   
+   for(ENUM_T_GROUP_ID i=NOTRADE;i<Unknown;i++)
+      s+=DoubleToString(arr_minitr[i].BestNP,2)+SP;
+
+//Next Row
+   s+="\r\n";
+
+//Left side of the Header 2
+   s+="Best miniTR:"+SP+SP+SP+SP+SP+SP+SP;
+
+//2  Second Header Row - Best miniTR name for each group   
+   for(ENUM_T_GROUP_ID i=NOTRADE;i<Unknown;i++)
+     {
+      //Don`t Show not trade
+      if(arr_minitr[i].minitr<2) s+=""+SP;
+      else  s+=EnumToString((ENUM_miniTR_ID)arr_minitr[i].minitr)+SP;
+     }
+
+//Next Row
+   s+="\r\n";
+
+   ENUM_miniTR_ID mini=0;
+//Circle T -Rows with Best miniTR in each Group 
+   for(int i=0;i<T_Count;i++)
+     {
+      //Begin of each ROW
+      s+=IntegerToString(i)+SP;
+      s+=DoubleToString(arr_rNP1[i].NP1_RT,2)+SP;
+      s+=DoubleToString(arr_rNP4[i].NP4_RT,2)+SP;
+      s+=IntegerToString(arr_mtr[i].dQ1)+SP;
+      s+=IntegerToString(arr_mtr[i].dQ4)+SP;
+      s+=EnumToString(arr_GroupID[i])+SP;
+      s+=TimeToString(arr_mtr[i].StartTime)+SP;
+      for(int j=0;j<GroupsCount;j++)
+        {
+         //Best TR NP1 or NP4
+         mini=(ENUM_miniTR_ID)arr_minitr[j].minitr;
+         s+=DoubleToString(Calc_miniTR(mini,i),2)+SP;
+        }//END OF Column-Group FOR  
+      //End of each ROW
+      s+="\r\n";
+     }//END OF T-ROW FOR
+
+//Write String to CSV
+   FileWriteString(file_handle,s);
+
+//Close File
+   FileClose(file_handle);
+   Print("Export matrix to CSV Completed..");
   }
 //+------------------------------------------------------------------+
