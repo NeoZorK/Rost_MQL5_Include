@@ -90,8 +90,16 @@ public:
    //Process all miniTRs
    void              Process_miniTR();
 
+   //Export miniTR to bin file
+   void              ExportMiniTR_ToBin();
+
+   //Print Statistics
+   void              PrintStatistics();
+
   };
-//CONSTRUCTOR  
+//+------------------------------------------------------------------+
+//|  CONSTRUCTOR                                                     |
+//+------------------------------------------------------------------+ 
 miniTR::miniTR(void)
   {
    m_x1=0;
@@ -120,6 +128,51 @@ bool miniTR::Init(void)
    m_groups_count=m_GroupsCount();
    m_minitr_count=m_MiniTrCount();
    return(true);
+  }
+//+------------------------------------------------------------------+
+//|  Print Statistics                                                |
+//+------------------------------------------------------------------+
+void miniTR::PrintStatistics(void)
+  {
+   Print("_______________________Processing Statistics_________________________");
+   
+//Print Best NP with Index  
+   for(ENUM_T_GROUP_ID i=NOTRADE;i<Unknown;i++)
+      Print(IntegerToString(i)+" | "
+            +EnumToString(i)+"| BEST NP = "
+            +DoubleToString(arr_minitr[i].BestNP,2)+
+            "("+EnumToString((ENUM_miniTR_ID)arr_minitr[i].minitr)+") T( "
+            +(string)arr_T_Count_in_GRP[i]+" )");
+
+//How many NO TRADE GROUPS: (SLEEP MARKET)  
+   Print("NO TRADES in PRIMINGS T Count: "+(string)arr_T_Count_in_GRP[NOTRADE]+" of "+(string)T_Count);
+
+//Counter ZeroProfit & Unknown GRP
+   int NonProfitGrpCount=0;
+   int UnknownGrpCount=0;
+
+//Print Groups Count Without miniTR (Zero or non profitable)+Unknown
+   for(int i=0;i<GroupsCount;i++)
+     {
+      if(arr_minitr[i].BestNP==0) NonProfitGrpCount++;
+      if(arr_GroupID[i]==Unknown) UnknownGrpCount++;
+     }
+
+   Print("Non Profit Groups count: "+(string)NonProfitGrpCount+" (of:"+(string)GroupsCount+" totally.)");
+   Print("Unknown Groups count: "+IntegerToString(UnknownGrpCount));
+
+   double TotalBestNP=0;
+
+//Print Sum of All NPs
+   for(ENUM_T_GROUP_ID i=NOTRADE;i<Unknown;i++)
+      TotalBestNP+=arr_minitr[i].BestNP;
+
+   Print("Total Sum of all Best NP: "+DoubleToString(TotalBestNP,2));
+
+//   if(NonProfitGrpCount+NeverMetGrpCount==GroupsCount)
+//      Alert("SUCCESS! All Groups are Profitable! ");
+
+   Print("________________________________Completed________________________________");
   }
 //+------------------------------------------------------------------+
 //| Calculate miniTR (227 items)                                     |
@@ -771,5 +824,28 @@ void miniTR::m_FindBest_miniTR()
         }//END OF i-miniTRs Count (4+)
      }//END OF J-GROUPS(23)
    Alert("Find best miniTR Complete.");
+  }
+//+------------------------------------------------------------------+
+//| Export miniTR to Bin (23 uchars)                                 |
+//+------------------------------------------------------------------+
+void miniTR::ExportMiniTR_ToBin()
+  {
+//Init filename
+   string fname="//"+AccountInfoString(ACCOUNT_SERVER)+"_"+Symbol()+"_atr";
+
+//If exist, del file (Replace by new one)
+   if(FileIsExist(fname,FILE_READ|FILE_WRITE|FILE_COMMON|FILE_BIN))
+      FileDelete(fname,FILE_READ|FILE_WRITE|FILE_COMMON|FILE_BIN);
+
+//Init 
+   int  file_h1=FileOpen(fname,FILE_READ|FILE_WRITE|FILE_BIN|FILE_COMMON);
+   if(file_h1==INVALID_HANDLE)  return;
+
+//Export
+   for(int i=0;i<GroupsCount;i++)
+      FileWriteStruct(file_h1,arr_minitr[i]);
+
+//Close File
+   FileClose(file_h1);
   }
 //+------------------------------------------------------------------+
