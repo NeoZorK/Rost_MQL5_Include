@@ -41,7 +41,7 @@ private:
    bool              m_minmax_Only;
 
    //miniTR Params
-   STRUCT_miniTR     m_arr_mtr[];
+   STRUCT_miniTR_params m_arr_mtr[];
 
    //RealTime NP
    RT_NP             m_arr_rNP1[];
@@ -63,8 +63,8 @@ private:
    //Statistics T count inside each group
    uint              m_arr_T_Count_in_GRP[];
 
-   //Check GroupID of every interval T                                 
-   void              m_Check_GroupID(void);
+   //Define GroupID of every interval T                                 
+   void              m_Define_GroupID(void);
 
    //Groups Count
    int               m_GroupsCount(void);
@@ -343,10 +343,10 @@ public:
    void              ExportMatrix_CSV(const bool m_csv_separator);
 
    //Check Current GroupID
-   ENUM_T_GROUP_ID   CurrentCheckGroupID(STRUCT_miniTR const &mtr);
+   ENUM_T_GROUP_ID   CurrentCheckGroupID(STRUCT_miniTR_params const &mtr);
 
    //Calculate Ck signal for current Group
-   ENUM_CK_SIGNALS   CalculateCk(STRUCT_miniTR const &mtr,ENUM_miniTR_ID const &miniTRID);
+   ENUM_CK_SIGNALS   CalculateCk(STRUCT_miniTR_params const &mtr,ENUM_miniTR_ID const &miniTRID);
 
   };
 //+------------------------------------------------------------------+
@@ -807,8 +807,8 @@ int miniTR::ImportMiniTRParams(const string &Pair,const string &_FName)
 //Save Total imported T Count   
    m_T_Count=i;
 
-//Check Group
-   if(m_T_Count>0) m_Check_GroupID();
+//Define Group ID for every T-interval
+   if(m_T_Count>0) m_Define_GroupID();
    else {Print("T Count="+(string)m_T_Count); return(-1);}
 
    return(m_T_Count);
@@ -834,9 +834,9 @@ int miniTR::m_MiniTrCount(void)
    return(j);
   }
 //+------------------------------------------------------------------+
-//|Check GroupID of every interval T                                 |
+//|Define GroupID of every interval T                                |
 //+------------------------------------------------------------------+
-void miniTR::m_Check_GroupID()
+void miniTR::m_Define_GroupID()
   {
 //Clear m_arr and set size (T)
    ArrayFree(m_arr_GroupID);
@@ -849,7 +849,7 @@ void miniTR::m_Check_GroupID()
    ArrayResize(m_arr_T_Count_in_GRP,m_groups_count);
    ArrayFill(m_arr_T_Count_in_GRP,0,m_groups_count,0);
 
-//Check GROUP  
+//Define GROUP  
    for(int i=0;i<ArrSize;i++)
      {
       //If Unknown - > Set it to Unknown
@@ -1008,11 +1008,11 @@ void miniTR::m_Check_GroupID()
      }//END OF FOR
 
    Print("Check Group Complete.");
-  }//END OF Check Group
+  }//END OF Define Group
 //+------------------------------------------------------------------+
 //|Check GroupID of one T interval                                   |
 //+------------------------------------------------------------------+
-ENUM_T_GROUP_ID miniTR::CurrentCheckGroupID(const STRUCT_miniTR &mtr)
+ENUM_T_GROUP_ID miniTR::CurrentCheckGroupID(const STRUCT_miniTR_params &mtr)
   {
 //If Unknown - > Set it to Unknown
    m_current_GroupID=Unknown;
@@ -4685,7 +4685,7 @@ double miniTR::m_Abs_Cmpd4_Min_pmm(const int &T_NUM)
 //--------------------------------------------------------------------
 //|   Calculate Ck signal for current Group                          |
 //-------------------------------------------------------------------- 
-ENUM_CK_SIGNALS  miniTR::CalculateCk(const STRUCT_miniTR &mtr,const ENUM_miniTR_ID &miniTRID)
+ENUM_CK_SIGNALS  miniTR::CalculateCk(const STRUCT_miniTR_params &mtr,const ENUM_miniTR_ID &miniTRID)
   {
 //Resize Arr
    ArrayResize(m_arr_rNP1,1,10);
