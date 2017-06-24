@@ -1252,7 +1252,10 @@ void miniTR::m_FindBestMAX_miniTR()
 void miniTR::ExportMiniTR_ToBin()
   {
 //Init filename
-   string fname="//"+AccountInfoString(ACCOUNT_SERVER)+"_"+Symbol()+"_atr";
+   string fname="";
+
+   if(m_minmax_Only) fname = "//"+AccountInfoString(ACCOUNT_SERVER)+"_"+Symbol()+"_minmax";
+   else              fname = "//"+AccountInfoString(ACCOUNT_SERVER)+"_"+Symbol()+"_full";
 
 //If exist, del file (Replace by new one)
    if(FileIsExist(fname,FILE_READ|FILE_WRITE|FILE_COMMON|FILE_BIN))
