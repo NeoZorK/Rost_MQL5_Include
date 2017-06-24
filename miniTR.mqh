@@ -55,7 +55,7 @@ private:
    double            m_arr_SUM_NP_GROUP[][23];
 
    //Sum of Positive T Count for every Group (23)
-   uint              m_arr_SUM_PositiveCount[][23];
+   int               m_arr_SUM_PositiveCount[][23];
 
    //Struct for EXPORT to bin
    STRUCT_miniTRID   m_arr_minitr[23];
@@ -398,8 +398,8 @@ void miniTR::PrintStatistics(void)
    for(ENUM_T_GROUP_ID i=NOTRADE;i<Unknown;i++)
       Print(IntegerToString(i)+" | "
             +EnumToString(i)+"| BEST NP = "
-            +DoubleToString(m_arr_minitr[i].Max_Balance,2)+
-            "("+EnumToString((ENUM_miniTR_ID)m_arr_minitr[i].MiniTR_ID_MaxBalance)+") T( "
+            +DoubleToString(m_arr_minitr[i].byMaxBal_GRP_FinalBal,2)+
+            "("+EnumToString((ENUM_miniTR_ID)m_arr_minitr[i].byMaxBal_Best_ID)+") T( "
             +(string)m_arr_T_Count_in_GRP[i]+" )");
 
 //How many NO TRADE GROUPS: (SLEEP MARKET)  
@@ -412,7 +412,7 @@ void miniTR::PrintStatistics(void)
 //Print Groups Count Without miniTR (Zero or non profitable)+Unknown
    for(int i=0;i<m_groups_count;i++)
      {
-      if(m_arr_minitr[i].Max_Balance==0) NonProfitGrpCount++;
+      if(m_arr_minitr[i].byMaxBal_GRP_FinalBal==0) NonProfitGrpCount++;
       if(m_arr_GroupID[i]==Unknown) UnknownGrpCount++;
      }
 
@@ -423,7 +423,7 @@ void miniTR::PrintStatistics(void)
 
 //Print Sum of All NPs
    for(ENUM_T_GROUP_ID i=NOTRADE;i<Unknown;i++)
-      TotalBestNP+=m_arr_minitr[i].Max_Balance;
+      TotalBestNP+=m_arr_minitr[i].byMaxBal_GRP_FinalBal;
 
    Print("Total Sum of all Best NP: "+DoubleToString(TotalBestNP,2));
 
@@ -1208,42 +1208,42 @@ void miniTR::Process_miniTR()
 //+------------------------------------------------------------------+
 void miniTR::m_FindBestMAX_miniTR()
   {
-   double MaximumNP=-9999999999999;
-   double MaximumPositiveCount=-9999999999999;
+   double MaximumNP=DBL_MIN;
+   int MaximumPositiveCount=INT_MIN;
 
 //Find Best miniTR in each Group  
-   for(int j=0;j<m_groups_count;j++)
+   for(ENUM_T_GROUP_ID group=0;group<m_groups_count;group++)
      {
       //Clear Maximum
-      MaximumNP=-9999999999999;
-      MaximumPositiveCount=-9999999999999;
+      MaximumNP=DBL_MIN;
+      MaximumPositiveCount=INT_MIN;
 
-      for(int i=0;i<m_minitr_count;i++)
+      for(ENUM_miniTR_ID tr_id=0;tr_id<m_minitr_count;tr_id++)
         {
          //MaxNP
-         if(m_arr_SUM_NP_GROUP[i][j]>MaximumNP)
+         if(m_arr_SUM_NP_GROUP[tr_id][group]>MaximumNP)
            {
             //Save Maximum NP
-            MaximumNP=m_arr_SUM_NP_GROUP[i][j];
+            MaximumNP=m_arr_SUM_NP_GROUP[tr_id][group];
 
             //Save miniTR Index & Best NP for this GroupID
-            m_arr_minitr[j].MiniTR_ID_MaxBalance=i;
-            m_arr_minitr[j].Max_Balance=MaximumNP;
+            m_arr_minitr[group].byMaxBal_Best_ID=tr_id;
+            m_arr_minitr[group].byMaxBal_GRP_FinalBal=MaximumNP;
            }
 
          //Max PositiveCount
-         if(m_arr_SUM_PositiveCount[i][j]>MaximumPositiveCount)
+         if(m_arr_SUM_PositiveCount[tr_id][group]>MaximumPositiveCount)
            {
             //Save Maximum NP
-            MaximumPositiveCount=m_arr_SUM_PositiveCount[i][j];
+            MaximumPositiveCount=m_arr_SUM_PositiveCount[tr_id][group];
 
             //Save miniTR Index & Best NP for this GroupID
-            m_arr_minitr[j].MiniTR_ID_MaxPositiveCount=i;
-            m_arr_minitr[j].Max_PositiveCount=MaximumPositiveCount;
+            m_arr_minitr[group].byMaxPlusCnt_Best_ID=tr_id;
+            m_arr_minitr[group].byMaxPlusCnt_GRP_PlusT_Cnt=MaximumPositiveCount;
            }
 
-        }//END OF i-miniTRs Count (4+)
-     }//END OF J-GROUPS(23)
+        }//END OF miniTRs Count (230)
+     }//END OF GROUPS(23)
    Print("Find best miniTR Complete.");
   }
 //+------------------------------------------------------------------+
@@ -1338,7 +1338,7 @@ Tn    max   max   ...   n23
 
 //3  Third Header Row - Best NP  for each group   
    for(ENUM_T_GROUP_ID i=NOTRADE;i<Unknown;i++)
-      s+=DoubleToString(m_arr_minitr[i].Max_Balance,2)+SP;
+      s+=DoubleToString(m_arr_minitr[i].byMaxBal_GRP_FinalBal,2)+SP;
 
 //Next Row
    s+="\r\n";
@@ -1350,8 +1350,8 @@ Tn    max   max   ...   n23
    for(ENUM_T_GROUP_ID i=NOTRADE;i<Unknown;i++)
      {
       //Don`t Show not trade
-      if(m_arr_minitr[i].Max_Balance<2) s+=""+SP;
-      else  s+=EnumToString((ENUM_miniTR_ID)m_arr_minitr[i].MiniTR_ID_MaxBalance)+SP;
+      if(m_arr_minitr[i].byMaxBal_GRP_FinalBal<2) s+=""+SP;
+      else  s+=EnumToString((ENUM_miniTR_ID)m_arr_minitr[i].byMaxBal_Best_ID)+SP;
      }
 
 //Next Row
@@ -1372,7 +1372,7 @@ Tn    max   max   ...   n23
       for(int j=0;j<m_groups_count;j++)
         {
          //Best TR NP1 or NP4
-         mini=(ENUM_miniTR_ID)m_arr_minitr[j].MiniTR_ID_MaxBalance;
+         mini=(ENUM_miniTR_ID)m_arr_minitr[j].byMaxBal_Best_ID;
          s+=DoubleToString(m_Calc_miniTR(mini,i),2)+SP;
         }//END OF Column-Group FOR  
       //End of each ROW
