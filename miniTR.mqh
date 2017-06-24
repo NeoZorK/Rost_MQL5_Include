@@ -339,6 +339,9 @@ public:
    //Print Statistics
    void              PrintStatistics();
 
+   //T Count in Group by GroupID
+   uint              T_Count_By_GroupID(const ENUM_T_GROUP_ID &GroupID) const {return(m_arr_T_Count_in_GRP[GroupID]);}
+
    //Export result matrix to csv (Group and miniTRs)
    void              ExportMatrix_CSV(const bool m_csv_separator);
 
