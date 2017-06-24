@@ -448,6 +448,9 @@ double miniTR::m_Calc_miniTR(ENUM_miniTR_ID const &mini,const int &t_num)
      {
       if(mini==Min_AB) return(m_Min_AB(t_num));
       if(mini==Max_AB) return(m_Max_AB(t_num));
+      
+      //Always Exit, don`t calculate other miniTR
+      return(NoTrade_Dimenish);
      }
 
    switch(mini)
