@@ -1226,9 +1226,10 @@ void miniTR::m_FindBestMAX_miniTR()
             //Save Maximum NP
             MaximumNP=m_arr_SUM_NP_GROUP[tr_id][group];
 
-            //Save miniTR Index & Best NP for this GroupID
+            //Save miniTR Index & Best NP & PlusCount for this GroupID
             m_arr_minitr[group].byMaxBal_Best_ID=tr_id;
             m_arr_minitr[group].byMaxBal_GRP_FinalBal=MaximumNP;
+            m_arr_minitr[group].byMaxBal_GRP_PlusT_Cnt=m_arr_SUM_PositiveCount[tr_id][group];
            }
 
          //Max PositiveCount
@@ -1237,9 +1238,10 @@ void miniTR::m_FindBestMAX_miniTR()
             //Save Maximum NP
             MaximumPositiveCount=m_arr_SUM_PositiveCount[tr_id][group];
 
-            //Save miniTR Index & Best NP for this GroupID
+            //Save miniTR Index & Best NP & PlusCount for this GroupID
             m_arr_minitr[group].byMaxPlusCnt_Best_ID=tr_id;
             m_arr_minitr[group].byMaxPlusCnt_GRP_PlusT_Cnt=MaximumPositiveCount;
+            m_arr_minitr[group].byMaxPlusCnt_GRP_FinalBal=m_arr_SUM_NP_GROUP[tr_id][group];
            }
 
         }//END OF miniTRs Count (230)
