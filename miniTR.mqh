@@ -28,6 +28,12 @@ private:
    //Count of T
    int               m_T_Count;
 
+   //Predict period D1,W1,MN1,Q1...
+   ENUM_myPredictPeriod m_predict_period;
+
+   //OHLC or Ticks?
+   bool              m_ohlc;
+
    //Groups Count
    int               m_groups_count;
 
@@ -316,7 +322,7 @@ public:
                      miniTR(void);
                     ~miniTR(void);
    //Init
-   bool              Init(const bool &MinMaxOnly);
+   bool              Init(const bool &MinMaxOnly,const ENUM_myPredictPeriod &PredictPeriod,const bool &OHLC);
 
    //Groups Count
    int             GroupsCount(void) const    {return(m_groups_count);}
@@ -379,13 +385,16 @@ miniTR::~miniTR(void)
 //+------------------------------------------------------------------+
 //| INIT                                                             |
 //+------------------------------------------------------------------+
-bool miniTR::Init(const bool &MinMaxOnly)
+bool miniTR::Init(const bool &MinMaxOnly,const ENUM_myPredictPeriod &PredictPeriod,const bool &OHLC)
   {
    m_groups_count=m_GroupsCount();
    m_minitr_count=m_MiniTrCount();
 
 //Prepare PositiveCounter
    m_TotalPositiveTCount=m_GroupsCount()*m_MiniTrCount();
+
+   m_predict_period=PredictPeriod;
+   m_ohlc=OHLC;
 
    m_minmax_Only=MinMaxOnly;
    return(true);
@@ -448,7 +457,7 @@ double miniTR::m_Calc_miniTR(ENUM_miniTR_ID const &mini,const int &t_num)
      {
       if(mini==Min_AB) return(m_Min_AB(t_num));
       if(mini==Max_AB) return(m_Max_AB(t_num));
-      
+
       //Always Exit, don`t calculate other miniTR
       return(NoTrade_Dimenish);
      }
@@ -1262,8 +1271,13 @@ void miniTR::ExportMiniTR_ToBin()
 //Init filename
    string fname="";
 
-   if(m_minmax_Only) fname = "//"+AccountInfoString(ACCOUNT_SERVER)+"_"+Symbol()+"_minmax";
-   else              fname = "//"+AccountInfoString(ACCOUNT_SERVER)+"_"+Symbol()+"_full";
+//Format: Alpari-MT5-Demo_EURUSD00_miniTR; first 0=Day, Second 0=false=ticks;
+
+   if(m_minmax_Only) fname="//"+AccountInfoString(ACCOUNT_SERVER)+"_"+Symbol()+
+      IntegerToString(m_predict_period)+(string)m_ohlc+"_minmax";
+
+   else   fname="//"+AccountInfoString(ACCOUNT_SERVER)+"_"+Symbol()+
+                IntegerToString(m_predict_period)+(string)m_ohlc+"_full";
 
 //If exist, del file (Replace by new one)
    if(FileIsExist(fname,FILE_READ|FILE_WRITE|FILE_COMMON|FILE_BIN))
