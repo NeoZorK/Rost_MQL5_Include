@@ -342,8 +342,11 @@ public:
    //Export miniTR to bin file
    void              ExportMiniTR_ToBin();
 
-   //Print Statistics
-   void              PrintStatistics();
+   //Print Statistics for experts
+   void              ExpertStatistics();
+
+   //Alert Statistics for script
+   void              ScriptStatistics();
 
    //T Count in Group by GroupID
    uint              T_Count_By_GroupID(const ENUM_T_GROUP_ID &GroupID) const {return(m_arr_T_Count_in_GRP[GroupID]);}
@@ -400,9 +403,9 @@ bool miniTR::Init(const bool &MinMaxOnly,const ENUM_myPredictPeriod &PredictPeri
    return(true);
   }
 //+------------------------------------------------------------------+
-//|  Print Statistics                                                |
+//|  Print Expert Statistics                                         |
 //+------------------------------------------------------------------+
-void miniTR::PrintStatistics(void)
+void miniTR::ExpertStatistics(void)
   {
    Print("_______________________Processing Statistics_________________________");
 
@@ -443,6 +446,51 @@ void miniTR::PrintStatistics(void)
 //      Alert("SUCCESS! All Groups are Profitable! ");
 
    Print("________________________________Completed________________________________");
+  }
+//+------------------------------------------------------------------+
+//|  Alert Script Statistics                                         |
+//+------------------------------------------------------------------+
+void miniTR::ScriptStatistics(void)
+  {
+   Alert("_______________________Processing Statistics_________________________");
+
+//Alert Best NP with Index  
+   for(ENUM_T_GROUP_ID i=NOTRADE;i<Unknown;i++)
+      Alert(IntegerToString(i)+" | "
+            +EnumToString(i)+"| BEST NP = "
+            +DoubleToString(m_arr_minitr[i].byMaxBal_GRP_FinalBal,2)+
+            "("+EnumToString((ENUM_miniTR_ID)m_arr_minitr[i].byMaxBal_Best_ID)+") T( "
+            +(string)m_arr_T_Count_in_GRP[i]+" )");
+
+//How many NO TRADE GROUPS: (SLEEP MARKET)  
+   Alert("NO TRADES in PRIMINGS T Count: "+(string)m_arr_T_Count_in_GRP[NOTRADE]+" of "+(string)m_T_Count);
+
+//Counter ZeroProfit & Unknown GRP
+   int NonProfitGrpCount=0;
+   int UnknownGrpCount=0;
+
+//Alert Groups Count Without miniTR (Zero or non profitable)+Unknown
+   for(int i=0;i<m_groups_count;i++)
+     {
+      if(m_arr_minitr[i].byMaxBal_GRP_FinalBal==0) NonProfitGrpCount++;
+      if(m_arr_GroupID[i]==Unknown) UnknownGrpCount++;
+     }
+
+   Alert("Non Profit Groups count: "+(string)NonProfitGrpCount+" (of:"+(string)m_groups_count+" totally.)");
+   Alert("Unknown Groups count: "+IntegerToString(UnknownGrpCount));
+
+   double TotalBestNP=0;
+
+//Alert Sum of All NPs
+   for(ENUM_T_GROUP_ID i=NOTRADE;i<Unknown;i++)
+      TotalBestNP+=m_arr_minitr[i].byMaxBal_GRP_FinalBal;
+
+   Alert("Total Sum of all Best NP: "+DoubleToString(TotalBestNP,2));
+
+//   if(NonProfitGrpCount+NeverMetGrpCount==GroupsCount)
+//      Alert("SUCCESS! All Groups are Profitable! ");
+
+   Alert("________________________________Completed________________________________");
   }
 //+------------------------------------------------------------------+
 //| Calculate miniTR (227 items)                                     |
@@ -1270,14 +1318,19 @@ void miniTR::ExportMiniTR_ToBin()
   {
 //Init filename
    string fname="";
+   string str_ohlc="";
+
+//Check if this OHLC robot?   
+   if(m_ohlc) str_ohlc="OHLC";
+   else       str_ohlc="TICK";
 
 //Format: Alpari-MT5-Demo_EURUSD00_miniTR; first 0=Day, Second 0=false=ticks;
 
    if(m_minmax_Only) fname="//"+AccountInfoString(ACCOUNT_SERVER)+"_"+Symbol()+
-      IntegerToString(m_predict_period)+(string)m_ohlc+"_minmax";
+      IntegerToString(m_predict_period)+str_ohlc+"_minmax";
 
    else   fname="//"+AccountInfoString(ACCOUNT_SERVER)+"_"+Symbol()+
-                IntegerToString(m_predict_period)+(string)m_ohlc+"_full";
+                IntegerToString(m_predict_period)+str_ohlc+"_full";
 
 //If exist, del file (Replace by new one)
    if(FileIsExist(fname,FILE_READ|FILE_WRITE|FILE_COMMON|FILE_BIN))
