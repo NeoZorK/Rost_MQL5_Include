@@ -28,6 +28,12 @@ private:
    //Count of T
    int               m_T_Count;
 
+   //Predict period D1,W1,MN1,Q1...
+   ENUM_myPredictPeriod m_predict_period;
+
+   //OHLC or Ticks?
+   bool              m_ohlc;
+
    //Groups Count
    int               m_groups_count;
 
@@ -41,7 +47,7 @@ private:
    bool              m_minmax_Only;
 
    //miniTR Params
-   STRUCT_miniTR     m_arr_mtr[];
+   STRUCT_miniTR_params m_arr_mtr[];
 
    //RealTime NP
    RT_NP             m_arr_rNP1[];
@@ -55,7 +61,7 @@ private:
    double            m_arr_SUM_NP_GROUP[][23];
 
    //Sum of Positive T Count for every Group (23)
-   uint              m_arr_SUM_PositiveCount[][23];
+   int               m_arr_SUM_PositiveCount[][23];
 
    //Struct for EXPORT to bin
    STRUCT_miniTRID   m_arr_minitr[23];
@@ -63,8 +69,8 @@ private:
    //Statistics T count inside each group
    uint              m_arr_T_Count_in_GRP[];
 
-   //Check GroupID of every interval T                                 
-   void              m_Check_GroupID(void);
+   //Define GroupID of every interval T                                 
+   void              m_Define_GroupID(void);
 
    //Groups Count
    int               m_GroupsCount(void);
@@ -316,7 +322,7 @@ public:
                      miniTR(void);
                     ~miniTR(void);
    //Init
-   bool              Init(const bool &MinMaxOnly);
+   bool              Init(const bool &MinMaxOnly,const ENUM_myPredictPeriod &PredictPeriod,const bool &OHLC);
 
    //Groups Count
    int             GroupsCount(void) const    {return(m_groups_count);}
@@ -336,17 +342,23 @@ public:
    //Export miniTR to bin file
    void              ExportMiniTR_ToBin();
 
-   //Print Statistics
-   void              PrintStatistics();
+   //Print Statistics for experts
+   void              ExpertStatistics();
+
+   //Alert Statistics for script
+   void              ScriptStatistics();
+
+   //T Count in Group by GroupID
+   uint              T_Count_By_GroupID(const ENUM_T_GROUP_ID &GroupID) const {return(m_arr_T_Count_in_GRP[GroupID]);}
 
    //Export result matrix to csv (Group and miniTRs)
    void              ExportMatrix_CSV(const bool m_csv_separator);
 
    //Check Current GroupID
-   ENUM_T_GROUP_ID   CurrentCheckGroupID(STRUCT_miniTR const &mtr);
+   ENUM_T_GROUP_ID   CurrentCheckGroupID(STRUCT_miniTR_params const &mtr);
 
    //Calculate Ck signal for current Group
-   ENUM_CK_SIGNALS   CalculateCk(STRUCT_miniTR const &mtr,ENUM_miniTR_ID const &miniTRID);
+   ENUM_CK_SIGNALS   CalculateCk(STRUCT_miniTR_params const &mtr,ENUM_miniTR_ID const &miniTRID);
 
   };
 //+------------------------------------------------------------------+
@@ -376,7 +388,7 @@ miniTR::~miniTR(void)
 //+------------------------------------------------------------------+
 //| INIT                                                             |
 //+------------------------------------------------------------------+
-bool miniTR::Init(const bool &MinMaxOnly)
+bool miniTR::Init(const bool &MinMaxOnly,const ENUM_myPredictPeriod &PredictPeriod,const bool &OHLC)
   {
    m_groups_count=m_GroupsCount();
    m_minitr_count=m_MiniTrCount();
@@ -384,13 +396,16 @@ bool miniTR::Init(const bool &MinMaxOnly)
 //Prepare PositiveCounter
    m_TotalPositiveTCount=m_GroupsCount()*m_MiniTrCount();
 
+   m_predict_period=PredictPeriod;
+   m_ohlc=OHLC;
+
    m_minmax_Only=MinMaxOnly;
    return(true);
   }
 //+------------------------------------------------------------------+
-//|  Print Statistics                                                |
+//|  Print Expert Statistics                                         |
 //+------------------------------------------------------------------+
-void miniTR::PrintStatistics(void)
+void miniTR::ExpertStatistics(void)
   {
    Print("_______________________Processing Statistics_________________________");
 
@@ -398,8 +413,8 @@ void miniTR::PrintStatistics(void)
    for(ENUM_T_GROUP_ID i=NOTRADE;i<Unknown;i++)
       Print(IntegerToString(i)+" | "
             +EnumToString(i)+"| BEST NP = "
-            +DoubleToString(m_arr_minitr[i].Max_Balance,2)+
-            "("+EnumToString((ENUM_miniTR_ID)m_arr_minitr[i].MiniTR_ID_MaxBalance)+") T( "
+            +DoubleToString(m_arr_minitr[i].byMaxBal_GRP_FinalBal,2)+
+            "("+EnumToString((ENUM_miniTR_ID)m_arr_minitr[i].byMaxBal_Best_ID)+") T( "
             +(string)m_arr_T_Count_in_GRP[i]+" )");
 
 //How many NO TRADE GROUPS: (SLEEP MARKET)  
@@ -412,7 +427,7 @@ void miniTR::PrintStatistics(void)
 //Print Groups Count Without miniTR (Zero or non profitable)+Unknown
    for(int i=0;i<m_groups_count;i++)
      {
-      if(m_arr_minitr[i].Max_Balance==0) NonProfitGrpCount++;
+      if(m_arr_minitr[i].byMaxBal_GRP_FinalBal==0) NonProfitGrpCount++;
       if(m_arr_GroupID[i]==Unknown) UnknownGrpCount++;
      }
 
@@ -423,7 +438,7 @@ void miniTR::PrintStatistics(void)
 
 //Print Sum of All NPs
    for(ENUM_T_GROUP_ID i=NOTRADE;i<Unknown;i++)
-      TotalBestNP+=m_arr_minitr[i].Max_Balance;
+      TotalBestNP+=m_arr_minitr[i].byMaxBal_GRP_FinalBal;
 
    Print("Total Sum of all Best NP: "+DoubleToString(TotalBestNP,2));
 
@@ -431,6 +446,51 @@ void miniTR::PrintStatistics(void)
 //      Alert("SUCCESS! All Groups are Profitable! ");
 
    Print("________________________________Completed________________________________");
+  }
+//+------------------------------------------------------------------+
+//|  Alert Script Statistics                                         |
+//+------------------------------------------------------------------+
+void miniTR::ScriptStatistics(void)
+  {
+   Alert("_______________________Processing Statistics_________________________");
+
+//Alert Best NP with Index  
+   for(ENUM_T_GROUP_ID i=NOTRADE;i<Unknown;i++)
+      Alert(IntegerToString(i)+" | "
+            +EnumToString(i)+"| BEST NP = "
+            +DoubleToString(m_arr_minitr[i].byMaxBal_GRP_FinalBal,2)+
+            "("+EnumToString((ENUM_miniTR_ID)m_arr_minitr[i].byMaxBal_Best_ID)+") T( "
+            +(string)m_arr_T_Count_in_GRP[i]+" )");
+
+//How many NO TRADE GROUPS: (SLEEP MARKET)  
+   Alert("NO TRADES in PRIMINGS T Count: "+(string)m_arr_T_Count_in_GRP[NOTRADE]+" of "+(string)m_T_Count);
+
+//Counter ZeroProfit & Unknown GRP
+   int NonProfitGrpCount=0;
+   int UnknownGrpCount=0;
+
+//Alert Groups Count Without miniTR (Zero or non profitable)+Unknown
+   for(int i=0;i<m_groups_count;i++)
+     {
+      if(m_arr_minitr[i].byMaxBal_GRP_FinalBal==0) NonProfitGrpCount++;
+      if(m_arr_GroupID[i]==Unknown) UnknownGrpCount++;
+     }
+
+   Alert("Non Profit Groups count: "+(string)NonProfitGrpCount+" (of:"+(string)m_groups_count+" totally.)");
+   Alert("Unknown Groups count: "+IntegerToString(UnknownGrpCount));
+
+   double TotalBestNP=0;
+
+//Alert Sum of All NPs
+   for(ENUM_T_GROUP_ID i=NOTRADE;i<Unknown;i++)
+      TotalBestNP+=m_arr_minitr[i].byMaxBal_GRP_FinalBal;
+
+   Alert("Total Sum of all Best NP: "+DoubleToString(TotalBestNP,2));
+
+//   if(NonProfitGrpCount+NeverMetGrpCount==GroupsCount)
+//      Alert("SUCCESS! All Groups are Profitable! ");
+
+   Alert("________________________________Completed________________________________");
   }
 //+------------------------------------------------------------------+
 //| Calculate miniTR (227 items)                                     |
@@ -445,6 +505,9 @@ double miniTR::m_Calc_miniTR(ENUM_miniTR_ID const &mini,const int &t_num)
      {
       if(mini==Min_AB) return(m_Min_AB(t_num));
       if(mini==Max_AB) return(m_Max_AB(t_num));
+
+      //Always Exit, don`t calculate other miniTR
+      return(NoTrade_Dimenish);
      }
 
    switch(mini)
@@ -807,8 +870,8 @@ int miniTR::ImportMiniTRParams(const string &Pair,const string &_FName)
 //Save Total imported T Count   
    m_T_Count=i;
 
-//Check Group
-   if(m_T_Count>0) m_Check_GroupID();
+//Define Group ID for every T-interval
+   if(m_T_Count>0) m_Define_GroupID();
    else {Print("T Count="+(string)m_T_Count); return(-1);}
 
    return(m_T_Count);
@@ -834,9 +897,9 @@ int miniTR::m_MiniTrCount(void)
    return(j);
   }
 //+------------------------------------------------------------------+
-//|Check GroupID of every interval T                                 |
+//|Define GroupID of every interval T                                |
 //+------------------------------------------------------------------+
-void miniTR::m_Check_GroupID()
+void miniTR::m_Define_GroupID()
   {
 //Clear m_arr and set size (T)
    ArrayFree(m_arr_GroupID);
@@ -849,7 +912,7 @@ void miniTR::m_Check_GroupID()
    ArrayResize(m_arr_T_Count_in_GRP,m_groups_count);
    ArrayFill(m_arr_T_Count_in_GRP,0,m_groups_count,0);
 
-//Check GROUP  
+//Define GROUP  
    for(int i=0;i<ArrSize;i++)
      {
       //If Unknown - > Set it to Unknown
@@ -1008,11 +1071,11 @@ void miniTR::m_Check_GroupID()
      }//END OF FOR
 
    Print("Check Group Complete.");
-  }//END OF Check Group
+  }//END OF Define Group
 //+------------------------------------------------------------------+
 //|Check GroupID of one T interval                                   |
 //+------------------------------------------------------------------+
-ENUM_T_GROUP_ID miniTR::CurrentCheckGroupID(const STRUCT_miniTR &mtr)
+ENUM_T_GROUP_ID miniTR::CurrentCheckGroupID(const STRUCT_miniTR_params &mtr)
   {
 //If Unknown - > Set it to Unknown
    m_current_GroupID=Unknown;
@@ -1208,42 +1271,44 @@ void miniTR::Process_miniTR()
 //+------------------------------------------------------------------+
 void miniTR::m_FindBestMAX_miniTR()
   {
-   double MaximumNP=-9999999999999;
-   double MaximumPositiveCount=-9999999999999;
+   double MaximumNP=DBL_MIN;
+   int MaximumPositiveCount=INT_MIN;
 
 //Find Best miniTR in each Group  
-   for(int j=0;j<m_groups_count;j++)
+   for(ENUM_T_GROUP_ID group=0;group<m_groups_count;group++)
      {
       //Clear Maximum
-      MaximumNP=-9999999999999;
-      MaximumPositiveCount=-9999999999999;
+      MaximumNP=DBL_MIN;
+      MaximumPositiveCount=INT_MIN;
 
-      for(int i=0;i<m_minitr_count;i++)
+      for(ENUM_miniTR_ID tr_id=0;tr_id<m_minitr_count;tr_id++)
         {
          //MaxNP
-         if(m_arr_SUM_NP_GROUP[i][j]>MaximumNP)
+         if(m_arr_SUM_NP_GROUP[tr_id][group]>MaximumNP)
            {
             //Save Maximum NP
-            MaximumNP=m_arr_SUM_NP_GROUP[i][j];
+            MaximumNP=m_arr_SUM_NP_GROUP[tr_id][group];
 
-            //Save miniTR Index & Best NP for this GroupID
-            m_arr_minitr[j].MiniTR_ID_MaxBalance=i;
-            m_arr_minitr[j].Max_Balance=MaximumNP;
+            //Save miniTR Index & Best NP & PlusCount for this GroupID
+            m_arr_minitr[group].byMaxBal_Best_ID=tr_id;
+            m_arr_minitr[group].byMaxBal_GRP_FinalBal=MaximumNP;
+            m_arr_minitr[group].byMaxBal_GRP_PlusT_Cnt=m_arr_SUM_PositiveCount[tr_id][group];
            }
 
          //Max PositiveCount
-         if(m_arr_SUM_PositiveCount[i][j]>MaximumPositiveCount)
+         if(m_arr_SUM_PositiveCount[tr_id][group]>MaximumPositiveCount)
            {
             //Save Maximum NP
-            MaximumPositiveCount=m_arr_SUM_PositiveCount[i][j];
+            MaximumPositiveCount=m_arr_SUM_PositiveCount[tr_id][group];
 
-            //Save miniTR Index & Best NP for this GroupID
-            m_arr_minitr[j].MiniTR_ID_MaxPositiveCount=i;
-            m_arr_minitr[j].Max_PositiveCount=MaximumPositiveCount;
+            //Save miniTR Index & Best NP & PlusCount for this GroupID
+            m_arr_minitr[group].byMaxPlusCnt_Best_ID=tr_id;
+            m_arr_minitr[group].byMaxPlusCnt_GRP_PlusT_Cnt=MaximumPositiveCount;
+            m_arr_minitr[group].byMaxPlusCnt_GRP_FinalBal=m_arr_SUM_NP_GROUP[tr_id][group];
            }
 
-        }//END OF i-miniTRs Count (4+)
-     }//END OF J-GROUPS(23)
+        }//END OF miniTRs Count (230)
+     }//END OF GROUPS(23)
    Print("Find best miniTR Complete.");
   }
 //+------------------------------------------------------------------+
@@ -1252,7 +1317,20 @@ void miniTR::m_FindBestMAX_miniTR()
 void miniTR::ExportMiniTR_ToBin()
   {
 //Init filename
-   string fname="//"+AccountInfoString(ACCOUNT_SERVER)+"_"+Symbol()+"_atr";
+   string fname="";
+   string str_ohlc="";
+
+//Check if this OHLC robot?   
+   if(m_ohlc) str_ohlc="OHLC";
+   else       str_ohlc="TICK";
+
+//Format: Alpari-MT5-Demo_EURUSD00_miniTR; first 0=Day, Second 0=false=ticks;
+
+   if(m_minmax_Only) fname="//"+AccountInfoString(ACCOUNT_SERVER)+"_"+Symbol()+
+      IntegerToString(m_predict_period)+str_ohlc+"_minmax";
+
+   else   fname="//"+AccountInfoString(ACCOUNT_SERVER)+"_"+Symbol()+
+                IntegerToString(m_predict_period)+str_ohlc+"_full";
 
 //If exist, del file (Replace by new one)
    if(FileIsExist(fname,FILE_READ|FILE_WRITE|FILE_COMMON|FILE_BIN))
@@ -1335,7 +1413,7 @@ Tn    max   max   ...   n23
 
 //3  Third Header Row - Best NP  for each group   
    for(ENUM_T_GROUP_ID i=NOTRADE;i<Unknown;i++)
-      s+=DoubleToString(m_arr_minitr[i].Max_Balance,2)+SP;
+      s+=DoubleToString(m_arr_minitr[i].byMaxBal_GRP_FinalBal,2)+SP;
 
 //Next Row
    s+="\r\n";
@@ -1347,8 +1425,8 @@ Tn    max   max   ...   n23
    for(ENUM_T_GROUP_ID i=NOTRADE;i<Unknown;i++)
      {
       //Don`t Show not trade
-      if(m_arr_minitr[i].Max_Balance<2) s+=""+SP;
-      else  s+=EnumToString((ENUM_miniTR_ID)m_arr_minitr[i].MiniTR_ID_MaxBalance)+SP;
+      if(m_arr_minitr[i].byMaxBal_GRP_FinalBal<2) s+=""+SP;
+      else  s+=EnumToString((ENUM_miniTR_ID)m_arr_minitr[i].byMaxBal_Best_ID)+SP;
      }
 
 //Next Row
@@ -1369,7 +1447,7 @@ Tn    max   max   ...   n23
       for(int j=0;j<m_groups_count;j++)
         {
          //Best TR NP1 or NP4
-         mini=(ENUM_miniTR_ID)m_arr_minitr[j].MiniTR_ID_MaxBalance;
+         mini=(ENUM_miniTR_ID)m_arr_minitr[j].byMaxBal_Best_ID;
          s+=DoubleToString(m_Calc_miniTR(mini,i),2)+SP;
         }//END OF Column-Group FOR  
       //End of each ROW
@@ -4685,7 +4763,7 @@ double miniTR::m_Abs_Cmpd4_Min_pmm(const int &T_NUM)
 //--------------------------------------------------------------------
 //|   Calculate Ck signal for current Group                          |
 //-------------------------------------------------------------------- 
-ENUM_CK_SIGNALS  miniTR::CalculateCk(const STRUCT_miniTR &mtr,const ENUM_miniTR_ID &miniTRID)
+ENUM_CK_SIGNALS  miniTR::CalculateCk(const STRUCT_miniTR_params &mtr,const ENUM_miniTR_ID &miniTRID)
   {
 //Resize Arr
    ArrayResize(m_arr_rNP1,1,10);
