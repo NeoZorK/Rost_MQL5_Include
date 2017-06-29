@@ -7,11 +7,36 @@
 #property link      ""
 #property version   "1.0"
 //+------------------------------------------------------------------+
-//| Init Density Class                                               |
+//| Density Status Enum                                              |
+//+------------------------------------------------------------------+
+enum ENUM_DENSITY_STATUS
+  {
+   ClassInitialised,              //Class Initialised
+   InitReady,                     // Init Ready
+   Reseted,                       // Reset private members
+   FilledBottle3,                 // Filled Bottle 3
+   DensityReady,                  // Density Ready
+   WaitingNewTicks,               // Waiting..
+   ClassDestroyed,                // Class Destructor
+  };
+//+------------------------------------------------------------------+
+//| POM Vector ENUM                                                  |
+//+------------------------------------------------------------------+
+enum ENUM_POM_VECTOR
+  {
+   Trend=1,
+   Flat=-1,
+   NONE=0,
+  };
+//+------------------------------------------------------------------+
+//| Init Density Structure                                           |
 //+------------------------------------------------------------------+
 struct STRUCT_INIT_DENSITY
   {
-
+   ENUM_POM_VECTOR   pom_vector;              // POM Vector Trend\Flat
+   uint              ticks_bottle_size;       // One Bottle Tick Size
+   char              pom_buy;                 // POM Buy
+   char              pom_sell;                // POM Sell
   };
 //+------------------------------------------------------------------+
 //| defines                                                          |
