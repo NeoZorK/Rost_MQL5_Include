@@ -14,8 +14,9 @@ enum ENUM_DENSITY_STATUS
    ClassInitialised,              //Class Initialised
    InitReady,                     // Init Ready
    Reseted,                       // Reset private members
-   FilledBottle3,                 // Filled Bottle 3
+   FilledBottle2,                 // Filled Bottle 2
    DensityReady,                  // Density Ready
+   CalcError,                     // Error in Calculation
    WaitingNewTicks,               // Waiting..
    ClassDestroyed,                // Class Destructor
   };
@@ -34,7 +35,7 @@ enum ENUM_POM_VECTOR
 struct STRUCT_INIT_DENSITY
   {
    ENUM_POM_VECTOR   pom_vector;              // POM Vector Trend\Flat
-   uint              ticks_bottle_size;       // One Bottle Tick Size
+   int               ticks_bottle_size;       // One Bottle Tick Size
    char              pom_buy;                 // POM Buy
    char              pom_sell;                // POM Sell
   };
