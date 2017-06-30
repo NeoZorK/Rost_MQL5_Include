@@ -7,6 +7,15 @@
 #property link      ""
 #property version   "1.0"
 //+------------------------------------------------------------------+
+//| Who First                                                        |
+//+------------------------------------------------------------------+
+enum ENUM_WF
+  {
+   Equal=0,
+   LowFirst=-1,
+   HighFirst=1,
+  };
+//+------------------------------------------------------------------+
 //| Density Status Enum                                              |
 //+------------------------------------------------------------------+
 enum ENUM_DENSITY_STATUS
@@ -25,12 +34,12 @@ enum ENUM_DENSITY_STATUS
 //+------------------------------------------------------------------+
 enum ENUM_POM_VECTOR
   {
+   NONE=0,
    Trend=1,
    Flat=-1,
-   NONE=0,
   };
 //+------------------------------------------------------------------+
-//| Init Density Structure                                           |
+//| Init Density Struct                                              |
 //+------------------------------------------------------------------+
 struct STRUCT_INIT_DENSITY
   {
@@ -38,6 +47,16 @@ struct STRUCT_INIT_DENSITY
    int               ticks_bottle_size;       // One Bottle Tick Size
    char              pom_buy;                 // POM Buy
    char              pom_sell;                // POM Sell
+  };
+//+------------------------------------------------------------------+
+//| OHLC Struct                                                      |
+//+------------------------------------------------------------------+
+struct STRUCT_OHLC
+  {
+   double            Open;
+   double            High;
+   double            Low;
+   double            Close;
   };
 //+------------------------------------------------------------------+
 //| defines                                                          |
