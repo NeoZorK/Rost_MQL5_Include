@@ -39,6 +39,20 @@ enum ENUM_POM_VECTOR
    Flat=-1,
   };
 //+------------------------------------------------------------------+
+//| Result Struct                                                    |
+//+------------------------------------------------------------------+
+struct STRUCT_RESULT_DENSITY
+  {
+   double            pom0;          // Pom in  Bottle 0
+   double            pom1;          // Pom in  Bottle 1
+   double            pom2;          // Pom in  Bottle 2
+   double            y1;            // First derivative
+   double            y2;            // Second derivative
+   double            density;       // Tick Density
+   ulong             dt1;           // Delta Time Captured ticks in bottle 1
+   ulong             dt2;           // Delta Time Captured ticks in bottle 2
+  };
+//+------------------------------------------------------------------+
 //| Init Density Struct                                              |
 //+------------------------------------------------------------------+
 struct STRUCT_INIT_DENSITY
