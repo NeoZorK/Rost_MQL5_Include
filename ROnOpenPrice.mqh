@@ -1,14 +1,15 @@
 //+------------------------------------------------------------------+
 //|                                                 ROnOpenPrice.mqh |
-//|                                           Copyright 2020,NeoZorK |
-//|  Do Not Calculate Each Tick!                                     |
+//|                      Copyright 2020, \x2662 Rostyslav Shcherbyna |
+//| Do Not Calculate Each Tick, Only New Bar!                        |
 //+------------------------------------------------------------------+
-#property copyright "Copyright 2020,NeoZorK"
-#property link      ""
+#property copyright "Copyright 2020,\x2662 Rostyslav Shcherbyna"
+#property description "\x2620 ROnOpenPrice Class"
+#property description " Calculate only on New Bars  "
+#property link      "\x2620 neozork@protonmail.com"
 #property version   "1.00"
 /*
 Description: NewBar = True, OldBar = False
-
 
 1) Init to onInit()
 2) Call isNewBar() method in onTick() function before any Calculations...
