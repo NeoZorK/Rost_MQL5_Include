@@ -1,9 +1,9 @@
 //+------------------------------------------------------------------+
 //|                                                 ROnOpenPrice.mqh |
-//|                      Copyright 2020, \x2662 Rostyslav Shcherbyna |
+//|                Copyright 2020-2021 , \x2662 Rostyslav Shcherbyna |
 //| Do Not Calculate Each Tick, Only New Bar!                        |
 //+------------------------------------------------------------------+
-#property copyright "Copyright 2020,\x2662 Rostyslav Shcherbyna"
+#property copyright "Copyright 2020-2021,\x2662 Rostyslav Shcherbyna"
 #property description "\x2620 ROnOpenPrice Class"
 #property description " Calculate only on New Bars  "
 #property link      "\x2620 neozork@protonmail.com"
@@ -63,7 +63,7 @@ void ROnOpenPrice::Init(void)
 bool ROnOpenPrice::isNewBar(void)
   {
 //Latest Bar Time
-   CopyTime(_Symbol,_Period,0,1,m_arr_open_bars);
+   CopyTime(_Symbol, _Period, 0, 1, m_arr_open_bars);
 //If NEW Bar, save it time
    if(m_arr_open_bars[0]>m_new_bar_time)
      {
