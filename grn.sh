@@ -10,7 +10,7 @@
 # bash git for-each-ref --format="%(refname)" refs/original/ | xargs -n 1 git update-ref -d
 
 git filter-branch --env-filter '
-OLD_EMAIL="neozork@pm.me"
+OLD_EMAIL="neo@gmail.com"
 CORRECT_NAME="Щербина Ростислав"
 CORRECT_EMAIL="neozork@protonmail.com"
 if [ "$GIT_COMMITTER_EMAIL" = "$OLD_EMAIL" ]
