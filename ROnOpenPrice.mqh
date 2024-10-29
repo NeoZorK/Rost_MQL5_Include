@@ -33,7 +33,7 @@ public:
    void                    Init();
 
    // Check if NewBar
-   bool                    isNewBar();
+   bool                    isNewBar(const bool &UseTicks);
   };
 //+------------------------------------------------------------------+
 //|  Constructor                                                     |
@@ -53,21 +53,25 @@ ROnOpenPrice::~ROnOpenPrice()
 //+------------------------------------------------------------------+
 void ROnOpenPrice::Init(void)
   {
-   m_arr_open_bars[0]=0;
-   m_new_bar_time=0;
+   m_arr_open_bars[0] = 0;
+   m_new_bar_time = 0;
   }
 //+------------------------------------------------------------------+
 //+------------------------------------------------------------------+
 //| is New Bar ?                                                     |
 //+------------------------------------------------------------------+
-bool ROnOpenPrice::isNewBar(void)
+bool ROnOpenPrice::isNewBar(const bool &UseTicks)
   {
+// Real Ticks -> Calc Each Tick
+   if(UseTicks)
+      return true;
+
 //Latest Bar Time
    CopyTime(_Symbol, _Period, 0, 1, m_arr_open_bars);
 //If NEW Bar, save it time
-   if(m_arr_open_bars[0]>m_new_bar_time)
+   if(m_arr_open_bars[0] > m_new_bar_time)
      {
-      m_new_bar_time=m_arr_open_bars[0];
+      m_new_bar_time = m_arr_open_bars[0];
       return(true);
      }
 
