@@ -29,7 +29,6 @@ struct STRUCT_CSV_HEADER
    ENUM_TIMEFRAMES                     TF;                        // Time Frame
    string                              filename;                  // File Name
    string                              symbol;                    // Symbol
-   string                              separator;                 // Separator
    datetime                            start_datetime;            // Start DateTime
    datetime                            stop_datetime;             // Stop  DateTime
    long                                strings_count;             // Strings Count
@@ -55,15 +54,16 @@ class RExportData
   {
 private:
 
-   STRUCT_CSV_HEADER                   m_csv_header;               // CSV Header
-   STRUCT_CSV_DATA                     m_csv_data[];               // CSV Data
-   int                                 m_header_fields_count;      // Header Fields Count
-   bool                                m_header_initialised;       // Is Header Initialised
+   STRUCT_CSV_HEADER                   m_csv_header;                                // CSV Header
+   STRUCT_CSV_DATA                     m_csv_data[];                                // CSV Data
+   int                                 m_header_fields_count;                       // Header Fields Count
+   int                                 m_csv_file_handle;                           // CSV File Handle
+   bool                                m_header_initialised;                        // Is Header Initialised
+   bool                                m_csv_description_header_initialised;        // Is CSV Description Header Initialised
+   bool                                m_csv_second_header_initialised;             // Is CSV Second Header Initialised
 
-// Functions
-   bool                                m_prepare_csv_file();       // Prepare CSV File
-   void                                m_close_file();             // Close File
-   
+   // Functions
+   void                                m_prepare_csv_file();       // Prepare CSV File
 
 public:
                      RExportData();
@@ -84,6 +84,7 @@ RExportData::RExportData()
 //+------------------------------------------------------------------+
 RExportData::~RExportData()
   {
+   FileClose(m_csv_file_handle);
   }
 //+------------------------------------------------------------------+
 //+------------------------------------------------------------------+
@@ -93,6 +94,10 @@ void RExportData::Init(const STRUCT_CSV_HEADER &Init)
   {
 // Check Init Struct
    m_header_initialised = false;
+
+// Try to Close Previous File
+   if(m_csv_file_handle >= 0)
+      FileClose(m_csv_file_handle);
 
 // Check TF
    if(Init.TF == 0)
@@ -114,14 +119,6 @@ void RExportData::Init(const STRUCT_CSV_HEADER &Init)
    if(symbol_length <= 2 || symbol_length > 20)
      {
       printf(__FUNCTION__ + " Wrong Symbol length," + (string)symbol_length);
-      return;
-     }
-
-// Check Separator
-   int separator_length = StringLen(Init.separator);
-   if(separator_length <= 2 || separator_length > 1)
-     {
-      printf(__FUNCTION__ + " Wrong Separator length," + (string)separator_length);
       return;
      }
 
@@ -165,23 +162,109 @@ void RExportData::Init(const STRUCT_CSV_HEADER &Init)
 //+------------------------------------------------------------------+
 //|  Prepare CSV File                                                |
 //+------------------------------------------------------------------+
-bool RExportData::m_prepare_csv_file(void)
+void RExportData::m_prepare_csv_file(void)
   {
+// Not Initialised yet
+   m_csv_description_header_initialised = false;
 
 // Check Init
    if(m_header_initialised != true)
-      return(false);
-      
-      // Create\open File
-      
-      // Initialize File for writing
-      
-      // Write Description Header 
-      
-      // Write Fields Header
+      return;
+
+// Create\open File
+   ResetLastError();
+
+// FileName
+   string  fn = m_csv_header.filename + "_" + m_csv_header.symbol + "_" + (string)m_csv_header.TF + ".csv";
+
+// Open File
+   m_csv_file_handle = FileOpen(fn, FILE_SHARE_READ | FILE_COMMON | FILE_READ | FILE_WRITE | FILE_CSV | FILE_ANSI);
+
+// Write Description Header
+   if(m_csv_file_handle != INVALID_HANDLE)
+     {
+      FileWrite(m_csv_file_handle,
+                m_csv_header.filename,
+                "TF = " + EnumToString(m_csv_header.TF),
+                m_csv_header.symbol,
+                TimeToString(m_csv_header.start_datetime),
+                TimeToString(m_csv_header.stop_datetime),
+                "Total Strings Count: " + (string)m_csv_header.strings_count,
+                "Additional Fields Count: " + (string)m_header_fields_count
+               );
+
+      // Description Header Initialised
+      m_csv_description_header_initialised = true;
+      Print("Description Header added to CSV");
+     }
+   else
+     {
+      Print(__FUNCTION__ + " write description header to csv failed, error ", GetLastError());
+      m_csv_description_header_initialised = false;
+      return;
+     }
+
+//Second Header Not initialised yet
+   m_csv_second_header_initialised = false;
+
+// Write Fields Header
+   string fields_header = "";
+
+// Additional fields to single string
+   for(int i = 0; i < m_header_fields_count; i++)
+      fields_header += m_csv_header.arrHeader_Fields[i] + " , ";
 
 
-// Ok
-   return(true);
+// Write Second Header = Fields + Additional Fields
+   if(m_csv_file_handle != INVALID_HANDLE)
+     {
+      FileWrite(m_csv_file_handle,
+                "DateTime:",
+                "TickVolume",
+                "Open",
+                "High",
+                "Low",
+                "Close",
+                fields_header
+               );
+
+      Print("Second Header added to CSV");
+
+      // Ok
+      m_csv_second_header_initialised = true;
+     }
+   else
+     {
+      Print(__FUNCTION__ + " write second header to csv failed, error ", GetLastError());
+      m_csv_second_header_initialised = false;
+      return;
+     }
   }
+//+------------------------------------------------------------------+
+//|   Write String to CSV                                            |
+//+------------------------------------------------------------------+
+void RExportData::Write_String_To_CSV(const STRUCT_CSV_DATA &Data)
+  {
+
+// Check Init
+   if(!m_header_initialised || !m_csv_description_header_initialised || !m_csv_second_header_initialised)
+      return;
+
+// Write Single String to CSV
+
+  }
+//+------------------------------------------------------------------+
+//|   Write ALL Strings to CSV                                       |
+//+------------------------------------------------------------------+
+void RExportData::Write_ALL_Strings_To_CSV(const STRUCT_CSV_DATA &Data[])
+  {
+
+// Check Init
+   if(!m_header_initialised || !m_csv_description_header_initialised || !m_csv_second_header_initialised)
+      return;
+
+// Write ALL Strings to CSV
+
+  }
+
 //+------------------------------------------------------------------+
