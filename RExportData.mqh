@@ -63,7 +63,7 @@ private:
    bool                                m_csv_second_header_initialised;             // Is CSV Second Header Initialised
 
    // Functions
-   void                                m_prepare_csv_file();       // Prepare CSV File
+   void                                m_prepare_csv_file();                        // Prepare CSV File
 
 public:
                      RExportData();
@@ -250,8 +250,37 @@ void RExportData::Write_String_To_CSV(const STRUCT_CSV_DATA &Data)
    if(!m_header_initialised || !m_csv_description_header_initialised || !m_csv_second_header_initialised)
       return;
 
-// Write Single String to CSV
+   string end_line = "\r\n";
+   string separator = ",";
 
+// Form Additional Field
+   string additional_fields_str = "";
+
+// Check Length of Header and Data
+   if(ArraySize(Data.arrAdditionallFields) != m_header_fields_count)
+     {
+      printf(__FUNCTION__ + " Additional Fields Count " + (string)ArraySize(Data.arrAdditionallFields) + " Not Equal " + (string)m_header_fields_count);
+      return;
+     }
+
+// form Additional Fields String
+   for(int i = 0; i < m_header_fields_count; i++)
+      additional_fields_str += DoubleToString(Data.arrAdditionallFields[i], 5) + separator;
+
+
+// form Final String
+   string s = TimeToString(Data.dt) + separator +
+              (string)Data.tick_volume + separator +
+              DoubleToString(Data.open) + separator +
+              DoubleToString(Data.high) + separator +
+              DoubleToString(Data.low) + separator +
+              DoubleToString(Data.close) + separator +
+              additional_fields_str +
+              end_line;
+
+// Write Single String to CSV
+   if(m_csv_file_handle != INVALID_HANDLE)
+      FileWriteString(m_csv_file_handle, s);
   }
 //+------------------------------------------------------------------+
 //|   Write ALL Strings to CSV                                       |
@@ -266,5 +295,4 @@ void RExportData::Write_ALL_Strings_To_CSV(const STRUCT_CSV_DATA &Data[])
 // Write ALL Strings to CSV
 
   }
-
 //+------------------------------------------------------------------+
