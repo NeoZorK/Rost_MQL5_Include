@@ -63,14 +63,15 @@ private:
    bool                                m_csv_second_header_initialised;             // Is CSV Second Header Initialised
 
    // Functions
-   void                                m_prepare_csv_file();                        // Prepare CSV File
+   void                                m_Prepare_csv_file();                                            // Prepare CSV File
+   void                                m_Write_String_To_CSV(const STRUCT_CSV_DATA &Data);              // Write Single String to CSV
 
 public:
                      RExportData();
                     ~RExportData();
 
    void              Init(const STRUCT_CSV_HEADER &Init);                           // Init Export Data
-   void              Write_String_To_CSV(const STRUCT_CSV_DATA &Data);              // Write Single String to CSV
+
    void              Write_ALL_Strings_To_CSV(const STRUCT_CSV_DATA &Data[]);       // Write ALL Strings to CSV
   };
 //+------------------------------------------------------------------+
@@ -162,7 +163,7 @@ void RExportData::Init(const STRUCT_CSV_HEADER &Init)
 //+------------------------------------------------------------------+
 //|  Prepare CSV File                                                |
 //+------------------------------------------------------------------+
-void RExportData::m_prepare_csv_file(void)
+void RExportData::m_Prepare_csv_file(void)
   {
 // Not Initialised yet
    m_csv_description_header_initialised = false;
@@ -243,13 +244,8 @@ void RExportData::m_prepare_csv_file(void)
 //+------------------------------------------------------------------+
 //|   Write String to CSV                                            |
 //+------------------------------------------------------------------+
-void RExportData::Write_String_To_CSV(const STRUCT_CSV_DATA &Data)
+void RExportData::m_Write_String_To_CSV(const STRUCT_CSV_DATA &Data)
   {
-
-// Check Init
-   if(!m_header_initialised || !m_csv_description_header_initialised || !m_csv_second_header_initialised)
-      return;
-
    string end_line = "\r\n";
    string separator = ",";
 
@@ -287,12 +283,12 @@ void RExportData::Write_String_To_CSV(const STRUCT_CSV_DATA &Data)
 //+------------------------------------------------------------------+
 void RExportData::Write_ALL_Strings_To_CSV(const STRUCT_CSV_DATA &Data[])
   {
-
 // Check Init
    if(!m_header_initialised || !m_csv_description_header_initialised || !m_csv_second_header_initialised)
       return;
 
 // Write ALL Strings to CSV
-
+   for(int i = 0; i < m_csv_header.strings_count; i++)
+      m_Write_String_To_CSV(Data[i]);
   }
 //+------------------------------------------------------------------+
