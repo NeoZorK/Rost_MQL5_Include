@@ -14,20 +14,19 @@
 /*
 Singleton: Class
 
-CSV has:
-1) filename.csv
-2) header-description
-3) header of data :
-datetime, open,high,low,close, tick volume
-
+CSV:
+0) Init -> Send buffer indexes for Export:
+1) Init -> Get Indicator Name (Should be 1 chart and 1 indicator on chart)
+2) when call ExportToCSV -> connect Indicator -> copybuffer of all
+3) then export to csv (datetime + ohlcv rates + all buffers)
 */
-//+------------------------------------------------------------------+
-//|  CSV HEADER STRUCT                                               |
-//+------------------------------------------------------------------+
+
 struct STRUCT_CSV_HEADER
   {
-   string                              arrHeader_Fields[];        // Header Fields
+   int               indicator_buffer_id;          // Indicator Buffer Id
+   string            indicator_buffer_name;        // Indicator Buffer Name
   };
+
 //+------------------------------------------------------------------+
 //|  MAIN CLASS                                                      |
 //+------------------------------------------------------------------+
@@ -49,23 +48,25 @@ private:
       double                              arrAdditionallFields[];    // Fields
      };
 
-   STRUCT_CSV_HEADER                   m_csv_header;                                // CSV Header
    STRUCT_CSV_DATA                     m_csv_data[];                                // CSV Data
+   int                                 m_ind_buf_indexes[];                         // Indicator Buffer Indexes
+   string                              m_indicator_name;                            // Indicator Name
+   int                                 m_indicator_handle;                          // Indicator handle
    int                                 m_header_fields_count;                       // Header Fields Count
    int                                 m_csv_file_handle;                           // CSV File Handle
-   bool                                m_header_initialised;                        // Is Header Initialised
-   bool                                m_csv_description_header_initialised;        // Is CSV Description Header Initialised
-   bool                                m_csv_second_header_initialised;             // Is CSV Second Header Initialised
+
 
    // Functions
-   void                                m_Prepare_csv_file();                                            // Prepare CSV File
+   void                                m_Prepare_csv_file(const STRUCT_CSV_HEADER &IndBufIndexes[]);                                            // Prepare CSV File
    void                                m_Write_String_To_CSV(const STRUCT_CSV_DATA &Data);              // Write Single String to CSV
 
 public:
                      RExportData();
                     ~RExportData();
 
-   void              Init(const STRUCT_CSV_HEADER &Init);                           // Init Export Data
+   // Buffer Indexes To Export, Example: 0,3,4
+   void              Init(const STRUCT_CSV_HEADER &IndBufIndexes[]);                                                       // Init
+   void              Export_Data_To_CSV();                                                                                 // Export Data to CSV
 
    void              Write_ALL_Strings_To_CSV(const STRUCT_CSV_DATA &Data[]);       // Write ALL Strings to CSV
   };
@@ -83,39 +84,43 @@ RExportData::~RExportData()
    FileClose(m_csv_file_handle);
   }
 //+------------------------------------------------------------------+
+//|  Init                                                            |
 //+------------------------------------------------------------------+
-//|   Init                                                           |
-//+------------------------------------------------------------------+
-void RExportData::Init(const STRUCT_CSV_HEADER &Init)
+void RExportData::Init(const STRUCT_CSV_HEADER &IndBufIndexes[])
   {
-// Check Init Struct
-   m_header_initialised = false;
+   m_header_fields_count = ArraySize(IndBufIndexes);
 
-// Try to Close Previous File
-   if(m_csv_file_handle >= 0)
-      FileClose(m_csv_file_handle);
+// Get Indicator Buffer Indexes
+   if(m_header_fields_count <= 0)
+     {
+      printf(__FUNCTION__, " No Indicator Buffer Indexes selected @");
+      return;
+     }
 
-// Check Header Fields Count
-   m_header_fields_count = ArraySize(Init.arrHeader_Fields);
+   m_indicator_name = ChartIndicatorName(ChartID(), 0, 0);
+   printf("Indicator Name:" + (string)m_indicator_name);
 
-// If Everethyng Ok, Save Struct;
-   m_csv_header = Init;
+// Connect Indicator
+   m_indicator_handle =  iCustom(_Symbol, PERIOD_CURRENT, m_indicator_name);
+
+//--- if the handle is not created
+   if(m_indicator_handle == INVALID_HANDLE)
+     {
+      Print(__FUNCTION__ + " Err " + IntegerToString(GetLastError()));
+      return;
+     }
 
 // Ok
-   m_header_initialised = true;
+   printf("Ind Connected");
+
+// Prepare csv
+   m_Prepare_csv_file(IndBufIndexes);
   }
 //+------------------------------------------------------------------+
 //|  Prepare CSV File                                                |
 //+------------------------------------------------------------------+
-void RExportData::m_Prepare_csv_file(void)
+void RExportData::m_Prepare_csv_file(const STRUCT_CSV_HEADER &IndBufIndexes[])
   {
-// Not Initialised yet
-   m_csv_description_header_initialised = false;
-
-// Check Init
-   if(m_header_initialised != true)
-      return;
-
 // Create\open File
    ResetLastError();
 
@@ -131,30 +136,23 @@ void RExportData::m_Prepare_csv_file(void)
       FileWrite(m_csv_file_handle,
                 TimeToString(TimeCurrent()),
                 "TF = " + EnumToString(_Period),
-                _Symbol,
-                "Additional Fields Count: " + (string)m_header_fields_count
+                _Symbol
                );
 
-      // Description Header Initialised
-      m_csv_description_header_initialised = true;
       Print("Description Header added to CSV");
      }
    else
      {
       Print(__FUNCTION__ + " write description header to csv failed, error ", GetLastError());
-      m_csv_description_header_initialised = false;
       return;
      }
-
-//Second Header Not initialised yet
-   m_csv_second_header_initialised = false;
 
 // Write Fields Header
    string fields_header = "";
 
 // Additional fields to single string
    for(int i = 0; i < m_header_fields_count; i++)
-      fields_header += m_csv_header.arrHeader_Fields[i] + " , ";
+      fields_header += IndBufIndexes[i].indicator_buffer_name + " , ";
 
 
 // Write Second Header = Fields + Additional Fields
@@ -172,15 +170,20 @@ void RExportData::m_Prepare_csv_file(void)
 
       Print("Second Header added to CSV");
 
-      // Ok
-      m_csv_second_header_initialised = true;
      }
    else
      {
       Print(__FUNCTION__ + " write second header to csv failed, error ", GetLastError());
-      m_csv_second_header_initialised = false;
       return;
      }
+  }
+//+------------------------------------------------------------------+
+//|  Export Data To CSV                                              |
+//+------------------------------------------------------------------+
+void RExportData::Export_Data_To_CSV(void)
+  {
+  // Get Calculated Data
+
   }
 //+------------------------------------------------------------------+
 //|   Write String to CSV                                            |
@@ -224,12 +227,9 @@ void RExportData::m_Write_String_To_CSV(const STRUCT_CSV_DATA &Data)
 //+------------------------------------------------------------------+
 void RExportData::Write_ALL_Strings_To_CSV(const STRUCT_CSV_DATA &Data[])
   {
-// Check Init
-   if(!m_header_initialised || !m_csv_description_header_initialised || !m_csv_second_header_initialised)
-      return;
 
 // Write ALL Strings to CSV
-   for(int i = 0; i < m_csv_header.strings_count; i++)
-      m_Write_String_To_CSV(Data[i]);
+//  for(int i = 0; i < m_csv_header.strings_count; i++)
+//    m_Write_String_To_CSV(Data[i]);
   }
 //+------------------------------------------------------------------+
