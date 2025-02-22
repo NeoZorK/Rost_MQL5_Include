@@ -124,7 +124,7 @@ void RExportData::Init(const STRUCT_CSV_HEADER &Init)
      }
 
 // Check Start Date
-   if(Init.start_datetime <= 0 || Init.start_datetime >= TimeCurrent())
+   if(Init.start_datetime < 0 || Init.start_datetime > TimeCurrent())
      {
       printf(__FUNCTION__ + " Wrong Start Date," + (string)Init.start_datetime);
       return;
