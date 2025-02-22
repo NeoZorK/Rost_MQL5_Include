@@ -116,10 +116,6 @@ void RExportData::Init(const STRUCT_CSV_HEADER &IndBufIndexes[])
       return;
      }
 
-// Ok
-   printf("Ind Connected");
-
-
 // Fill Buffers
    ArrayResize(m_csv_ind_buffers_id, m_header_fields_count);
 
@@ -155,7 +151,7 @@ void RExportData::m_Prepare_csv_file()
                 _Symbol
                );
 
-      Print("Description Header added to CSV");
+      printf("Switched to: " + (string) _Symbol + " " + EnumToString(_Period));
      }
    else
      {
@@ -183,9 +179,6 @@ void RExportData::m_Prepare_csv_file()
                 "Close",
                 fields_header
                );
-
-      Print("Second Header added to CSV");
-
      }
    else
      {
@@ -201,13 +194,16 @@ void RExportData::Export_Data_To_CSV(void)
 // Get Calculated Data
    m_indicator_bars_calculated =  BarsCalculated(m_indicator_handle);
 
-// Not All Calculated, Exit
-   if(m_indicator_bars_calculated != Bars(_Symbol, PERIOD_CURRENT))
-     {
-      printf("Waiting Indicator Bars Calculation...");
-      return;
-     }
-
+   /*
+   // Not All Calculated, Exit
+      if(m_indicator_bars_calculated != Bars(_Symbol, PERIOD_CURRENT))
+        {
+         printf("Waiting Indicator Bars Calculation...");
+         printf("Ind bar calculated = " + (string)m_indicator_bars_calculated);
+         printf("Bars on chart  = " + (string)Bars(_Symbol, PERIOD_CURRENT));
+         return;
+        }
+   */
 // Set Size if Ind Buffers
    ArrayResize(m_indicator_buffers, m_header_fields_count);
 
@@ -220,9 +216,13 @@ void RExportData::Export_Data_To_CSV(void)
                                       m_indicator_bars_calculated,
                                       m_indicator_buffers[i].buf);
 
+      printf("Buffers copied: " + (string)i + " " + (string)m_indicator_buffers[i].copied);
+
       // Exit
       if(m_indicator_buffers[i].copied < 0)
+        {
          return;
+        }
 
       printf("Buffers copied: " + (string)i + " " + (string)m_indicator_buffers[i].copied);
      }
