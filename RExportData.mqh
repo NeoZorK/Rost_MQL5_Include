@@ -34,9 +34,13 @@ class RExportData
   {
 private:
 
-   //+------------------------------------------------------------------+
-   //|  CSV DATA STRUCT                                                 |
-   //+------------------------------------------------------------------+
+
+   struct STRUCT_IND_BUF
+     {
+      double                           buf[];                     // Buffer
+      int                              copied;                    // Copied
+     };
+
    struct STRUCT_CSV_DATA
      {
       datetime                            dt;                        // Date Time
@@ -49,15 +53,17 @@ private:
      };
 
    STRUCT_CSV_DATA                     m_csv_data[];                                // CSV Data
-   int                                 m_ind_buf_indexes[];                         // Indicator Buffer Indexes
+   STRUCT_CSV_HEADER                   m_csv_ind_buffers_id[];                      // Indicator buffers ID
+   STRUCT_IND_BUF                      m_indicator_buffers[];                       // Indicator Buffers
    string                              m_indicator_name;                            // Indicator Name
    int                                 m_indicator_handle;                          // Indicator handle
+   int                                 m_indicator_bars_calculated;                 // Indicator bars calculated
    int                                 m_header_fields_count;                       // Header Fields Count
    int                                 m_csv_file_handle;                           // CSV File Handle
 
 
    // Functions
-   void                                m_Prepare_csv_file(const STRUCT_CSV_HEADER &IndBufIndexes[]);                                            // Prepare CSV File
+   void                                m_Prepare_csv_file();                                            // Prepare CSV File
    void                                m_Write_String_To_CSV(const STRUCT_CSV_DATA &Data);              // Write Single String to CSV
 
 public:
@@ -113,13 +119,23 @@ void RExportData::Init(const STRUCT_CSV_HEADER &IndBufIndexes[])
 // Ok
    printf("Ind Connected");
 
+
+// Fill Buffers
+   ArrayResize(m_csv_ind_buffers_id, m_header_fields_count);
+
+   for(int i = 0; i < m_header_fields_count; i++)
+     {
+      m_csv_ind_buffers_id[i].indicator_buffer_id = IndBufIndexes[i].indicator_buffer_id;
+      m_csv_ind_buffers_id[i].indicator_buffer_name = IndBufIndexes[i].indicator_buffer_name;
+     }
+
 // Prepare csv
-   m_Prepare_csv_file(IndBufIndexes);
+   m_Prepare_csv_file();
   }
 //+------------------------------------------------------------------+
 //|  Prepare CSV File                                                |
 //+------------------------------------------------------------------+
-void RExportData::m_Prepare_csv_file(const STRUCT_CSV_HEADER &IndBufIndexes[])
+void RExportData::m_Prepare_csv_file()
   {
 // Create\open File
    ResetLastError();
@@ -152,7 +168,7 @@ void RExportData::m_Prepare_csv_file(const STRUCT_CSV_HEADER &IndBufIndexes[])
 
 // Additional fields to single string
    for(int i = 0; i < m_header_fields_count; i++)
-      fields_header += IndBufIndexes[i].indicator_buffer_name + " , ";
+      fields_header += m_csv_ind_buffers_id[i].indicator_buffer_name + " , ";
 
 
 // Write Second Header = Fields + Additional Fields
@@ -182,7 +198,34 @@ void RExportData::m_Prepare_csv_file(const STRUCT_CSV_HEADER &IndBufIndexes[])
 //+------------------------------------------------------------------+
 void RExportData::Export_Data_To_CSV(void)
   {
-  // Get Calculated Data
+// Get Calculated Data
+   m_indicator_bars_calculated =  BarsCalculated(m_indicator_handle);
+
+// Not All Calculated, Exit
+   if(m_indicator_bars_calculated != Bars(_Symbol, PERIOD_CURRENT))
+     {
+      printf("Waiting Indicator Bars Calculation...");
+      return;
+     }
+
+// Set Size if Ind Buffers
+   ArrayResize(m_indicator_buffers, m_header_fields_count);
+
+// Get Buffers
+   for(int i = 0; i < m_header_fields_count; i++)
+     {
+      m_indicator_buffers[i].copied = CopyBuffer(m_indicator_handle,
+                                      m_csv_ind_buffers_id[i].indicator_buffer_id,
+                                      0,
+                                      m_indicator_bars_calculated,
+                                      m_indicator_buffers[i].buf);
+
+      // Exit
+      if(m_indicator_buffers[i].copied < 0)
+         return;
+
+      printf("Buffers copied: " + (string)i + " " + (string)m_indicator_buffers[i].copied);
+     }
 
   }
 //+------------------------------------------------------------------+
