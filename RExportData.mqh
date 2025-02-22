@@ -26,26 +26,7 @@ datetime, open,high,low,close, tick volume
 //+------------------------------------------------------------------+
 struct STRUCT_CSV_HEADER
   {
-   ENUM_TIMEFRAMES                     TF;                        // Time Frame
-   string                              filename;                  // File Name
-   string                              symbol;                    // Symbol
-   datetime                            start_datetime;            // Start DateTime
-   datetime                            stop_datetime;             // Stop  DateTime
-   long                                strings_count;             // Strings Count
    string                              arrHeader_Fields[];        // Header Fields
-  };
-//+------------------------------------------------------------------+
-//|  CSV DATA STRUCT                                                 |
-//+------------------------------------------------------------------+
-struct STRUCT_CSV_DATA
-  {
-   datetime                            dt;                        // Date Time
-   long                                tick_volume;               // Tick Volume
-   double                              open;                      // Open Price
-   double                              high;                      // High Price
-   double                              low;                       // Low Price
-   double                              close;                     // Close Price
-   double                              arrAdditionallFields[];    // Fields
   };
 //+------------------------------------------------------------------+
 //|  MAIN CLASS                                                      |
@@ -53,6 +34,20 @@ struct STRUCT_CSV_DATA
 class RExportData
   {
 private:
+
+   //+------------------------------------------------------------------+
+   //|  CSV DATA STRUCT                                                 |
+   //+------------------------------------------------------------------+
+   struct STRUCT_CSV_DATA
+     {
+      datetime                            dt;                        // Date Time
+      long                                tick_volume;               // Tick Volume
+      double                              open;                      // Open Price
+      double                              high;                      // High Price
+      double                              low;                       // Low Price
+      double                              close;                     // Close Price
+      double                              arrAdditionallFields[];    // Fields
+     };
 
    STRUCT_CSV_HEADER                   m_csv_header;                                // CSV Header
    STRUCT_CSV_DATA                     m_csv_data[];                                // CSV Data
@@ -100,57 +95,6 @@ void RExportData::Init(const STRUCT_CSV_HEADER &Init)
    if(m_csv_file_handle >= 0)
       FileClose(m_csv_file_handle);
 
-// Check TF
-   if(Init.TF == 0)
-     {
-      printf(__FUNCTION__ + " TF == Current! , Exit");
-      return;
-     }
-
-// Check File Name
-   int str_length = StringLen(Init.filename);
-   if(str_length <= 5 || str_length > 50)
-     {
-      printf(__FUNCTION__ + " Wrong FileName length," + (string)str_length);
-      return;
-     }
-
-// Check Symbol
-   int symbol_length = StringLen(Init.symbol);
-   if(symbol_length <= 2 || symbol_length > 20)
-     {
-      printf(__FUNCTION__ + " Wrong Symbol length," + (string)symbol_length);
-      return;
-     }
-
-// Check Start Date
-   if(Init.start_datetime < 0 || Init.start_datetime > TimeCurrent())
-     {
-      printf(__FUNCTION__ + " Wrong Start Date," + (string)Init.start_datetime);
-      return;
-     }
-
-// Check Stop Date
-   if(Init.stop_datetime <= 0)
-     {
-      printf(__FUNCTION__ + " Wrong Stop Date," + (string)Init.stop_datetime);
-      return;
-     }
-
-// Check Start > Stop Date
-   if(Init.stop_datetime >= Init.start_datetime)
-     {
-      printf(__FUNCTION__ + " Wrong Start Date: " + (string)Init.start_datetime + " OR Stop Date: " + (string)Init.stop_datetime);
-      return;
-     }
-
-// Check Strings Count, must be > 0
-   if(Init.strings_count <= 0)
-     {
-      printf(__FUNCTION__ + " Wrong Strings Count," + (string)Init.strings_count);
-      return;
-     }
-
 // Check Header Fields Count
    m_header_fields_count = ArraySize(Init.arrHeader_Fields);
 
@@ -176,7 +120,7 @@ void RExportData::m_Prepare_csv_file(void)
    ResetLastError();
 
 // FileName
-   string  fn = m_csv_header.filename + "_" + m_csv_header.symbol + "_" + (string)m_csv_header.TF + ".csv";
+   string  fn = "CSVExport" + "_" + _Symbol + "_" + EnumToString(_Period) + ".csv";
 
 // Open File
    m_csv_file_handle = FileOpen(fn, FILE_SHARE_READ | FILE_COMMON | FILE_READ | FILE_WRITE | FILE_CSV | FILE_ANSI);
@@ -185,12 +129,9 @@ void RExportData::m_Prepare_csv_file(void)
    if(m_csv_file_handle != INVALID_HANDLE)
      {
       FileWrite(m_csv_file_handle,
-                m_csv_header.filename,
-                "TF = " + EnumToString(m_csv_header.TF),
-                m_csv_header.symbol,
-                TimeToString(m_csv_header.start_datetime),
-                TimeToString(m_csv_header.stop_datetime),
-                "Total Strings Count: " + (string)m_csv_header.strings_count,
+                TimeToString(TimeCurrent()),
+                "TF = " + EnumToString(_Period),
+                _Symbol,
                 "Additional Fields Count: " + (string)m_header_fields_count
                );
 
