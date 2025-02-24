@@ -9,8 +9,6 @@
 #property link      "\x2620 neozork@protonmail.com"
 #property version   "1.00"
 //
-//
-//
 /*
 Singleton: Class
 
@@ -20,13 +18,12 @@ CSV:
 2) when call ExportToCSV -> connect Indicator -> copybuffer of all
 3) then export to csv (datetime + ohlcv rates + all buffers)
 */
-
+//
 struct STRUCT_CSV_HEADER
   {
    int               indicator_buffer_id;          // Indicator Buffer Id
    string            indicator_buffer_name;        // Indicator Buffer Name
   };
-
 //+------------------------------------------------------------------+
 //|  MAIN CLASS                                                      |
 //+------------------------------------------------------------------+
@@ -34,25 +31,13 @@ class RExportData
   {
 private:
 
-
+   // Indicator Buffer number + count of copied data
    struct STRUCT_IND_BUF
      {
       double                           buf[];                     // Buffer
       int                              copied;                    // Copied
      };
 
-   struct STRUCT_CSV_DATA
-     {
-      datetime                            dt;                        // Date Time
-      long                                tick_volume;               // Tick Volume
-      double                              open;                      // Open Price
-      double                              high;                      // High Price
-      double                              low;                       // Low Price
-      double                              close;                     // Close Price
-      double                              arrAdditionallFields[];    // Fields
-     };
-
-   STRUCT_CSV_DATA                     m_csv_data[];                                // CSV Data
    STRUCT_CSV_HEADER                   m_csv_ind_buffers_id[];                      // Indicator buffers ID
    STRUCT_IND_BUF                      m_indicator_buffers[];                       // Indicator Buffers
    string                              m_indicator_name;                            // Indicator Name
@@ -63,8 +48,6 @@ private:
 
    // Flag to check if Already Exported data to csv
    bool                                m_already_exported_csv;                      // Already Exported CSV
-
-
 
    // Functions
    void                                m_Prepare_csv_file();                                            // Prepare CSV File
@@ -77,8 +60,6 @@ public:
    // Buffer Indexes To Export, Example: 0,3,4
    void              Init(const STRUCT_CSV_HEADER &IndBufIndexes[]);                                                       // Init
    void              Export_Data_To_CSV();                                                                                 // Export Data to CSV
-
-   void              Write_ALL_Strings_To_CSV(const STRUCT_CSV_DATA &Data[]);       // Write ALL Strings to CSV
   };
 //+------------------------------------------------------------------+
 //|  Constructor                                                     |
@@ -93,6 +74,7 @@ RExportData::RExportData()
 //+------------------------------------------------------------------+
 RExportData::~RExportData()
   {
+// Closing Files on Exit
    FileClose(m_csv_file_handle);
   }
 //+------------------------------------------------------------------+
@@ -174,14 +156,13 @@ void RExportData::m_Prepare_csv_file()
 
 // Additional fields to single string
    for(int i = 0; i < m_header_fields_count; i++)
-      fields_header += m_csv_ind_buffers_id[i].indicator_buffer_name + " , ";
-
+      fields_header += m_csv_ind_buffers_id[i].indicator_buffer_name;
 
 // Write Second Header = Fields + Additional Fields
    if(m_csv_file_handle != INVALID_HANDLE)
      {
       FileWrite(m_csv_file_handle,
-                "DateTime:",
+                "DateTime",
                 "TickVolume",
                 "Open",
                 "High",
@@ -208,16 +189,6 @@ void RExportData::Export_Data_To_CSV(void)
 // Get Calculated Data
    m_indicator_bars_calculated =  BarsCalculated(m_indicator_handle);
 
-   /*
-   // Not All Calculated, Exit
-      if(m_indicator_bars_calculated != Bars(_Symbol, PERIOD_CURRENT))
-        {
-         printf("Waiting Indicator Bars Calculation...");
-         printf("Ind bar calculated = " + (string)m_indicator_bars_calculated);
-         printf("Bars on chart  = " + (string)Bars(_Symbol, PERIOD_CURRENT));
-         return;
-        }
-   */
 // Set Size if Ind Buffers
    ArrayResize(m_indicator_buffers, m_header_fields_count);
 
@@ -293,15 +264,5 @@ void RExportData::m_Write_String_To_CSV()
       // Exit
       return;
      }
-  }
-//+------------------------------------------------------------------+
-//|   Write ALL Strings to CSV                                       |
-//+------------------------------------------------------------------+
-void RExportData::Write_ALL_Strings_To_CSV(const STRUCT_CSV_DATA &Data[])
-  {
-
-// Write ALL Strings to CSV
-//  for(int i = 0; i < m_csv_header.strings_count; i++)
-//    m_Write_String_To_CSV(Data[i]);
   }
 //+------------------------------------------------------------------+
