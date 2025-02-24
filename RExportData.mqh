@@ -38,6 +38,10 @@ private:
       int                              copied;                    // Copied
      };
 
+   // line strings
+   string                              m_end_line_str;                              // End Line string
+   string                              m_separator_str;                             // Field Separator string
+
    STRUCT_CSV_HEADER                   m_csv_ind_buffers_id[];                      // Indicator buffers ID
    STRUCT_IND_BUF                      m_indicator_buffers[];                       // Indicator Buffers
    string                              m_indicator_name;                            // Indicator Name
@@ -45,6 +49,8 @@ private:
    int                                 m_indicator_bars_calculated;                 // Indicator bars calculated
    int                                 m_header_fields_count;                       // Header Fields Count
    int                                 m_csv_file_handle;                           // CSV File Handle
+
+
 
    // Flag to check if Already Exported data to csv
    bool                                m_already_exported_csv;                      // Already Exported CSV
@@ -68,6 +74,8 @@ RExportData::RExportData()
   {
 // Reset Bool Flag
    m_already_exported_csv = false;
+   m_end_line_str = "\r\n";
+   m_separator_str = ",";
   }
 //+------------------------------------------------------------------+
 //|  Destructor                                                      |
@@ -96,7 +104,7 @@ void RExportData::Init(const STRUCT_CSV_HEADER &IndBufIndexes[])
      }
 
    m_indicator_name = ChartIndicatorName(ChartID(), 0, 0);
-   printf("Export Data to CSV From -> Indicator Name:" + (string)m_indicator_name);
+   printf("Export Data to CSV From -> Indicator Name:" + (string)m_indicator_name + " to COMMON Folder");
 
 // Connect Indicator
    m_indicator_handle =  iCustom(_Symbol, PERIOD_CURRENT, m_indicator_name);
@@ -156,18 +164,18 @@ void RExportData::m_Prepare_csv_file()
 
 // Additional fields to single string
    for(int i = 0; i < m_header_fields_count; i++)
-      fields_header += m_csv_ind_buffers_id[i].indicator_buffer_name;
+      fields_header += m_csv_ind_buffers_id[i].indicator_buffer_name + m_separator_str;
 
 // Write Second Header = Fields + Additional Fields
    if(m_csv_file_handle != INVALID_HANDLE)
      {
       FileWrite(m_csv_file_handle,
-                "DateTime",
-                "TickVolume",
-                "Open",
-                "High",
-                "Low",
-                "Close",
+                "DateTime" + m_separator_str,
+                "TickVolume" + m_separator_str,
+                "Open" + m_separator_str,
+                "High" + m_separator_str,
+                "Low" + m_separator_str,
+                "Close" + m_separator_str,
                 fields_header
                );
      }
@@ -218,16 +226,15 @@ void RExportData::Export_Data_To_CSV(void)
 //+------------------------------------------------------------------+
 void RExportData::m_Write_String_To_CSV()
   {
-   string end_line = "\r\n";
-   string separator = ",";
-
 // Form Additional Field
    string additional_fields_str = "";
 
+// Save Start Time
+   ulong start_time = GetMicrosecondCount();
 
 // form Additional Fields String
    for(int i = 0; i < m_header_fields_count; i++)
-      additional_fields_str += DoubleToString(m_indicator_buffers[i].buf[0], 5) + separator;
+      additional_fields_str += DoubleToString(m_indicator_buffers[i].buf[0], 5) + m_separator_str;
 
 // Get MQL Rates
    MqlRates rates[];
@@ -239,17 +246,17 @@ void RExportData::m_Write_String_To_CSV()
    if(copied <= 0)
       Print("Error copying price data ", GetLastError());
    else
-      Print("Additionally Rates Copied ", ArraySize(rates), " bars");
+      Print("Additionally DateOHLCV Rates Copied: ", ArraySize(rates), " bars");
 
 // Form Final String
-   string s = TimeToString(rates[0].time) + separator +
-              (string)rates[0].tick_volume + separator +
-              DoubleToString(rates[0].open) + separator +
-              DoubleToString(rates[0].high) + separator +
-              DoubleToString(rates[0].low) + separator +
-              DoubleToString(rates[0].close) + separator +
+   string s = TimeToString(rates[0].time) + m_separator_str +
+              (string)rates[0].tick_volume + m_separator_str +
+              DoubleToString(rates[0].open) + m_separator_str +
+              DoubleToString(rates[0].high) + m_separator_str +
+              DoubleToString(rates[0].low) + m_separator_str +
+              DoubleToString(rates[0].close) + m_separator_str +
               additional_fields_str +
-              end_line;
+              m_end_line_str;
 
 // Write Single String to CSV
    if(m_csv_file_handle != INVALID_HANDLE)
@@ -260,6 +267,12 @@ void RExportData::m_Write_String_To_CSV()
 
       // Set Flag, CSV Already Exported
       m_already_exported_csv = true;
+
+      // Save Stop Time
+      ulong stop_time = GetMicrosecondCount();
+
+      // Total Time for Export to CSV
+      printf("Total Time for Export Indicators data to CSV: " + DoubleToString((stop_time - start_time) / 1000.0, 2) + " msec");
 
       // Exit
       return;
