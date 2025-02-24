@@ -68,7 +68,7 @@ private:
 
    // Functions
    void                                m_Prepare_csv_file();                                            // Prepare CSV File
-   void                                m_Write_String_To_CSV(const STRUCT_CSV_DATA &Data);              // Write Single String to CSV
+   void                                m_Write_String_To_CSV();                                         // Write Single String to CSV
 
 public:
                      RExportData();
@@ -245,7 +245,7 @@ void RExportData::Export_Data_To_CSV(void)
 //+------------------------------------------------------------------+
 //|   Write String to CSV                                            |
 //+------------------------------------------------------------------+
-void RExportData::m_Write_String_To_CSV(const STRUCT_CSV_DATA &Data)
+void RExportData::m_Write_String_To_CSV()
   {
    string end_line = "\r\n";
    string separator = ",";
@@ -253,34 +253,46 @@ void RExportData::m_Write_String_To_CSV(const STRUCT_CSV_DATA &Data)
 // Form Additional Field
    string additional_fields_str = "";
 
-// Check Length of Header and Data
-   if(ArraySize(Data.arrAdditionallFields) != m_header_fields_count)
-     {
-      printf(__FUNCTION__ + " Additional Fields Count " + (string)ArraySize(Data.arrAdditionallFields) + " Not Equal " + (string)m_header_fields_count);
-      return;
-     }
 
 // form Additional Fields String
    for(int i = 0; i < m_header_fields_count; i++)
-      additional_fields_str += DoubleToString(Data.arrAdditionallFields[i], 5) + separator;
+      additional_fields_str += DoubleToString(m_indicator_buffers[i].buf[0], 5) + separator;
 
+// Get MQL Rates
+   MqlRates rates[];
 
-// form Final String
-   string s = TimeToString(Data.dt) + separator +
-              (string)Data.tick_volume + separator +
-              DoubleToString(Data.open) + separator +
-              DoubleToString(Data.high) + separator +
-              DoubleToString(Data.low) + separator +
-              DoubleToString(Data.close) + separator +
+// Copy All Rates from 1970 to Now
+   int copied = CopyRates(_Symbol, PERIOD_CURRENT, 0, m_indicator_bars_calculated, rates);
+
+// Debug
+   if(copied <= 0)
+      Print("Error copying price data ", GetLastError());
+   else
+      Print("Copied ", ArraySize(rates), " bars");
+
+// Form Final String
+   string s = TimeToString(rates[0].time) + separator +
+              (string)rates[0].tick_volume + separator +
+              DoubleToString(rates[0].open) + separator +
+              DoubleToString(rates[0].high) + separator +
+              DoubleToString(rates[0].low) + separator +
+              DoubleToString(rates[0].close) + separator +
               additional_fields_str +
               end_line;
 
 // Write Single String to CSV
    if(m_csv_file_handle != INVALID_HANDLE)
+     {
       FileWriteString(m_csv_file_handle, s);
+      FileFlush(m_csv_file_handle);
+      FileClose(m_csv_file_handle);
 
-// Set Flag, CSV Already Exported
-   m_already_exported_csv = true;
+      // Set Flag, CSV Already Exported
+      m_already_exported_csv = true;
+
+      // Exit
+      return;
+     }
   }
 //+------------------------------------------------------------------+
 //|   Write ALL Strings to CSV                                       |
