@@ -224,9 +224,6 @@ void RExportData::Export_Data_To_CSV(void)
 //+------------------------------------------------------------------+
 void RExportData::m_Write_String_To_CSV()
   {
-// Form Additional Field
-   string additional_fields_str = "";
-
 // Save Start Time
    ulong start_time = GetMicrosecondCount();
 
@@ -255,11 +252,14 @@ void RExportData::m_Write_String_To_CSV()
      }
 
 // Save Datat to disk Each 128 iteration
-   int flush_kokef = 127;
+   int flush_koef = 127;
 
 // Export All Data
    for(int i = 0; i < copied; i++)
      {
+      // Form Additional Field
+      string additional_fields_str = "";
+
       // form Additional Fields String
       for(int x = 0; x < m_header_fields_count; x++)
          additional_fields_str += DoubleToString(m_indicator_buffers[x].buf[i], 5) + m_separator_str;
@@ -278,7 +278,7 @@ void RExportData::m_Write_String_To_CSV()
       FileWriteString(m_csv_file_handle, s);
 
       // Flush Data to Disk each z
-      if((i & flush_kokef) == flush_kokef)
+      if((i & flush_koef) == flush_koef)
          FileFlush(m_csv_file_handle);
      }//END OF FOR
 
