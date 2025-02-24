@@ -96,7 +96,7 @@ void RExportData::Init(const STRUCT_CSV_HEADER &IndBufIndexes[])
      }
 
    m_indicator_name = ChartIndicatorName(ChartID(), 0, 0);
-   printf("Indicator Name:" + (string)m_indicator_name);
+   printf("Export Data to CSV From -> Indicator Name:" + (string)m_indicator_name);
 
 // Connect Indicator
    m_indicator_handle =  iCustom(_Symbol, PERIOD_CURRENT, m_indicator_name);
@@ -207,7 +207,7 @@ void RExportData::Export_Data_To_CSV(void)
          return;
         }
 
-      printf("Buffers copied: " + (string)i + " " + (string)m_indicator_buffers[i].copied);
+      printf("Indictor Data from Buffer Number : " + (string)i + " copied: " + (string)m_indicator_buffers[i].copied);
      }//END OF FOR
 
 // Write indicator data to CSV
@@ -239,7 +239,7 @@ void RExportData::m_Write_String_To_CSV()
    if(copied <= 0)
       Print("Error copying price data ", GetLastError());
    else
-      Print("Copied ", ArraySize(rates), " bars");
+      Print("Additionally Rates Copied ", ArraySize(rates), " bars");
 
 // Form Final String
    string s = TimeToString(rates[0].time) + separator +
