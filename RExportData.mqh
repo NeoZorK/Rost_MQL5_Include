@@ -251,8 +251,8 @@ void RExportData::m_Write_String_To_CSV()
       return;
      }
 
-// Save Datat to disk Each 128 iteration
-   int flush_koef = 127;
+// Save Datat to disk Each 1024 iteration
+   int flush_koef = 1024;
 
 // Export All Data
    for(int i = 0; i < copied; i++)
@@ -277,7 +277,7 @@ void RExportData::m_Write_String_To_CSV()
       // Write Single String to CSV
       FileWriteString(m_csv_file_handle, s);
 
-      // Flush Data to Disk each z
+      // Flush Data to Disk each flush_koef
       if((i & flush_koef) == flush_koef)
          FileFlush(m_csv_file_handle);
      }//END OF FOR
