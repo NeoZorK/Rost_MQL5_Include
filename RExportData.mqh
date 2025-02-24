@@ -50,22 +50,20 @@ private:
    int                                 m_header_fields_count;                       // Header Fields Count
    int                                 m_csv_file_handle;                           // CSV File Handle
 
-
-
    // Flag to check if Already Exported data to csv
    bool                                m_already_exported_csv;                      // Already Exported CSV
 
    // Functions
-   void                                m_Prepare_csv_file();                                            // Prepare CSV File
-   void                                m_Write_String_To_CSV();                                         // Write Single String to CSV
+   void                                m_Prepare_csv_file();                        // Prepare CSV File
+   void                                m_Write_String_To_CSV();                     // Write Single String to CSV
 
 public:
                      RExportData();
                     ~RExportData();
 
    // Buffer Indexes To Export, Example: 0,3,4
-   void              Init(const STRUCT_CSV_HEADER &IndBufIndexes[]);                                                       // Init
-   void              Export_Data_To_CSV();                                                                                 // Export Data to CSV
+   void              Init(const STRUCT_CSV_HEADER &IndBufIndexes[]);                // Init
+   void              Export_Data_To_CSV();                                          // Export Data to CSV
   };
 //+------------------------------------------------------------------+
 //|  Constructor                                                     |
@@ -232,10 +230,6 @@ void RExportData::m_Write_String_To_CSV()
 // Save Start Time
    ulong start_time = GetMicrosecondCount();
 
-// form Additional Fields String
-   for(int i = 0; i < m_header_fields_count; i++)
-      additional_fields_str += DoubleToString(m_indicator_buffers[i].buf[0], 5) + m_separator_str;
-
 // Get MQL Rates
    MqlRates rates[];
 
@@ -244,38 +238,44 @@ void RExportData::m_Write_String_To_CSV()
 
 // Debug
    if(copied <= 0)
+     {
       Print("Error copying price data ", GetLastError());
+      return;
+     }
    else
       Print("Additionally DateOHLCV Rates Copied: ", ArraySize(rates), " bars");
 
-// Form Final String
-   string s = TimeToString(rates[0].time) + m_separator_str +
-              (string)rates[0].tick_volume + m_separator_str +
-              DoubleToString(rates[0].open) + m_separator_str +
-              DoubleToString(rates[0].high) + m_separator_str +
-              DoubleToString(rates[0].low) + m_separator_str +
-              DoubleToString(rates[0].close) + m_separator_str +
-              additional_fields_str +
-              m_end_line_str;
-
-// Write Single String to CSV
-   if(m_csv_file_handle != INVALID_HANDLE)
+// Export All Data
+   for(int i = 0; i < copied; i++)
      {
+      // form Additional Fields String
+      for(int x = 0; x < m_header_fields_count; x++)
+         additional_fields_str += DoubleToString(m_indicator_buffers[x].buf[i], 5) + m_separator_str;
+
+      // Form Final String
+      string s = TimeToString(rates[i].time) + m_separator_str +
+                 (string)rates[i].tick_volume + m_separator_str +
+                 DoubleToString(rates[i].open) + m_separator_str +
+                 DoubleToString(rates[i].high) + m_separator_str +
+                 DoubleToString(rates[i].low) + m_separator_str +
+                 DoubleToString(rates[i].close) + m_separator_str +
+                 additional_fields_str +
+                 m_end_line_str;
+
+      // Write Single String to CSV
       FileWriteString(m_csv_file_handle, s);
-      FileFlush(m_csv_file_handle);
-      FileClose(m_csv_file_handle);
+     }//END OF FOR
 
-      // Set Flag, CSV Already Exported
-      m_already_exported_csv = true;
+// Close File
+   FileClose(m_csv_file_handle);
 
-      // Save Stop Time
-      ulong stop_time = GetMicrosecondCount();
+// Set Flag, CSV Already Exported
+   m_already_exported_csv = true;
 
-      // Total Time for Export to CSV
-      printf("Total Time for Export Indicators data to CSV: " + DoubleToString((stop_time - start_time) / 1000.0, 2) + " msec");
+// Save Stop Time
+   ulong stop_time = GetMicrosecondCount();
 
-      // Exit
-      return;
-     }
+// Total Time for Export to CSV
+   printf("Total Time for Export Indicators data to CSV: " + DoubleToString((stop_time - start_time) / 1000.0, 2) + " msec");
   }
 //+------------------------------------------------------------------+
