@@ -245,6 +245,18 @@ void RExportData::m_Write_String_To_CSV()
    else
       Print("Additionally DateOHLCV Rates Copied: ", ArraySize(rates), " bars");
 
+// Check File Handle
+   if(m_csv_file_handle == INVALID_HANDLE)
+     {
+      Print(__FUNCTION__ + " err wrong csv file name");
+
+      // Exit
+      return;
+     }
+
+// Save Datat to disk Each 128 iteration
+   int flush_kokef = 127;
+
 // Export All Data
    for(int i = 0; i < copied; i++)
      {
@@ -264,6 +276,10 @@ void RExportData::m_Write_String_To_CSV()
 
       // Write Single String to CSV
       FileWriteString(m_csv_file_handle, s);
+
+      // Flush Data to Disk each z
+      if((i & flush_kokef) == flush_kokef)
+         FileFlush(m_csv_file_handle);
      }//END OF FOR
 
 // Close File
