@@ -61,6 +61,10 @@ private:
    int                                 m_header_fields_count;                       // Header Fields Count
    int                                 m_csv_file_handle;                           // CSV File Handle
 
+   // Flag to check if Already Exported data to csv
+   bool                                m_already_exported_csv;                      // Already Exported CSV
+
+
 
    // Functions
    void                                m_Prepare_csv_file();                                            // Prepare CSV File
@@ -81,6 +85,8 @@ public:
 //+------------------------------------------------------------------+
 RExportData::RExportData()
   {
+// Reset Bool Flag
+   m_already_exported_csv = false;
   }
 //+------------------------------------------------------------------+
 //|  Destructor                                                      |
@@ -94,6 +100,10 @@ RExportData::~RExportData()
 //+------------------------------------------------------------------+
 void RExportData::Init(const STRUCT_CSV_HEADER &IndBufIndexes[])
   {
+// Reset Flag Already exported to CSV
+   m_already_exported_csv = false;
+
+// Save Size of Additional fields from Indicator
    m_header_fields_count = ArraySize(IndBufIndexes);
 
 // Get Indicator Buffer Indexes
@@ -191,6 +201,10 @@ void RExportData::m_Prepare_csv_file()
 //+------------------------------------------------------------------+
 void RExportData::Export_Data_To_CSV(void)
   {
+// Check if CSV Already Exported
+   if(m_already_exported_csv == true)
+      return;
+
 // Get Calculated Data
    m_indicator_bars_calculated =  BarsCalculated(m_indicator_handle);
 
@@ -216,17 +230,17 @@ void RExportData::Export_Data_To_CSV(void)
                                       m_indicator_bars_calculated,
                                       m_indicator_buffers[i].buf);
 
-      printf("Buffers copied: " + (string)i + " " + (string)m_indicator_buffers[i].copied);
-
-      // Exit
+      // No copied, Exit
       if(m_indicator_buffers[i].copied < 0)
         {
          return;
         }
 
       printf("Buffers copied: " + (string)i + " " + (string)m_indicator_buffers[i].copied);
-     }
+     }//END OF FOR
 
+// Write indicator data to CSV
+   m_Write_String_To_CSV();
   }
 //+------------------------------------------------------------------+
 //|   Write String to CSV                                            |
@@ -264,6 +278,9 @@ void RExportData::m_Write_String_To_CSV(const STRUCT_CSV_DATA &Data)
 // Write Single String to CSV
    if(m_csv_file_handle != INVALID_HANDLE)
       FileWriteString(m_csv_file_handle, s);
+
+// Set Flag, CSV Already Exported
+   m_already_exported_csv = true;
   }
 //+------------------------------------------------------------------+
 //|   Write ALL Strings to CSV                                       |
