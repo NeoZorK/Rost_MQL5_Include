@@ -252,7 +252,9 @@ void RExportData::m_Write_String_To_CSV()
      }
 
 // Save Datat to disk Each 1024 iteration
-   int flush_koef = 1024;
+   int flush_koef = 127;
+
+   printf("Waiting Indicator...");
 
 // Export All Data
    for(int i = 0; i < copied; i++)
