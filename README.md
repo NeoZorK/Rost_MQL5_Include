@@ -1,20 +1,20 @@
-# Rost_MQL5_Include
+# 🚀 Rost_MQL5_Include
 
 A comprehensive collection of MQL5 include files for MetaTrader 5 Expert Advisors and Indicators, providing advanced trading functionality, position management, risk control, and technical analysis tools.
 
-## About Me
+## 👨‍💻 About Me
 
 **NeoZorK** (Rostyslav Shcherbyna) is a professional MQL5 developer with extensive experience in algorithmic trading and financial markets. Specializing in creating robust, efficient, and feature-rich trading systems for MetaTrader 5 platform.
 
-[LinkedIn Profile](https://www.linkedin.com/in/rostyslav-sh-) - Connect with me for professional networking and collaboration opportunities in algorithmic trading development.
+🔗 [LinkedIn Profile](https://www.linkedin.com/in/rostyslav-sh-) - Connect with me for professional networking and collaboration opportunities in algorithmic trading development.
 
-## Overview
+## 📋 Overview
 
 This repository contains a comprehensive set of MQL5 include files designed to work with `SCHR_Global.mq5` Expert Advisor. These include files provide modular, reusable functionality for various trading operations, making it easy to build sophisticated trading systems.
 
-## Include Files Functionality
+## ⚙️ Include Files Functionality
 
-### Core Position Management
+### 🎯 Core Position Management
 
 #### `RPositions.mqh` - Advanced Position Management
 - **Universal position handling** for both Netting and Hedging accounts
