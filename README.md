@@ -363,3 +363,13 @@ This software is for educational and research purposes. Trading involves substan
 **Last Updated:** 2025
 
 ⚠️ **Warning:** Trading on financial markets involves high risks. Use these experts at your own risk.
+
+---
+
+## 💝 Support the Project
+
+If you find this library helpful and would like to support its development, consider making a donation:
+
+**Bitcoin (BTC):** `bc1qm0ynz8tk2em3zr8agv5j3550vpm420z3hxdfkq`
+
+Your support helps maintain and improve this open-source project! 🚀
