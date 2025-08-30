@@ -2,6 +2,34 @@
 
 A comprehensive collection of MQL5 include files for MetaTrader 5 Expert Advisors and Indicators, providing advanced trading functionality, position management, risk control, and technical analysis tools.
 
+---
+
+## 💝 Support the Project
+
+If you find this library helpful and would like to support its development, consider making a donation:
+
+### Bitcoin (BTC)
+**Wallet Address**: `bc1qm0ynz8tk2em3zr8agv5j3550vpm420z3hxdfkq`
+
+[![Bitcoin](https://img.shields.io/badge/Bitcoin-Donate-orange.svg?style=flat&logo=bitcoin)](bitcoin:bc1qm0ynz8tk2em3zr8agv5j3550vpm420z3hxdfkq)
+
+> 💡 **QR Code**: Scan the QR code below or copy the wallet address above to send your donation.
+
+<div align="center">
+
+![Bitcoin QR Code](https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=bc1qm0ynz8tk2em3zr8agv5j3550vpm420z3hxdfkq)
+
+</div>
+
+### Why Support?
+- 🚀 **Continuous Development**: Help fund new features and improvements
+- 🐛 **Bug Fixes**: Support faster bug resolution and updates
+- 📚 **Documentation**: Better documentation and tutorials
+- 💡 **New Features**: Development of additional trading tools
+- 🌟 **Community**: Help grow the MQL5 trading community
+
+---
+
 ## 👨‍💻 About Me
 
 **NeoZorK** (Rostyslav Shcherbyna) is a professional MQL5 developer with extensive experience in algorithmic trading and financial markets. Specializing in creating robust, efficient, and feature-rich trading systems for MetaTrader 5 platform.
@@ -366,10 +394,4 @@ This software is for educational and research purposes. Trading involves substan
 
 ---
 
-## 💝 Support the Project
 
-If you find this library helpful and would like to support its development, consider making a donation:
-
-**Bitcoin (BTC):** `bc1qm0ynz8tk2em3zr8agv5j3550vpm420z3hxdfkq`
-
-Your support helps maintain and improve this open-source project! 🚀
