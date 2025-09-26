@@ -6,11 +6,17 @@
 #property copyright "Copyright 2025,\x2662 Rostyslav Shcherbyna"
 #property description "\x2620 RExportData Class"
 #property description " Exports Data to CSV "
+#property description " !!! It exports Indicators Data only with Default INPUT !!!"
+#property description " if you want export specific input parameters -> change DEFAULT INPUT! "
 #property link      "\x2620 neozork@protonmail.com"
 #property version   "1.00"
 //
 /*
 Singleton: Class
+
+
+!!! It exports Indicators Data only with Default INPUT !!!
+if you want export specific input parameters -> change DEFAULT INPUT!
 
 CSV:
 0) Init -> Send buffer indexes for Export:
@@ -62,7 +68,7 @@ public:
                     ~RExportData();
 
    // Buffer Indexes To Export, Example: 0,3,4
-   void              Init(const STRUCT_CSV_HEADER &IndBufIndexes[]);                // Init
+   void              Init(const STRUCT_CSV_HEADER &IndBufIndexes[],const string &ind_name); // Init
    void              Export_Data_To_CSV();                                          // Export Data to CSV
   };
 //+------------------------------------------------------------------+
@@ -86,8 +92,11 @@ RExportData::~RExportData()
 //+------------------------------------------------------------------+
 //|  Init                                                            |
 //+------------------------------------------------------------------+
-void RExportData::Init(const STRUCT_CSV_HEADER &IndBufIndexes[])
+void RExportData::Init(const STRUCT_CSV_HEADER &IndBufIndexes[],const string &ind_name)
   {
+// Get name without extension
+   m_indicator_name = GetFileNameWithoutExtension(ind_name);
+
 // Reset Flag Already exported to CSV
    m_already_exported_csv = false;
 
@@ -101,7 +110,7 @@ void RExportData::Init(const STRUCT_CSV_HEADER &IndBufIndexes[])
       return;
      }
 
-   m_indicator_name = ChartIndicatorName(ChartID(), 0, 0);
+// m_indicator_name = ChartIndicatorName(ChartID(), 0, 0);
    printf("Export Data to CSV From -> Indicator Name:" + (string)m_indicator_name + " to COMMON Folder");
 
 // Connect Indicator
@@ -296,4 +305,25 @@ void RExportData::m_Write_String_To_CSV()
 // Total Time for Export to CSV
    printf("Total Time for Export Indicators data to CSV: " + DoubleToString((stop_time - start_time) / 1000.0, 2) + " msec");
   }
+//+------------------------------------------------------------------+
+//| Function to extract file name without extension                  |
+//| from a full string (e.g., "SCHR_Wave.mq5" -> "SCHR_Wave")        |
+//+------------------------------------------------------------------+
+string GetFileNameWithoutExtension(string full_file_name)
+  {
+// Search for the position of the last dot in the string
+   int dot_position = StringFind(full_file_name, ".mq5",0);
+
+// If a dot is found and it's not the first character
+   if(dot_position > 0)
+     {
+      // Extract the substring from the beginning up to the dot position
+      // StringSubstr(string_source, start_position, length)
+      return StringSubstr(full_file_name, 0, dot_position);
+     }
+
+// If no dot is found (or it's an invalid name), return the original string
+   return full_file_name;
+  }
+//+------------------------------------------------------------------+
 //+------------------------------------------------------------------+
